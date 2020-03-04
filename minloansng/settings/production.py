@@ -119,10 +119,10 @@ WSGI_APPLICATION = 'minloansng.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'd6k5ve5k7970gs',
-        'USER': 'dwvbhvsnamxqjy',
-        'PASSWORD': '977e022d80938c5ffb2c88cf44ebcb3335516f3a68258d47d5e44c584dc7b1e9',
-        'HOST': 'ec2-107-22-195-114.compute-1.amazonaws.com',
+        'NAME': 'd7epjljjk3gfm0',
+        'USER': 'sjefusmocigoqw',
+        'PASSWORD': '43845d756c8c04404dc20e947aacd783852725ba7271dd5b641d6d8106dc2f82',
+        'HOST': 'ec2-23-22-156-110.compute-1.amazonaws.com',
         'PORT': '5432'
     }
 }

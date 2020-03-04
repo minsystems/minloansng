@@ -3,7 +3,7 @@ import cloudinary.uploader
 import cloudinary.api
 
 cloudinary.config(
-    cloud_name="hybldomrw",
-    api_key="213676336326581",
-    api_secret="TpWKkBw27MuNGji8gYjSaG30Nr4"
+    cloud_name="hbnufshgh",
+    api_key="535136462687993",
+    api_secret="3dv0-st4yglI7xhNCLarmha5T3k"
 )
