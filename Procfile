@@ -1,0 +1,1 @@
+web: gunicorn minloansng.wsgi --log-file -

@@ -1,0 +1,52 @@
+{% load static %}
+<!-- header-start -->
+    <header>
+        <div class="header-area ">
+            <div id="sticky-header" class="main-header-area">
+                <div class="container-fluid ">
+                    <div class="header_bottom_border">
+                        <div class="row align-items-center">
+                            <div class="col-xl-3 col-lg-2">
+                                <div class="logo">
+                                    <a href="/">
+                                        <img src="https://cdn.minloans.com.ng/min-homepage/img/logo.png" alt="" class="img-responsive" width="44px" height="44px">
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-7">
+                                <div class="main-menu  d-none d-lg-block">
+                                    <nav>
+                                        <ul id="navigation">
+                                            <li><a href="/">home</a></li>
+                                            <li><a href="#">Features</a></li>
+                                            <li><a href="#">Pricing</a></li>
+                                            <li><a href="#">MinMarket</a></li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-3 d-none d-lg-block">
+                                <div class="Appointment">
+                                    <div class="phone_num d-none d-xl-block">
+                                        <a href="tel:+2348159104399"> <i class="fa fa-phone"></i> 08159104399</a>
+                                    </div>
+                                    <div class="d-none d-lg-block">
+                                        {% if request.user.is_authenticated %}
+                                            <a href="{% url 'account:profile-detail' request.user.profile.slug %}" class="boxed-btn4">{{ request.user.profile.get_name }}</a>
+                                        {% else %}
+                                            <a class="boxed-btn4" href="{% url 'register' %}">Sign Up For Free</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mobile_menu d-block d-lg-none"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </header>
+<!-- header-end -->

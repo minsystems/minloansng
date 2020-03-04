@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>{{ object.user }} Update | Minloansng, Minmarket, Minaccounts</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="shortcut icon" type="image/x-icon" href="https://cdn.minloans.com.ng/min-homepage/img/favicon.ico">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" type="text/css" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- icheck bootstrap -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/dist/css/adminlte.min.css">
+  <!-- Google Font: Source Sans Pro -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+</head>
+<body class="hold-transition register-page">
+<div class="register-box">
+  <div class="register-logo">
+    <a href="#"><b>Company</b> Information </a>
+  </div>
+
+  <div class="card">
+    <div class="card-body register-card-body">
+      <p class="login-box-msg">Enter Company Information</p>
+
+      <form class="companyForm" action="{% url 'company-url:update-company-profile' object.slug %}" method="post"> {% csrf_token %}
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" id="comapny-name" placeholder="Company Name" required>
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-building"></span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="email" class="form-control" id="company-email" placeholder="Company Email">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-envelope"></span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" id="branch-address" placeholder="Branch, example: Lagos Ajah">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-location-arrow"></span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" id="branch-code" placeholder="Branch Code, example: 778998">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-lock"></span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <!-- /.col -->
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary btn-block">
+                <i class="fas fa-plus"></i>
+                Create My Company Profile
+            </button>
+          </div>
+          <!-- /.col -->
+        </div>
+      </form>
+
+    </div>
+    <!-- /.form-box -->
+  </div><!-- /.card -->
+</div>
+<!-- /.register-box -->
+
+<!-- jQuery -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="https://cdn.minloans.com.ng/min-dash/dist/js/adminlte.min.js"></script>
+
+<script>
+    $( function () {
+        'use strict';
+        $(document).ready(function () {
+            {% if messages %}
+                {% for message in messages %}
+                    $(document).Toasts('create', {
+                        class: {% if message.tags %}'bg-warning'{% endif %},
+                        title: {% if message.tags %}'Warning'{% endif %},
+                        subtitle: 'Warning!',
+                        body: {% if message.tags %}'{{ message }}'{% endif %}
+                      });
+                    {% if object.name %}
+                      setTimeout(function () {
+                          window.location.replace("{% url 'company-url:dashboard' object.slug %}");
+                      }, 3000);
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            // Initialize data
+            var companyForm = $('.companyForm');
+            var companyFormMethod = companyForm.attr('method');
+            var companyFormEndpoint = companyForm.attr('action');
+
+            function displaySubmitting(submitBtn, defaultText, doSubmit) {
+                if (doSubmit) {
+                    submitBtn.addClass("disabled");
+                    submitBtn.html("<i class='fa fa-spin fa-spinner'></i> Creating Company..");
+                } else {
+                    submitBtn.removeClass("disabled");
+                    submitBtn.add(defaultText);
+                }
+            }
+
+            var companyFormSubmitBtn = companyForm.find("[type='submit']");
+            var companyFormSubmitBtnText = companyFormSubmitBtn.text();
+
+            companyForm.submit(function (event) {
+                event.preventDefault();
+
+                {% include 'csrf_ajax/csrf_ajax_token.js' %}
+
+                var companyFormData = {
+                    "companyName": $('#comapny-name').val(),
+                    "companyEmail": $('#company-email').val(),
+                    "branchAddress": $('#branch-address').val(),
+                    "branchCode": $('#branch-code').val(),
+                };
+                console.log(companyFormData);
+                var thisForm = $(this);
+
+                displaySubmitting(companyFormSubmitBtn, "", true);
+
+                $.ajax({
+                    method: companyFormMethod,
+                    url: companyFormEndpoint,
+                    data: companyFormData,
+                    contentType: 'application/x-www-form-urlencoded',
+                    dataType: 'json',
+
+                    success: function (data) {
+                        companyForm[0].reset();
+                        setTimeout(function () {
+                            window.location.replace("{% url 'company-url:dashboard' object.slug %}");
+                        }, 5000);
+                    }, error: function (error) {
+                        console.log(error);
+                        companyForm[0].reset();
+                        $.alert({
+                            icon: 'fa fa-warning',
+                            title: 'Oops!',
+                            content: "An Error Occurred!",
+                            theme: 'white',
+                            backgroundDismiss: true,
+                            animationSpeed: 2000,
+                        });
+                        displaySubmitting(companyFormSubmitBtn, companyFormSubmitBtnText, false);
+                    }
+                })
+            })
+        })
+    } (jQuery))
+</script>
+
+</body>
+</html>

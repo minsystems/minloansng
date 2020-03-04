@@ -1,0 +1,9 @@
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'app159623486@heroku.com'
+EMAIL_HOST_PASSWORD = "FReakyboygeniuse123"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = "minloansnigeria@gmail.com"
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "mathegeniuse@gmail.com"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+SENDGRID_API_KEY = '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'

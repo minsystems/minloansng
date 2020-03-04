@@ -1,0 +1,19 @@
+{% load static %}
+
+<script>
+    $(function () {
+        'use strict';
+        $(document).ready(function () {
+            {% if messages %}
+                {% for message in messages %}
+                    $(document).Toasts('create', {
+                        class: {% if message.tags %}'bg-warning'{% endif %},
+                        title: {% if message.tags %}'Account Suspension'{% endif %},
+                        subtitle: 'Warning!',
+                        body: {% if message.tags %}'{{ message }}'{% endif %}
+                      });
+                {% endfor %}
+            {% endif %}
+        })
+    })
+</script>

@@ -1,0 +1,73 @@
+<!--
+author: mathemartins
+author URL: http://minloans.com.ng
+License: Creative Commons Attribution 3.0 Unported
+License URL: http://creativecommons.org/licenses/by/3.0/
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <title> {% block title %} {% endblock title %} | Minloansng, Minmarket &amp; Minaccount</title>
+      <!-- Tell the browser to be responsive to screen width -->
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+
+      <link rel="shortcut icon" type="image/x-icon" href="https://cdn.minloans.com.ng/min-homepage/img/favicon.ico">
+
+      <!-- Font Awesome -->
+      <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css">
+      <!-- Ionicons -->
+      <link rel="stylesheet" type="text/css" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+      <!-- overlayScrollbars -->
+      <link rel="stylesheet" type="text/css" href="https://cdn.minloans.com.ng/min-dash/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+
+      <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/dist/css/adminlte.min.css">
+
+      {% block css_links %}
+
+      {% endblock css_links %}
+      <!-- Google Font: Source Sans Pro -->
+      <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    </head>
+
+    <body class="hold-transition sidebar-mini layout-fixed">
+
+        <div class="wrapper">
+
+            {% include 'nav/navbar.html' %}
+
+            {% include 'sidenav/sidebar.html' %}
+
+            <div class="content-wrapper">
+
+                {% block content_header %}
+
+                {% endblock content_header %}
+
+                {% block content %}
+
+                {% endblock content %}
+
+            </div>
+
+            {% include 'footer/footer.html' %}
+
+            <!-- Control Sidebar -->
+            <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+            </aside>
+            <!-- /.control-sidebar -->
+
+        </div>
+
+        {% block js_links %}
+
+        {% endblock js_links %}
+        <!-- overlayScrollbars -->
+        <script src="https://cdn.minloans.com.ng/min-dash/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+
+        {% include 'js/dashjs.html' %}
+
+    </body>
+</html>

@@ -1,0 +1,259 @@
+{% load static %}
+
+<!doctype html>
+<html class="no-js" lang="zxx">
+
+<head>
+   <meta charset="utf-8">
+   <meta http-equiv="x-ua-compatible" content="ie=edge">
+   <title>{{ object.get_name }}</title>
+   <meta name="description" content="">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+   <!-- <link rel="manifest" href="site.webmanifest"> -->
+   <link rel="shortcut icon" type="image/x-icon" href="https://cdn.minloans.com.ng/min-homepage/img/favicon.ico">
+   <!-- Place favicon.ico in the root directory -->
+
+   <!-- CSS here -->
+   <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/bootstrap.min.css">
+   <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/owl.carousel.min.css">
+   <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/magnific-popup.css">
+   <link rel="stylesheet" href="https://use.fontawesome.com/89122a8218.css">
+   <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/themify-icons.css">
+   <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/nice-select.css">
+   <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/flaticon.css">
+   <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/gijgo.css">
+   <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/animate.css">
+   <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/slicknav.css">
+   <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/style.css">
+   <!-- <link rel="stylesheet" href="css/responsive.css"> -->
+</head>
+
+<body>
+
+    {% include 'nav/home-nav.html' %}
+
+    <!-- bradcam_area  -->
+    <div class="bradcam_area bradcam_bg_3">
+          <div class="container">
+              <div class="row">
+                  <div class="col-xl-12">
+                      <div class="bradcam_text">
+                          <h3>{{ object.get_name }} | Profile</h3>
+                      </div>
+                  </div>
+              </div>
+          </div>
+    </div>
+      <!--/ bradcam_area  -->
+
+    <!--================Blog Area =================-->
+   <section class="blog_area single-post-area section-padding">
+      <div class="container">
+         <div class="row">
+            <div class="col-lg-8 posts-list">
+               <div class="blog-author">
+                  <div class="media align-items-center">
+                     <img src="{{ object.get_image }}" alt="{{ object.get_name }} profile">
+                     <div class="media-body">
+                        <a href="#">
+                           <h4>{{ object.get_name }}</h4>
+                        </a>
+                        <p>ROLE: <strong>{{ object.role }}</strong></p>
+                     </div>
+                  </div>
+               </div>
+               <div class="comments-area">
+                   <h4>Minloansng Products</h4>
+                   <div class="comment-list">
+                       <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div class="single_service wow fadeInLeft" data-wow-duration="1.2s" data-wow-delay=".5s">
+                        <div class="service_icon_wrap text-center">
+                            <div class="service_icon ">
+                                <img class="img-responsive" width="250px" height="100px" src="https://web4africa.com/wp-content/uploads/dotSTORE.png" alt="">
+                            </div>
+                        </div>
+                        <div class="info text-center">
+                            <span>Minmarket</span><hr/>
+                            <small style="color: #5b80b2;">
+                                <a href="#">Get customisable apps &amp; plugins to manage your business!</a>
+                            </small><hr/>
+                        </div>
+                        <div class="service_content">
+                            <ul class="text-center">
+                                <li> Free Apps &amp; Paid Apps </li>
+                                <li> Plugins &amp; Third party </li>
+                            </ul><hr/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="single_service wow fadeInUp" data-wow-duration="1s" data-wow-delay=".3s">
+                        <div class="service_icon_wrap text-center">
+                            <div class="service_icon ">
+                                <img class="img-responsive" width="250px" height="100px" src="https://i.udemycdn.com/course/750x422/2334782_d673_2.jpg" alt="">
+                            </div>
+                        </div>
+                        <div class="info text-center">
+                            <span>Minaccounting</span><hr/>
+                            <small style="color: #5b80b2;">
+                                <a href="#">Accounting SAAS, to help you manage your business</a>
+                            </small><hr/>
+                        </div>
+                        <div class="service_content">
+                            <ul class="text-center">
+                                <li> Cloud Based &amp; Support </li>
+                                <li> Buy OFF or Subscribe </li>
+                            </ul><hr/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                   </div>
+
+               </div>
+               <div class="comments-area">
+                  <h4>Opened Tickets ( 1 )</h4>
+                  <div class="comment-list">
+                     <div class="single-comment justify-content-between d-flex">
+                        <div class="user justify-content-between d-flex">
+                           <div class="thumb" style="background-color: #333333">
+                              <img src="https://cdn.minloans.com.ng/min-homepage/img/svg_icon/service_1.png" class="img-responsive" alt="">
+                           </div>
+                           <div class="desc">
+                              <p class="comment">
+                                 Payment made has not yet been activated on the platform
+                              </p>
+                              <div class="d-flex justify-content-between">
+                                 <div class="d-flex align-items-center">
+                                    <h5>
+                                       <a href="#">{{ object.get_name }}</a>
+                                    </h5>
+                                    <p class="date">{{ object.timestamp|timesince }}</p>
+                                 </div>
+                                 <div class="reply-btn">
+                                    <a href="#" class="btn-reply text-uppercase">done</a>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div class="comment-form">
+                  <h4>Open A Ticket</h4>
+                  <form class="form-contact comment_form" action="#" id="commentForm">
+                     <div class="row">
+                        <div class="col-12">
+                           <div class="form-group">
+                              <textarea class="form-control w-100" name="comment" id="comment" cols="30" rows="9"
+                                 placeholder="Describe your request"></textarea>
+                           </div>
+                        </div>
+                        <div class="col-sm-8">
+                           <div class="form-group">
+                              <input class="form-control" name="name" id="name" type="text" placeholder="Title">
+                           </div>
+                        </div>
+                        <div class="col-sm-4">
+                           <div class="form-group">
+                               <select class="form-control" id="company" name="text">
+                                    <option class="form-control" value=" "> Select Affected Company  . </option>
+                                   {% for comp in user_comp_qs %}
+                                       <option class="form-control" value="{{ comp }}">{{ comp }}</option>
+                                   {% endfor %}
+                               </select>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="form-group">
+                        <button type="submit" class="button button-contactForm btn_1 boxed-btn">Open My Ticket</button>
+                     </div>
+                  </form>
+               </div>
+            </div>
+            <div class="col-lg-4">
+               <div class="blog_right_sidebar">
+                  <aside class="single_sidebar_widget post_category_widget">
+                     <h4 class="widget_title">
+                         {% if user_comp_qs.count == 1 %}
+                             My Company
+                         {% elif user_comp_qs.count >= 2 %}
+                             My Companies
+                         {% else %}
+                             My Company
+                         {% endif %}
+                     </h4>
+                     <ul class="list cat-list">
+                        {% for comp in user_comp_qs %}
+                            <li>
+                               <a href="{{ comp.get_absolute_url }}" class="d-flex">
+                                  <p>{{ comp }}</p>
+                               </a>
+                            </li>
+                        {% endfor %}
+                     </ul>
+                  </aside>
+                  <aside class="single_sidebar_widget popular_post_widget">
+                     <h3 class="widget_title">Access Token</h3>
+                     <div class="media post_item">
+                        <small><em>{{ object.token }}</em></small>
+                     </div>
+                  </aside>
+                  <aside class="single_sidebar_widget tag_cloud_widget">
+                     <h4 class="widget_title">Current Plan</h4>
+                     <div class="well well-sm">
+                         ACTIVE: <strong>{{ user_plan }}</strong> <i class="fa fa-check"></i>
+                         <hr/> <small> Expires in <strong>{{ object.trial_days }}</strong></small>
+                         {% if user_plan == 'FREEMIUM' %}
+                             <hr/>
+                             <a href="#" style="color: #efefef" class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn">
+                                 Upgrade Account
+                             </a>
+                         {% endif %}
+                     </div>
+                  </aside>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
+   <!--================ Blog Area end =================-->
+
+
+    {% include 'footer/home-footer.html' %}
+
+    <script src="https://cdn.minloans.com.ng/min-homepage/js/vendor/modernizr-3.5.0.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/vendor/jquery-1.12.4.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/popper.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/bootstrap.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/owl.carousel.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/isotope.pkgd.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/ajax-form.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/waypoints.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.counterup.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/imagesloaded.pkgd.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/scrollIt.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.scrollUp.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/wow.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/nice-select.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.slicknav.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.magnific-popup.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/plugins.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/gijgo.min.js"></script>
+
+   <!--contact js-->
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/contact.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.ajaxchimp.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.form.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.validate.min.js"></script>
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/mail-script.js"></script>
+
+   <script src="https://cdn.minloans.com.ng/min-homepage/js/main.js"></script>
+
+   {% include 'js/dashjs.html' %}
+
+</body>
+
+</html>
