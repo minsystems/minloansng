@@ -151,20 +151,28 @@
 
                     success: function (data) {
                         companyForm[0].reset();
+                          $(document).Toasts('create', {
+                            class: 'bg-success',
+                            autohide: true,
+                            delay: 750,
+                            title: 'Updated!',
+                            subtitle: 'Success',
+                            body: 'Company Updated Successfully.'
+                          });
                         setTimeout(function () {
                             window.location.replace("{% url 'company-url:dashboard' object.slug %}");
                         }, 5000);
                     }, error: function (error) {
                         console.log(error);
                         companyForm[0].reset();
-                        $.alert({
-                            icon: 'fa fa-warning',
-                            title: 'Oops!',
-                            content: "An Error Occurred!",
-                            theme: 'white',
-                            backgroundDismiss: true,
-                            animationSpeed: 2000,
-                        });
+                            $(document).Toasts('create', {
+                                class: 'bg-danger',
+                                autohide: true,
+                                delay: 750,
+                                title: 'Error!',
+                                subtitle: '',
+                                body: 'An Error Occurred!.'
+                            });
                         displaySubmitting(companyFormSubmitBtn, companyFormSubmitBtnText, false);
                     }
                 })

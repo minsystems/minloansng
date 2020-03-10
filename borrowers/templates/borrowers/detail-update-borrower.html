@@ -1,0 +1,499 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %} {{ object }} {% endblock title %}
+
+
+{% block css_links %}
+    <!-- daterange picker -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/daterangepicker/daterangepicker.css">
+  <!-- iCheck for checkboxes and radio inputs -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- Bootstrap Color Picker -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
+  <!-- Tempusdominus Bbootstrap 4 -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/select2/css/select2.min.css">
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+  <!-- Bootstrap4 Duallistbox -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
+{% endblock css_links %}
+
+
+{% block content_header %}
+
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Update {{ borrower_obj }}</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{{ object.get_absolute_url }}">Home</a></li>
+              <li class="breadcrumb-item active">{{ object.name }}</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+{% endblock content_header %}
+
+
+{% block content %}
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-3">
+
+            <!-- Profile Image -->
+            <div class="card card-primary card-outline">
+              <div class="card-body box-profile">
+                <div class="text-center">
+                  <img class="profile-user-img img-fluid img-circle"
+                       src="{{ borrower_obj.get_image }}"
+                       alt="{{ borrower_obj }}">
+                </div>
+
+                <h3 class="profile-username text-center">{{ borrower_obj }}</h3>
+
+                <p class="text-muted text-center">
+                    <strong>Company: </strong> {{ borrower_obj.business_name }}
+                </p>
+
+                <ul class="list-group list-group-unbordered mb-3">
+                  <li class="list-group-item">
+                    <b>Phone</b> <a class="float-right">{{ borrower_obj.phone }}</a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Email</b> <a class="float-right">{{ borrower_obj.email }}</a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Age</b> <a class="float-right">{{ age }} years old</a>
+                  </li>
+                </ul>
+
+                <a href="tel: {{ borrower_obj.phone }}" class="btn btn-primary btn-block"><b>Call {{ borrower_obj }}</b></a>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+
+            <!-- About Me Box -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">More Info</h3>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <strong><i class="fas fa-book mr-1"></i> Land Phone/ Other Phone</strong>
+
+                <p class="text-muted">
+                  {% if borrower_obj.land_line %}{{ borrower_obj.land_line }}{% else %} Company Phone or Other Phone {% endif %}
+                </p>
+
+                <hr>
+
+                <strong><i class="fas fa-map-marker-alt mr-1"></i> Location</strong>
+
+                <p class="text-muted">{{ borrower_obj.get_address }}</p>
+
+                <hr>
+
+                <strong><i class="fas fa-pencil-alt mr-1"></i> Details &amp; More</strong>
+
+                <p class="text-muted">
+                    <span class="tag tag-danger"><strong>Job Status</strong>: {{ borrower_obj.working_status }}</span><br/>
+                  <span class="tag tag-success"><strong>SSN</strong>: {{ borrower_obj.unique_identifier }}</span><br/>
+                  <span class="tag tag-warning"><strong>Bank</strong>: {{ borrower_obj.bank }}</span><br/>
+                  <span class="tag tag-primary"><strong>Account Number</strong>: {{ borrower_obj.account_number }}</span><br/>
+                  <span class="tag tag-info"><strong>B.V.N</strong>: {{ borrower_obj.bvn }}</span>
+                </p>
+
+                <hr>
+
+                <strong><i class="far fa-file-alt mr-1"></i> Notes</strong>
+
+                <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam fermentum enim neque.</p>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+          <div class="col-md-9">
+            <div class="card">
+              <div class="card-header p-2">
+                <ul class="nav nav-pills">
+                  <li class="nav-item"><a class="nav-link active" href="#activity" data-toggle="tab">Loan Activity</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Events/Timeline</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Update Information</a></li>
+                </ul>
+              </div><!-- /.card-header -->
+              <div class="card-body">
+                <div class="tab-content">
+                  <div class="active tab-pane" id="activity">
+
+                    <!-- Post -->
+                    <div class="post">
+                      <div class="user-block">
+                        <img class="img-circle img-bordered-sm" src="" alt="">
+                        <span class="username">
+                          <a href="#">Remita Direct Debit - {{ borrower_obj }}</a>
+                          <a href="#" class="float-right btn-tool"><i class="fas fa-times"></i></a>
+                        </span>
+                        <span class="description">Loan Collected On - 7:30 PM today</span>
+                      </div>
+                      <!-- /.user-block -->
+                      <p>
+                        Lorem ipsum represents a long-held tradition for designers,
+                      </p>
+
+                      <br/>
+
+                      <p>
+                        <a href="#" class="link-black text-sm mr-2"><i class="fas fa-edit mr-1"></i> Change/Modify</a>
+                        <a href="#" class="link-black text-sm"><i class="fas fa-archive mr-1"></i> Archive Loan</a>
+                        <span class="float-right">
+                          <a href="#" class="link-black text-sm">
+                            <i class="far fa-credit-card mr-1"></i> Installments (5)
+                          </a>
+                        </span>
+                      </p>
+
+                    </div>
+                    <!-- /.post -->
+
+                  </div>
+                  <!-- /.tab-pane -->
+                  <div class="tab-pane" id="timeline">
+                    <!-- The timeline -->
+                    <div class="timeline timeline-inverse">
+                      <!-- timeline time label -->
+                      <div class="time-label">
+                        <span class="bg-danger">
+                          10 Feb. 2014
+                        </span>
+                      </div>
+                      <!-- /.timeline-label -->
+                      <!-- timeline item -->
+                      <div>
+                        <i class="fas fa-envelope bg-primary"></i>
+
+                        <div class="timeline-item">
+                          <span class="time"><i class="far fa-clock"></i> 12:05</span>
+
+                          <h3 class="timeline-header"><a href="#">Support Team</a> sent you an email</h3>
+
+                          <div class="timeline-body">
+                            Etsy doostang zoodles disqus groupon greplin oooj voxy zoodles,
+                            weebly ning heekya handango imeem plugg dopplr jibjab, movity
+                            jajah plickers sifteo edmodo ifttt zimbra. Babblely odeo kaboodle
+                            quora plaxo ideeli hulu weebly balihoo...
+                          </div>
+                          <div class="timeline-footer">
+                            <a href="#" class="btn btn-primary btn-sm">Read more</a>
+                            <a href="#" class="btn btn-danger btn-sm">Delete</a>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- END timeline item -->
+                      <!-- timeline item -->
+                      <div>
+                        <i class="fas fa-user bg-info"></i>
+
+                        <div class="timeline-item">
+                          <span class="time"><i class="far fa-clock"></i> 5 mins ago</span>
+
+                          <h3 class="timeline-header border-0"><a href="#">Sarah Young</a> accepted your friend request
+                          </h3>
+                        </div>
+                      </div>
+                      <!-- END timeline item -->
+                      <!-- timeline item -->
+                      <div>
+                        <i class="fas fa-comments bg-warning"></i>
+
+                        <div class="timeline-item">
+                          <span class="time"><i class="far fa-clock"></i> 27 mins ago</span>
+
+                          <h3 class="timeline-header"><a href="#">Jay White</a> commented on your post</h3>
+
+                          <div class="timeline-body">
+                            Take me to your leader!
+                            Switzerland is small and neutral!
+                            We are more like Germany, ambitious and misunderstood!
+                          </div>
+                          <div class="timeline-footer">
+                            <a href="#" class="btn btn-warning btn-flat btn-sm">View comment</a>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- END timeline item -->
+                      <!-- timeline time label -->
+                      <div class="time-label">
+                        <span class="bg-success">
+                          3 Jan. 2014
+                        </span>
+                      </div>
+                      <!-- /.timeline-label -->
+                      <!-- timeline item -->
+                      <div>
+                        <i class="fas fa-camera bg-purple"></i>
+
+                        <div class="timeline-item">
+                          <span class="time"><i class="far fa-clock"></i> 2 days ago</span>
+
+                          <h3 class="timeline-header"><a href="#">Mina Lee</a> uploaded new photos</h3>
+
+                          <div class="timeline-body">
+                            <img src="http://placehold.it/150x100" alt="...">
+                            <img src="http://placehold.it/150x100" alt="...">
+                            <img src="http://placehold.it/150x100" alt="...">
+                            <img src="http://placehold.it/150x100" alt="...">
+                          </div>
+                        </div>
+                      </div>
+                      <!-- END timeline item -->
+                      <div>
+                        <i class="far fa-clock bg-gray"></i>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /.tab-pane -->
+
+                  <div class="tab-pane" id="settings">
+                    <form method="POST" enctype="multipart/form-data" novalidate>
+                      {% csrf_token %}
+
+                      {% for hidden_field in form.hidden_fields %}
+                        {{ hidden_field }}
+                      {% endfor %}
+
+                      {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                          {% for error in form.non_field_errors %}
+                            {{ error }}
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+
+                      {% for field in form.visible_fields %}
+                        <div class="form-group">
+                          {{ field.label_tag }}
+
+                          {% if form.is_bound %}
+                            {% if field.errors %}
+                              {% render_field field class="form-control is-invalid" %}
+                              {% for error in field.errors %}
+                                <div class="invalid-feedback">
+                                  {{ error }}
+                                </div>
+                              {% endfor %}
+                            {% else %}
+                              {% render_field field class="form-control is-valid" %}
+                            {% endif %}
+                          {% else %}
+                            {% render_field field class="form-control" %}
+                          {% endif %}
+
+                          {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                          {% endif %}
+                        </div>
+                      {% endfor %}
+
+                      <button type="submit" class="btn btn-primary btn-block">Update</button>
+                  </form>
+                  </div>
+                  <!-- /.tab-pane -->
+                </div>
+                <!-- /.tab-content -->
+              </div><!-- /.card-body -->
+            </div>
+            <!-- /.nav-tabs-custom -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+
+{% endblock content %}
+
+
+{% block js_links %}
+<!-- jQuery -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Select2 -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/select2/js/select2.full.min.js"></script>
+<!-- Bootstrap4 Duallistbox -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
+<!-- InputMask -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/moment/moment.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/inputmask/min/jquery.inputmask.bundle.min.js"></script>
+<!-- date-range-picker -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/daterangepicker/daterangepicker.js"></script>
+<!-- bootstrap color picker -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+<!-- Bootstrap Switch -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+<!-- Page script -->
+<!-- jquery-validation -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/jquery-validation/jquery.validate.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/jquery-validation/additional-methods.min.js"></script>
+<!-- AdminLTE App -->
+<script src="https://cdn.minloans.com.ng/min-dash/dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="https://cdn.minloans.com.ng/min-dash/dist/js/demo.js"></script>
+<script>
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2();
+
+    //Initialize Select2 Elements
+    $('.select2bs4').select2({
+      theme: 'bootstrap4'
+    });
+
+    //Datemask dd/mm/yyyy
+    $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' });
+    //Datemask2 mm/dd/yyyy
+    $('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' });
+    //Money Euro
+    $('[data-mask]').inputmask();
+
+    $('#id_date_of_birth').daterangepicker({
+        singleDatePicker: true,
+        showDropdowns: true,
+        minYear: 1910,
+        maxYear: parseInt(moment().format('YYYY'),10),
+        locale: {
+            format: 'YYYY-MM-DD'
+        }
+       }, function(start, end, label) {
+        var years = moment().diff(start, 'years');
+    });
+
+    //Date range picker
+    $('#reservation').daterangepicker();
+    //Date range picker with time picker
+    $('#reservationtime').daterangepicker({
+      timePicker: true,
+      timePickerIncrement: 30,
+      locale: {
+        format: 'MM/DD/YYYY hh:mm A'
+      }
+    });
+    //Date range as a button
+    $('#daterange-btn').daterangepicker(
+      {
+        ranges   : {
+          'Today'       : [moment(), moment()],
+          'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+          'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
+          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+          'This Month'  : [moment().startOf('month'), moment().endOf('month')],
+          'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        startDate: moment().subtract(29, 'days'),
+        endDate  : moment()
+      },
+      function (start, end) {
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
+      }
+    );
+
+    //Timepicker
+    $('#timepicker').datetimepicker({
+      format: 'LT'
+    });
+
+    //Bootstrap Duallistbox
+    $('.duallistbox').bootstrapDualListbox();
+
+    //Colorpicker
+    $('.my-colorpicker1').colorpicker();
+    //color picker with addon
+    $('.my-colorpicker2').colorpicker();
+
+    $('.my-colorpicker2').on('colorpickerChange', function(event) {
+      $('.my-colorpicker2 .fa-square').css('color', event.color.toString());
+    });
+
+    $("input[data-bootstrap-switch]").each(function(){
+      $(this).bootstrapSwitch('state', $(this).prop('checked'));
+    });
+
+    $("#country").change(function () {
+        const currentCountry = $(this).val();
+        $('#state').val("Enter A Corresponding State To The Country: " + currentCountry).change(function () {
+            $("#lga").val("Enter A Corresponding LGA To The Country: " + $(this).val())
+        })
+    });
+
+    Toast.fire({
+        type: 'Success',
+        title: 'Borrower Account!'
+    })
+
+  })
+</script>
+<script type="text/javascript">
+$(document).ready(function () {
+  $.validator.setDefaults({
+    submitHandler: function () {
+      console.log( "submitted clicked!" );
+    }
+  });
+  $('.addBorrowerForm').validate({
+    rules: {
+      email: {
+        required: true,
+        email: true,
+      },
+      password: {
+        required: true,
+        minlength: 5
+      },
+      terms: {
+        required: true
+      },
+    },
+    messages: {
+      email: {
+        required: "Please enter a email address",
+        email: "Please enter a vaild email address"
+      },
+      password: {
+        required: "Please provide a password",
+        minlength: "Your password must be at least 5 characters long"
+      },
+      terms: "Please accept our terms"
+    },
+    errorElement: 'span',
+    errorPlacement: function (error, element) {
+      error.addClass('invalid-feedback');
+      element.closest('.form-group').append(error);
+    },
+    highlight: function (element, errorClass, validClass) {
+      $(element).addClass('is-invalid');
+    },
+    unhighlight: function (element, errorClass, validClass) {
+      $(element).removeClass('is-invalid');
+    }
+  });
+});
+</script>
+{% endblock js_links %}

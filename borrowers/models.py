@@ -36,9 +36,9 @@ class Borrower(models.Model):
     address = models.CharField(max_length=300, blank=True, null=True, help_text='Block 32, Arizona Street')
     lga = models.CharField(max_length=300, blank=True, null=True)
     state = models.CharField(max_length=300, choices=STATE, blank=True, null=True, help_text='Province/State')
-    country = CountryField()
+    country = CountryField(blank=True, null=True)
     title = models.CharField(blank=True, null=True, max_length=300)
-    phone = PhoneNumberField()
+    phone = PhoneNumberField(blank=True, null=True)
     land_line = PhoneNumberField(blank=True, null=True)
     business_name = models.CharField(max_length=300, blank=True, null=True)
     working_status = models.CharField(max_length=300, choices=WORKING_STATUS, blank=True, null=True)
@@ -49,7 +49,7 @@ class Borrower(models.Model):
     slug = models.SlugField(unique=True, blank=True, null=True)
     account_number = models.CharField(blank=True, null=True, max_length=11)
     bvn = models.CharField(blank=True, null=True, max_length=300, help_text='Bank Verification Number')
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField( null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
 
@@ -68,6 +68,12 @@ class Borrower(models.Model):
 
     image_tag.short_description = 'Profile Image'
     image_tag.allow_tags = True
+
+    @property
+    def get_image(self):
+        if self.photo:
+            return self.photo.url
+        return "https://img.icons8.com/officel/2x/user.png"
 
 
 class BorrowerGroup(models.Model):

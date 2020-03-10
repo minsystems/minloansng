@@ -1,0 +1,502 @@
+{% extends 'base.html' %}
+
+
+{% block title %} {{ object }} {% endblock title %}
+
+
+{% block css_links %}
+    <!-- daterange picker -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/daterangepicker/daterangepicker.css">
+  <!-- iCheck for checkboxes and radio inputs -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- Bootstrap Color Picker -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
+  <!-- Tempusdominus Bbootstrap 4 -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/select2/css/select2.min.css">
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+  <!-- Bootstrap4 Duallistbox -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
+{% endblock css_links %}
+
+
+{% block content_header %}
+
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Add Borrower - {{ object.name }}</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{{ object.get_absolute_url }}">Home</a></li>
+              <li class="breadcrumb-item active">{{ object.name }}</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+{% endblock content_header %}
+
+
+{% block content %}
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <!-- left column -->
+          <div class="col-md-8">
+            <!-- jquery validation -->
+            <!-- Input addon -->
+            <form class="form-group addBorrowerForm" method="post" action="{% url 'borrowers-url:borrower-create' object.slug %}" enctype="multipart/form-data" role="form">
+                {% csrf_token %}
+                <div class="card card-info">
+                  <div class="card-header">
+                    <h3 class="card-title">Add Borrower</h3>
+                  </div>
+                  <div class="card-body">
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-user-md"></i> </span>
+                        </div>
+                        <select class="form-control" id="title" required>
+                          <option value="Mr">Mr</option>
+                          <option value="Mrs">Mrs</option>
+                          <option value="Master">Master</option>
+                          <option value="Miss">Miss</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-user"></i> </span>
+                      </div>
+                      <input type="text" class="form-control" id="first_name" placeholder="First Name" required>
+                    </div>
+
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-user"></i> </span>
+                      </div>
+                      <input type="text" class="form-control" id="last_name" placeholder="Last Name" required>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">GENDER </span>
+                        </div>
+                        <select class="form-control" id="gender" required>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-phone"></i> </span>
+                      </div>
+                      <input type="text" class="form-control" id="phone" placeholder="phone" required>
+                    </div>
+
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-phone-square"></i> </span>
+                      </div>
+                      <input type="text" class="form-control" id="landline" placeholder="Landline">
+                    </div>
+
+                    <div class="input-group mb-3">
+                      <input type="text" class="form-control" id="business_name" placeholder="Business/Company Name" required>
+                      <div class="input-group-append">
+                        <span class="input-group-text"><i class="fas fa-check"></i></span>
+                      </div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Working Status</span>
+                        </div>
+                        <select class="form-control" id="working_status" required>
+                          <option value="Employed">Employed</option>
+                          <option value="Unemployed">Unemployed</option>
+                          <option value="Self-Employed">Self-employed</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                      </div>
+                      <input type="email" class="form-control" id="email" placeholder="Email" required>
+                    </div>
+
+                    <div class="input-group mb-3">
+                      <input type="text" class="form-control" id="unique_identifier" placeholder="ID Card Number, INT'L Passport, SSN / Card Unique Number" required>
+                      <div class="input-group-append">
+                        <span class="input-group-text">SSN</span>
+                      </div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Bank</span>
+                        </div>
+                        <select class="form-control" id="bank_codes" required>
+                          {% for bank in banks %}
+                            <option value="{{ bank }}">{{ bank }}</option>
+                          {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-credit-card"></i> </span>
+                      </div>
+                      <input type="text" class="form-control" id="account_number" placeholder="Account Number" required>
+                      <div class="input-group-append">
+                        <span class="input-group-text">NN </span>
+                      </div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">BVN </span>
+                      </div>
+                      <input type="text" class="form-control" id="bvn" placeholder="Bank Verification Number" required>
+                      <div class="input-group-append">
+                        <span class="input-group-text">BVN </span>
+                      </div>
+                    </div>
+
+                    <div class="input-group mb-3 date" data-provide="datepicker">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-calendar"></i> </span>
+                      </div>
+                      <input type="text" class="form-control" name="birthday" id="date_of_birth" placeholder="Date Of Birth" required>
+                    </div>
+
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-book"></i> </span>
+                      </div>
+                      <input type="text" class="form-control" id="address" placeholder="Block 27, Alpha Building Street" required>
+                      <div class="input-group-append">
+                        <span class="input-group-text"><i class="fa fa-truck"></i> </span>
+                      </div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Country</span>
+                        </div>
+                        <select class="form-control" id="country" required>
+                          {% for country in country_qs %}
+                            <option value="{{ country.code }}">{{ country.name }}</option>
+                          {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">State</span>
+                        </div>
+                        <input type="text" class="form-control" id="state" placeholder="System Would Re-validate The State Data" required>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">L.G.A</span>
+                        </div>
+                        <input type="text" class="form-control" id="lga" placeholder="Minloansng Validates Data Input Based On References Above" required>
+                    </div>
+
+                  </div>
+                  <!-- /.card-body -->
+                  <div class="card-footer">
+                      <button type="submit" class="btn btn-primary btn-block">
+                          <i class="fas fa-plus"></i> Create &amp; Validate
+                      </button>
+                  </div>
+                </div>
+            </form>
+            <!-- /.card -->
+            <!-- /.card -->
+          </div>
+          <!--/.col (left) -->
+          <!-- right column -->
+          <div class="col-md-4">
+              <div class="card card-warning">
+                  <div class="card-header">
+                      <h3 class="card-title" style="color: honeydew">Borrower Group</h3>
+                  </div>
+                  <!-- /.card-header -->
+                  <div class="card-body">
+                      <p class="text-center text-capitalize">
+                          Borrower group lets you add borrowers into a group and pay the group for the borrowers to access and manage shared fundings
+                          amongst themselves.
+                      </p><hr/>
+                      <a href="{% url 'borrowers-url:borrower-group-create' object.slug %}" class="btn btn-primary btn-block"> Add Borrower Group </a>
+                  </div>
+              </div>
+          </div>
+          <!--/.col (right) -->
+        </div>
+        <!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+
+{% endblock content %}
+
+
+{% block js_links %}
+<!-- jQuery -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Select2 -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/select2/js/select2.full.min.js"></script>
+<!-- Bootstrap4 Duallistbox -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
+<!-- InputMask -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/moment/moment.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/inputmask/min/jquery.inputmask.bundle.min.js"></script>
+<!-- date-range-picker -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/daterangepicker/daterangepicker.js"></script>
+<!-- bootstrap color picker -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+<!-- Bootstrap Switch -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+<!-- Page script -->
+<!-- jquery-validation -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/jquery-validation/jquery.validate.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/jquery-validation/additional-methods.min.js"></script>
+<!-- AdminLTE App -->
+<script src="https://cdn.minloans.com.ng/min-dash/dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="https://cdn.minloans.com.ng/min-dash/dist/js/demo.js"></script>
+<script>
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2();
+
+    //Initialize Select2 Elements
+    $('.select2bs4').select2({
+      theme: 'bootstrap4'
+    });
+
+    //Datemask dd/mm/yyyy
+    $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' });
+    //Datemask2 mm/dd/yyyy
+    $('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' });
+    //Money Euro
+    $('[data-mask]').inputmask();
+
+    $('input[name="birthday"]').daterangepicker({
+        singleDatePicker: true,
+        showDropdowns: true,
+        minYear: 1910,
+        maxYear: parseInt(moment().format('YYYY'),10),
+        locale: {
+            format: 'YYYY-MM-DD'
+        }
+       }, function(start, end, label) {
+        var years = moment().diff(start, 'years');
+    });
+
+    //Date range picker
+    $('#reservation').daterangepicker();
+    //Date range picker with time picker
+    $('#reservationtime').daterangepicker({
+      timePicker: true,
+      timePickerIncrement: 30,
+      locale: {
+        format: 'MM/DD/YYYY hh:mm A'
+      }
+    });
+    //Date range as a button
+    $('#daterange-btn').daterangepicker(
+      {
+        ranges   : {
+          'Today'       : [moment(), moment()],
+          'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+          'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
+          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+          'This Month'  : [moment().startOf('month'), moment().endOf('month')],
+          'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        startDate: moment().subtract(29, 'days'),
+        endDate  : moment()
+      },
+      function (start, end) {
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
+      }
+    );
+
+    //Timepicker
+    $('#timepicker').datetimepicker({
+      format: 'LT'
+    });
+
+    //Bootstrap Duallistbox
+    $('.duallistbox').bootstrapDualListbox();
+
+    //Colorpicker
+    $('.my-colorpicker1').colorpicker();
+    //color picker with addon
+    $('.my-colorpicker2').colorpicker();
+
+    $('.my-colorpicker2').on('colorpickerChange', function(event) {
+      $('.my-colorpicker2 .fa-square').css('color', event.color.toString());
+    });
+
+    $("input[data-bootstrap-switch]").each(function(){
+      $(this).bootstrapSwitch('state', $(this).prop('checked'));
+    });
+
+    $("#country").change(function () {
+        const currentCountry = $(this).val();
+        $('#state').val("Enter A Corresponding State To The Country: " + currentCountry).change(function () {
+            $("#lga").val("Enter A Corresponding LGA To The Country: " + $(this).val())
+        })
+    });
+
+    // Process and Initialize Submit system
+    let borrowerForm = $('.addBorrowerForm');
+    let borrowerFormMethod = borrowerForm.attr('method');
+    let borrowerFormEndpoint = borrowerForm.attr('action');
+
+    function displaySubmitting(submitBtn, defaultText, doSubmit) {
+        if (doSubmit) {
+            submitBtn.addClass("disabled");
+            submitBtn.html("<i class='fa fa-spin fa-spinner'></i> Creating Borrower..");
+        } else {
+            submitBtn.removeClass("disabled");
+            submitBtn.add(defaultText);
+        }
+    }
+
+    let borrowerFormSubmitBtn = borrowerForm.find("[type='submit']");
+    let borrowerFormSubmitBtnText = borrowerFormSubmitBtn.text();
+
+    borrowerForm.submit(function (event) {
+        event.preventDefault();
+        {% include 'csrf_ajax/csrf_ajax_token.js' %}
+
+        const borrowerFormData = {
+            "title":$('#title').val(),
+            "firstName":$('#first_name').val(),
+            "lastName":$('#last_name').val(),
+            "gender":$('#gender').val(),
+            "phone":$('#phone').val(),
+            "landPhone":$('#landline').val(),
+            "businessName":$('#business_name').val(),
+            "workingStatus":$('#working_status').val(),
+            "email":$('#email').val(),
+            "unique_identifier":$('#unique_identifier').val(),
+            "bank":$('#bank_codes').val(),
+            "accountNumber":$('#account_number').val(),
+            "bvn":$('#bvn').val(),
+            "dateOfBirth":$('#date_of_birth').val(),
+            "address":$('#address').val(),
+            "country":$('#country').val(),
+            "state":$('#state').val(),
+            "lga":$('#lga').val()
+        };
+
+        console.log(borrowerFormData);
+
+        displaySubmitting(borrowerFormSubmitBtn, "", true);
+
+        $.ajax({
+            method: borrowerFormMethod,
+            url: borrowerFormEndpoint,
+            data: borrowerFormData,
+            contentType: 'application/x-www-form-urlencoded',
+
+            success: function (data) {
+                borrowerForm[0].reset();
+                $(document).Toasts('create', {
+                    class: 'bg-success',
+                    autohide: true,
+                    delay: 750,
+                    title: 'Created!',
+                    subtitle: 'Success',
+                    body: 'Account Created Successfully!' //+ data.message
+                });
+                setTimeout(function () {
+                    window.location.replace("{% url 'loans-url:loan-create' object.slug %}");
+                }, 5000);
+            }, error: function (error) {
+                borrowerForm[0].reset();
+                $(document).Toasts('create', {
+                    class: 'bg-danger',
+                    autohide: true,
+                    delay: 750,
+                    title: 'Error!',
+                    subtitle: '',
+                    body: 'An Error Occurred!'
+                });
+                displaySubmitting(borrowerFormSubmitBtn, borrowerFormSubmitBtnText, false);
+            }
+        })
+    })
+
+  })
+</script>
+<script type="text/javascript">
+$(document).ready(function () {
+  $.validator.setDefaults({
+    submitHandler: function () {
+      console.log( "submitted clicked!" );
+    }
+  });
+  $('.addBorrowerForm').validate({
+    rules: {
+      email: {
+        required: true,
+        email: true,
+      },
+      password: {
+        required: true,
+        minlength: 5
+      },
+      terms: {
+        required: true
+      },
+    },
+    messages: {
+      email: {
+        required: "Please enter a email address",
+        email: "Please enter a vaild email address"
+      },
+      password: {
+        required: "Please provide a password",
+        minlength: "Your password must be at least 5 characters long"
+      },
+      terms: "Please accept our terms"
+    },
+    errorElement: 'span',
+    errorPlacement: function (error, element) {
+      error.addClass('invalid-feedback');
+      element.closest('.form-group').append(error);
+    },
+    highlight: function (element, errorClass, validClass) {
+      $(element).addClass('is-invalid');
+    },
+    unhighlight: function (element, errorClass, validClass) {
+      $(element).removeClass('is-invalid');
+    }
+  });
+});
+</script>
+{% endblock js_links %}

@@ -59,7 +59,7 @@
               </div>
               <!-- /.card-header -->
               <!-- form start -->
-              <form role="form" id="quickForm">
+              <form role="form" id="quickForm" method="post" action="{% url 'loans-url:loan-create' %}">
                 {% csrf_token %}
                 <div class="card-body">
 
@@ -87,7 +87,7 @@
                         {% endfor %}
                     </select>
                      <br/>
-                     <a href="#" class="btn btn-primary">Add A Borrower</a>
+                     <a href="{% url 'borrowers-url:borrower-create' object.slug %}" class="btn btn-primary">Add A Borrower</a>
                   </div>
 
                   <hr/>
@@ -108,7 +108,7 @@
                             <i class="far fa-calendar-alt"></i>
                           </span>
                         </div>
-                        <input type="text" class="form-control float-right" id="reservation" required>
+                        <input type="text" class="form-control float-right" id="release_date" required>
                      </div>
                   </div>
 
@@ -189,7 +189,9 @@
                   </div>
                   <!-- /.card-header -->
                   <div class="card-body">
-                      <p>Loan Description</p>
+                      <img src="https://cdn.minloans.com.ng/min-homepage/img/logo.png" width="200px" height="200px" class="mx-auto d-block img-responsive img-rounded" id="loan-package-type-image" /><hr/>
+                      <h3 class="text-center text-capitalize text-primary" id="loan-package-type-title">Loan Package Title</h3>
+                      <p class="text-center" id="loan-package-type-description">Loan Package Description</p>
                   </div>
               </div>
           </div>
@@ -239,17 +241,17 @@
     //Initialize Select2 Elements
     $('.select2bs4').select2({
       theme: 'bootstrap4'
-    })
+    });
 
     //Datemask dd/mm/yyyy
-    $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
+    $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' });
     //Datemask2 mm/dd/yyyy
-    $('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' })
+    $('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' });
     //Money Euro
-    $('[data-mask]').inputmask()
+    $('[data-mask]').inputmask();
 
     //Date range picker
-    $('#reservation').daterangepicker()
+    $('#reservation').daterangepicker();
     //Date range picker with time picker
     $('#reservationtime').daterangepicker({
       timePicker: true,
@@ -257,7 +259,7 @@
       locale: {
         format: 'MM/DD/YYYY hh:mm A'
       }
-    })
+    });
     //Date range as a button
     $('#daterange-btn').daterangepicker(
       {
@@ -275,20 +277,33 @@
       function (start, end) {
         $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
       }
-    )
+    );
+
+    // Calendar Selector
+    $('#release_date').daterangepicker({
+        singleDatePicker: true,
+        showDropdowns: true,
+        minYear: 1910,
+        maxYear: parseInt(moment().format('YYYY'),10),
+        locale: {
+            format: 'YYYY-MM-DD'
+        }
+       }, function(start, end, label) {
+        var years = moment().diff(start, 'years');
+    });
 
     //Timepicker
     $('#timepicker').datetimepicker({
       format: 'LT'
-    })
+    });
 
     //Bootstrap Duallistbox
-    $('.duallistbox').bootstrapDualListbox()
+    $('.duallistbox').bootstrapDualListbox();
 
     //Colorpicker
-    $('.my-colorpicker1').colorpicker()
+    $('.my-colorpicker1').colorpicker();
     //color picker with addon
-    $('.my-colorpicker2').colorpicker()
+    $('.my-colorpicker2').colorpicker();
 
     $('.my-colorpicker2').on('colorpickerChange', function(event) {
       $('.my-colorpicker2 .fa-square').css('color', event.color.toString());
@@ -598,7 +613,35 @@ $(document).ready(function () {
                         $('#repayment-interval-figure-period').val("Days To Complete Repayment");
                     }
                 }
-            })
+            });
+
+            $('#loan-package-type').change(function () {
+                const changed_data = $(this).val();
+                console.log(changed_data);
+
+                if (changed_data === 'Remita Direct Debit') {
+                    const dd_loanDescription = '<b>Remita Direct Debit</b> lets your customers pay you in a more convenient and flexible manner, without suffering the financial burden of one-off payment.\n' +
+                        'With this installment payment option, the customer gives an instruction to their bank, authorizing that a biller is paid an amount of money over a specified period of time. ' +
+                        'The amount can be for fixed or varied.';
+                    const imgLink = 'https://netstorage-legit.akamaized.net/images/vllkyt7nki3c742g7.jpg';
+                    $('#loan-package-type-image').attr("src", imgLink);
+                    $('#loan-package-type-title').html($(this).val());
+                    $('#loan-package-type-description').html(dd_loanDescription);
+                } else if (changed_data === 'Personal Loan') {
+                    const dd_loanDescription = 'Get the most out of life with DEFAULT PERSONAL LOANS – an unsecured personal installment loan designed to help you fulfill your dreams and live life to the max';
+                    const imgLink = 'https://cdn.minloans.com.ng/min-homepage/img/logo.png';
+                    $('#loan-package-type-image').attr("src", imgLink);
+                    $('#loan-package-type-title').html($(this).val());
+                    $('#loan-package-type-description').html(dd_loanDescription);
+                }
+            });
+
+            // initialize local data
+            const loanForm = $('#quickForm');
+            const loanFormMethod = loanForm.attr('method');
+            const loanFormEndpoint = loanForm.attr('action');
+
+
         });
     })
 </script>

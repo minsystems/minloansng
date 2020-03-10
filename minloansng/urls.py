@@ -26,6 +26,7 @@ urlpatterns = [
     re_path(r'^accounts/', include(("accounts.passwords.urls", 'accounts-password-url'), namespace='account-password')),
     path('dashboard/', include(('company.urls', 'company-url'), namespace='company-url')),
     path('loans/', include(('loans.urls', 'loans-url'), namespace='loans-url')),
+    path('borrowers/', include(('borrowers.urls', 'borrowers-url'), namespace='borrowers-url')),
     path('system/handler/', include(('mincore.urls', 'mincore-url'), namespace='mincore-url')),
     path('login/', LoginView.as_view(), name='login'),
     path('register/', RegisterView.as_view(), name='register'),

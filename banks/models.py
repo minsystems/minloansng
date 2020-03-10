@@ -10,4 +10,5 @@ class BankCode(models.Model):
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
 
     def __str__(self):
-        return '{bank}: {code}'.format(bank=self.name, code=self.code)
+        return self.name
+        # return '{bank}: {code}'.format(bank=self.name, code=self.code)
