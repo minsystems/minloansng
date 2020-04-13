@@ -17,8 +17,7 @@ from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 from sendgrid import Mail, SendGridAPIClient
 
-from minloansng.utils import unique_key_generator, get_trial_days, unique_slug_by_name, unique_slug_generator, \
-    random_string_generator
+from minloansng.utils import unique_key_generator, get_trial_days, unique_slug_generator_by_email, random_string_generator
 from minloansng import email_settings
 
 DEFAULT_ACTIVATION_DAYS = getattr(settings, 'DEFAULT_ACTIVATION_DAYS', 7)
@@ -290,7 +289,7 @@ def post_save_user_create_reciever(sender, instance, created, *args, **kwargs):
     if created:
         obj = EmailActivation.objects.create(user=instance, email=instance.email)
         obj.send_activation()
-        Profile.objects.create(user=instance, slug=unique_slug_generator(instance), token=random_string_generator(45))
+        Profile.objects.create(user=instance, slug=unique_slug_generator_by_email(instance), token=random_string_generator(45))
 
 
 post_save.connect(post_save_user_create_reciever, sender=User)
