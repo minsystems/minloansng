@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -33,8 +33,6 @@ class Dashboard(View):
                                 print("STARTUP")
                             elif user_plan == "BUSINESS":
                                 print("BUSINESS")
-                            elif user_plan == "COMPANY":
-                                print("COMPANY")
                             elif user_plan == "ENTERPRISE":
                                 print("ENTERPRISE")
                             else:
@@ -42,7 +40,18 @@ class Dashboard(View):
                         elif user_plan == "FREEMIUM":
                             if timezone.now() > user_profile_obj.trial_days:
                                 # return redirect to payment page
-                                messages.error(request, "Account Expired!")  # jQuery Handles Redirect
+                                messages.error(request, "Account Expired!, Your Account Has Been Expired You Would Be "
+                                                        "Redirected To The Payment Portal Upgrade Your Payment")
+                                # jQuery Handles Redirect
+                                user_companies_qs = request.user.profile.company_set.all()
+                                company_msg = Messages.objects.all().filter(to_obj=company_obj)
+                                context = {
+                                    'company': company_obj,
+                                    'object': company_obj,
+                                    'userCompany_qs': user_companies_qs,
+                                    'msg': company_msg,
+                                }
+                                return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
                             else:
                                 remaining_days = user_profile_obj.trial_days - timezone.now()
                                 messages.warning(request,
@@ -52,7 +61,7 @@ class Dashboard(View):
                                 company_msg = Messages.objects.all().filter(to_obj=company_obj)
                                 context = {
                                     'company': company_obj,
-                                    'object':company_obj,
+                                    'object': company_obj,
                                     'userCompany_qs': user_companies_qs,
                                     'msg': company_msg,
                                 }
@@ -73,9 +82,6 @@ class Dashboard(View):
                 if company_obj.user.plan == "BUSINESS":
                     print("Have A Custom Homepage Without URL Masking")
                     return render(request, "company/public-home.html", context={})
-                elif company_obj.user.plan == "COMPANY":
-                    print("Have A Custom Homepage With URL Masking")
-                    return render(request, "company/public-home.html", context={})
                 elif company_obj.user.plan == "ENTERPRISE":
                     print("Have A Custom Homepage With URL Masking")
                     return render(request, "company/public-home.html", context={})
@@ -90,9 +96,6 @@ class Dashboard(View):
 
                 if company_obj.user.plan == "BUSINESS":
                     print("Have A Custom Homepage Without URL Masking")
-                    return render(request, "company/public-home.html", context={})
-                elif company_obj.user.plan == "COMPANY":
-                    print("Have A Custom Homepage With URL Masking")
                     return render(request, "company/public-home.html", context={})
                 elif company_obj.user.plan == "ENTERPRISE":
                     print("Have A Custom Homepage With URL Masking")

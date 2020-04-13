@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from loans.models import LoanType, Collateral, LoanTerms, Loan, ModeOfRepayments, Penalty, CollateralFiles
+from loans.models import LoanType, Collateral, LoanTerms, Loan, ModeOfRepayments, Penalty, CollateralFiles, CollateralType
 
 
 @admin.register(Collateral)
@@ -27,3 +27,4 @@ admin.site.register(Loan)
 admin.site.register(ModeOfRepayments)
 admin.site.register(Penalty)
 admin.site.register(CollateralFiles)
+admin.site.register(CollateralType)

@@ -46,7 +46,7 @@ class MessageList(LoginRequiredMixin, View):
                             company_msg = Messages.objects.all().filter(to_obj=company_obj)
                             context = {
                                 'company': company_obj,
-                                'object':company_obj,
+                                'object': company_obj,
                                 'userCompany_qs': user_companies_qs,
                                 'msg': company_msg,
                             }
@@ -81,7 +81,7 @@ class MessageDetail(LoginRequiredMixin, View):
                             company_msg_obj = Messages.objects.get(to_obj=company_obj, slug=kwargs.get('slug_message'))
                             context = {
                                 'company': company_obj,
-                                'object':company_obj,
+                                'object': company_obj,
                                 'userCompany_qs': user_companies_qs,
                                 'msg_obj': company_msg_obj,
                             }
@@ -95,3 +95,8 @@ class MessageDetail(LoginRequiredMixin, View):
                 return redirect('404_')
         else:
             return redirect(reverse('account:user-update'))
+
+
+class AccountUpgrade(View):
+    def get(self, *args, **kwargs):
+        return render(self.request, template_name="payment-upgrade/account-upgrade.html", context={})

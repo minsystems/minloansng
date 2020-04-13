@@ -11,7 +11,14 @@
                         title: {% if message.tags %}'Account Suspension'{% endif %},
                         subtitle: 'Warning!',
                         body: {% if message.tags %}'{{ message }}'{% endif %}
-                      });
+                    });
+                    const messageVal = "{{ message }}";
+                    console.log(typeof (messageVal));
+                    {% if message == "Account Expired!, Your Account Has Been Expired You Would Be Redirected To The Payment Portal Upgrade Your Payment" %}
+                        setTimeout(function () {
+                            window.location.replace("mincore-url:account-upgrade");
+                        }, 3000);
+                    {% endif %}
                 {% endfor %}
             {% endif %}
         })

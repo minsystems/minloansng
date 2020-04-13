@@ -59,7 +59,7 @@
               </div>
               <!-- /.card-header -->
               <!-- form start -->
-              <form role="form" id="quickForm" method="post" action="{% url 'loans-url:loan-create' %}">
+              <form role="form" id="quickForm" method="post" action="{% url 'loans-url:loan-create' object.slug %}">
                 {% csrf_token %}
                 <div class="card-body">
 
@@ -80,7 +80,7 @@
                     <label for="borrower">Borrower or Borrower Group</label>
                     <select class="form-control select2" style="width: 100%;" id="borrower" required>
                         {% for borrower in borrowers_qs %}
-                            <option value="{{ borrower }}">{{ borrower }}</option>
+                            <option value="{{ borrower.slug }}">{{ borrower }}</option>
                         {% endfor %}
                         {% for bw_group in borrower_group_qs %}
                             <option value="{{ bw_group }}">{{ bw_group }}</option>
@@ -319,7 +319,7 @@
 $(document).ready(function () {
   $.validator.setDefaults({
     submitHandler: function () {
-      alert( "Form successful submitted!" );
+
     }
   });
   $('#quickForm').validate({
@@ -641,7 +641,75 @@ $(document).ready(function () {
             const loanFormMethod = loanForm.attr('method');
             const loanFormEndpoint = loanForm.attr('action');
 
+            function displaySubmitting(submitBtn, defaultText, doSubmit) {
+                if (doSubmit) {
+                    submitBtn.addClass("disabled");
+                    submitBtn.html("<i class='fa fa-spin fa-spinner'></i> Creating Loan..");
+                } else {
+                    submitBtn.removeClass("disabled");
+                    submitBtn.add(defaultText);
+                }
+            }
 
+            const loanFormSubmitBtn = loanForm.find("[type='submit']");
+            const loanFormSubmitBtnText = loanFormSubmitBtn.text();
+
+            loanForm.submit(function (event) {
+                event.preventDefault();
+
+                {% include 'csrf_ajax/csrf_ajax_token.js' %}
+
+                const loanFormData = {
+                    "loanType":$('#loan-package-type').val(),
+                    "borrower":$('#borrower').val(),
+                    "amount":$('#principal-amount').val(),
+                    "releaseDate":$('#release_date').val(),
+                    "interestFigure":$('#loan-interest-figure').val(),
+                    "interestPeriod":$('#loan-interest-period').val(),
+                    "durationFigure":$('#loan-duration-figure').val(),
+                    "durationPeriod":$('#loan-duration-period').val(),
+                    "repaymentInterval":$('#repayment-interval').val(),
+                    "repaymentIntervalFigure":$('#repayment-interval-figure').val(),
+                    "repaymentIntervalPeriod":$('#repayment-interval-figure-period').val(),
+                    "processingFee":$('#loan-processing-fee').val(),
+                    "insuranceFee":$('#insurance-fee').val(),
+                };
+
+                displaySubmitting(loanFormSubmitBtn, "", true);
+
+                $.ajax({
+                    method: loanFormMethod,
+                    url: loanFormEndpoint,
+                    data: loanFormData,
+                    contentType: 'application/x-www-form-urlencoded',
+
+                    success: function (data) {
+                        loanForm[0].reset();
+                        $(document).Toasts('create', {
+                            class: 'bg-success',
+                            autohide: true,
+                            delay: 750,
+                            title: 'Created!',
+                            subtitle: 'Success',
+                            body: '' + data.message
+                        });
+                        setTimeout(function () {
+                            window.location.replace("{% url 'loans-url:loan-create' object.slug %}");
+                        }, 5000);
+                    }, error: function (error) {
+                        loanForm[0].reset();
+                        $(document).Toasts('create', {
+                            class: 'bg-danger',
+                            autohide: true,
+                            delay: 750,
+                            title: 'Error!',
+                            subtitle: '',
+                            body: 'An Error Occurred!'
+                        });
+                        displaySubmitting(loanFormSubmitBtn, loanFormSubmitBtnText, false);
+                    }
+                })
+            })
         });
     })
 </script>

@@ -2,11 +2,13 @@ from cloudinary.models import CloudinaryField
 from django.db import models
 
 # Create your models here.
+from django.db.models.signals import post_save
 from django.urls import reverse
 
 from accounts.models import Profile, upload_image_path
 from borrowers.models import Borrower
 from company.models import Company
+from minloansng.utils import unique_slug_by_name
 from minmarkets.models import LoanPackage
 
 INTEREST_PLAN = (
@@ -49,7 +51,7 @@ COLLATERAL_STATUS = (
 class LoanTerms(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(blank=True, null=True, max_length=300)
-    content = models.TextField()
+    content = models.TextField(blank=True, null=True)
     package = models.ForeignKey(LoanPackage, on_delete=models.CASCADE, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
@@ -64,7 +66,7 @@ class LoanTerms(models.Model):
 
 class ModeOfRepayments(models.Model):
     name = models.CharField(max_length=300, blank=True, null=True)
-    describe = models.TextField()
+    describe = models.TextField(blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
 
     class Meta:
@@ -80,7 +82,7 @@ class Penalty(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
     describe = models.TextField()
     punishment_fee = models.CharField(max_length=300, blank=True, null=True)
-    re_occuring = models.BooleanField(False)
+    re_occuring = models.BooleanField(default=False)
     value_on_period = models.IntegerField(default=7, blank=True, null=True)
     period = models.CharField(max_length=20, choices=INTEREST_PLAN, default="Per Month", blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
@@ -143,13 +145,13 @@ class LoanType(models.Model):
 class Collateral(models.Model):
     collateral_type = models.OneToOneField(CollateralType, on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField(blank=True, null=True, max_length=300)
-    registered_date = models.DateTimeField()
+    registered_date = models.DateTimeField(blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
     status = models.CharField(max_length=40, choices=COLLATERAL_STATUS, default="OPEN", blank=True, null=True)
     value = models.CharField(max_length=300, blank=True, null=True, help_text='Object Worth')
-    condition = models.TextField(help_text='Describe status of object')
+    condition = models.TextField(help_text='Describe status of object', blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     image = CloudinaryField(upload_image_path, null=True, blank=True)
     collateral_files = models.ForeignKey(CollateralFiles, on_delete=models.CASCADE, blank=True, null=True)
 
@@ -158,7 +160,7 @@ class Collateral(models.Model):
         verbose_name_plural = 'Collateral'
 
     def __str__(self):
-        return self.name
+        return self.slug
 
 
 class LoanQuerySet(models.query.QuerySet):
@@ -181,11 +183,12 @@ class Loan(models.Model):
     account_officer = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
     borrower = models.ForeignKey(Borrower, on_delete=models.CASCADE, blank=True, null=True)
-    loan_type = models.OneToOneField(LoanType, on_delete=models.CASCADE, blank=True, null=True)
+    loan_type = models.ForeignKey(LoanType, on_delete=models.CASCADE, blank=True, null=True)
     loan_key = models.CharField(blank=True, null=True, max_length=300)
     principal_amount = models.CharField(blank=True, null=True, max_length=300)
     balance_due = models.CharField(blank=True, null=True, max_length=300)
-    interest = models.CharField(max_length=20, choices=INTEREST_PLAN, default="Per Month", blank=True, null=True)
+    interest = models.PositiveIntegerField(blank=True, null=True)
+    interest_period = models.CharField(max_length=20, choices=INTEREST_PLAN, default="Per Month", blank=True, null=True)
     loan_duration_circle = models.CharField(max_length=20, choices=DURATION_PLAN, default="Months", blank=True,
                                             null=True)
     loan_duration_circle_figure = models.IntegerField(default=1)
@@ -193,13 +196,13 @@ class Loan(models.Model):
                                         null=True)
     number_repayments = models.CharField(blank=True, null=True, max_length=300)
     release_date = models.DateTimeField(help_text='Loan Paid To Customer On:')
-    collection_date = models.DateTimeField(help_text='Each Date Loan Balance Is Been Paid Back')
-    end_date = models.DateTimeField(help_text='Maturity Date')
+    collection_date = models.DateTimeField(help_text='Each Date Loan Balance Is Been Paid Back', blank=True, null=True)
+    end_date = models.DateTimeField(help_text='Maturity Date', blank=True, null=True)
     processing_fee = models.CharField(blank=True, null=True, max_length=300)
     grace_period = models.IntegerField(default=1, help_text='Counts In Days')
     insurance = models.CharField(blank=True, null=True, max_length=300)
     collateral = models.OneToOneField(Collateral, on_delete=models.CASCADE, blank=True, null=True)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     loan_file_upload = CloudinaryField(upload_image_path, null=True, blank=True)
     active = models.BooleanField(default=True)
     loan_status = models.CharField(max_length=20, choices=LOAN_STATUS, default="OPEN", blank=True, null=True)
@@ -218,11 +221,23 @@ class Loan(models.Model):
         verbose_name_plural = "loans"
         ordering = ("-timestamp",)
 
-    def get_absolute_url(self):
-        return reverse('namespace-url:url-detail', kwargs={'slug': self.slug})
+    # def get_absolute_url(self, company_inst):
+    #     return reverse('loans-url:loan-detail', kwargs={'slug': company_inst.slug, 'loan_slug': self.slug})
 
     def __str__(self):
         return self.loan_key
 
     def get_opened_loans_by_company(self):
         return self.objects.opened_loans().filter(company=self.company)
+
+
+def post_save_user_create_reciever(sender, instance, created, *args, **kwargs):
+    print(kwargs)
+    print(instance.borrower)
+    if created:
+        Collateral.objects.get_or_create(slug=instance.loan_key)
+        Penalty.objects.create(title=instance.loan_key)
+        LoanTerms.objects.create(title=instance.loan_key)
+
+
+post_save.connect(post_save_user_create_reciever, sender=Loan)
