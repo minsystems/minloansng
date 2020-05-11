@@ -1,0 +1,222 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<!doctype html>
+<html class="no-js" lang="zxx">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Minloansng, Minmarket, Minaccount</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- <link rel="manifest" href="site.webmanifest"> -->
+    <link rel="shortcut icon" type="image/x-icon" href="https://cdn.minloans.com.ng/min-homepage/img/favicon.ico">
+    <!-- Place favicon.ico in the root directory -->
+
+    <!-- CSS here -->
+    <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/magnific-popup.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/89122a8218.css">
+
+    <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/themify-icons.css">
+    <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/nice-select.css">
+    <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/flaticon.css">
+    <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/gijgo.css">
+    <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/animate.min.css">
+    <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/slick.css">
+    <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/slicknav.css">
+
+    <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-homepage/css/style.css">
+    <!-- <link rel="stylesheet" href="css/responsive.css"> -->
+</head>
+
+<body>
+
+    <!--[if lte IE 9]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+        <![endif]-->
+    <!-- header-start -->
+
+    {% include 'nav/home-nav.html' %}
+
+    <!-- bradcam_area  -->
+      <div class="bradcam_area bradcam_bg_3">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="bradcam_text">
+                        <h3>Contact Us</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    <!--/ bradcam_area  -->
+
+    <!-- ================ contact section start ================= -->
+  <section class="contact-section section_padding">
+    <div class="container">
+      <div class="d-none d-sm-block mb-5 pb-4">
+        <div id="map" style="height: 480px;"></div>
+        <script>
+          function initMap() {
+            var uluru = {lat: 6.4926, lng: 3.3490};
+            var grayStyles = [
+              {
+                featureType: "all",
+                stylers: [
+                  { saturation: -90 },
+                  { lightness: 50 }
+                ]
+              },
+              {elementType: 'labels.text.fill', stylers: [{color: '#ccdee9'}]}
+            ];
+            var map = new google.maps.Map(document.getElementById('map'), {
+              center: {lat: 6.4926, lng: 3.3490},
+              zoom: 9,
+              styles: grayStyles,
+              scrollwheel:  false
+            });
+          }
+
+        </script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpfS1oRGreGSBU5HHjMmQ3o5NLw7VdJ6I&callback=initMap"></script>
+
+      </div>
+
+
+      <div class="row">
+        <div class="col-12">
+          <h2 class="contact-title">Get in Touch</h2>
+        </div>
+        <div class="col-lg-8">
+          <form class="form-contact contact_form" action="{% url 'mincore-url:contact-processor' %}" method="post" id="contactForm" novalidate="novalidate">
+              {% csrf_token %}
+            <div class="row">
+              <div class="col-12">
+                <div class="form-group">
+                    <textarea class="form-control w-100" name="message" id="message" cols="30" rows="9" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Enter Message'" placeholder = 'Enter Message'></textarea>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <input class="form-control" name="name" id="name" type="text" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Enter your name'" placeholder = 'Enter your name'>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <input class="form-control" name="email" id="email" type="email" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Enter email address'" placeholder = 'Enter email address'>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-group">
+                  <input class="form-control" name="subject" id="subject" type="text" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Enter Subject'" placeholder = 'Enter Subject'>
+                </div>
+              </div>
+            </div>
+            <div class="form-group mt-3">
+              <button type="submit" class="button button-contactForm btn_4 boxed-btn">Send Message</button>
+            </div>
+          </form>
+        </div>
+        <div class="col-lg-4">
+          <div class="media contact-info">
+            <span class="contact-info__icon">
+                <img src="https://cdn.minloans.com.ng/svgs/home-run.svg" class="img-responsive" width="40px" height="40px"/>
+            </span>
+            <div class="media-body">
+              <h3>Surulere, Lagos, Nigeria.</h3>
+              <p>Bode-Thomas, Street</p>
+            </div>
+          </div>
+          <div class="media contact-info">
+            <span class="contact-info__icon">
+                <img src="https://cdn.minloans.com.ng/svgs/phone.svg" class="img-responsive" width="40px" height="40px"/>
+            </span>
+            <div class="media-body">
+              <h3>+ (234) 8159 104 399</h3>
+              <p>Support: Mon to Saturday 9am to 4pm</p>
+            </div>
+          </div>
+          <div class="media contact-info">
+            <span class="contact-info__icon">
+                <img src="https://cdn.minloans.com.ng/svgs/email.svg" class="img-responsive" width="40px" height="40px"/>
+            </span>
+            <div class="media-body">
+              <h3>customer@minloans.com.ng</h3>
+              <p>Send your request, We listen!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ================ contact section end ================= -->
+
+
+    {% include 'base/h_footer.html' %}
+
+    <script>
+        $(function () {
+            'use strict';
+            $(document).ready(function () {
+                const contactForm = $('.contact_form');
+                const contactFormMethod = contactForm.attr('method');
+                const contactFormEndpoint = contactForm.attr('action');
+                const contactFormSubmitBtn = contactForm.find("[type='submit']");
+                const contactFormSubmitBtnText = contactFormSubmitBtn.text();
+
+                function displaySubmitting(submitBtn, defaultText, doSubmit) {
+                    if (doSubmit) {
+                        submitBtn.addClass("disabled");
+                        submitBtn.html("<i class='fa fa-spin fa-spinner'></i> Sending Message ...");
+                    } else {
+                        submitBtn.removeClass("disabled");
+                        submitBtn.add(defaultText);
+                    }
+                }
+
+                contactForm.submit(function (event) {
+                    event.preventDefault();
+
+                    {% include 'csrf_ajax/csrf_ajax_token.js' %}
+
+                    const contactFormData = {
+                        "messageBody": $('#message').val(),
+                        "messageSender": $('#name').val(),
+                        "messageEmail": $('#email').val(),
+                        "messageSubject": $('#subject').val()
+                    };
+                    console.log(contactFormData);
+                    const thisForm = $(this);
+
+                    displaySubmitting(contactFormSubmitBtn, "", true);
+
+                    $.ajax({
+                        method: contactFormMethod,
+                        url: "/system/handler/contact-processor/",
+                        data: contactFormData,
+                        contentType: 'application/x-www-form-urlencoded',
+                        dataType: 'json',
+
+                        success: function (data) {
+                            contactForm[0].reset();
+                        }, error: function (error) {
+                            console.log(error);
+                            contactForm[0].reset();
+                            //alert would be here
+                            displaySubmitting(contactFormSubmitBtn, contactFormSubmitBtnText, false);
+                        }
+                    })
+
+                })
+            })
+        })
+    </script>
+
+</body>
+
+</html>

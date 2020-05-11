@@ -7,16 +7,16 @@
             {% if messages %}
                 {% for message in messages %}
                     $(document).Toasts('create', {
-                        class: {% if message.tags %}'bg-warning'{% endif %},
-                        title: {% if message.tags %}'Account Suspension'{% endif %},
-                        subtitle: 'Warning!',
+                        class: {% if message.tags == 'success' %}'bg-success' {% elif message.tags == 'info' %} 'bg-info' {% elif message.tags == 'warning' %} 'bg-warning' {% elif message.tags == 'error' %} 'bg-danger' {% endif %},
+                        title: {% if message.tags == 'success' %}'Success!' {% elif message.tags == 'info' %} 'Signed In As: '{% elif message.tags == 'warning' %} 'Warning' {% elif message.tags == 'error' %} 'Oops! Sorry' {% endif %},
+                        subtitle: 'minloansng',
                         body: {% if message.tags %}'{{ message }}'{% endif %}
                     });
                     const messageVal = "{{ message }}";
                     console.log(typeof (messageVal));
                     {% if message == "Account Expired!, Your Account Has Been Expired You Would Be Redirected To The Payment Portal Upgrade Your Payment" %}
                         setTimeout(function () {
-                            window.location.replace("mincore-url:account-upgrade");
+                            window.location.replace("{% url 'mincore-url:account-upgrade' %}");
                         }, 3000);
                     {% endif %}
                 {% endfor %}

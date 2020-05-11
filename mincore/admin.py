@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from mincore.models import Subscribers, Messages, SupportTickets
+from mincore.models import Subscribers, Messages, SupportTickets, PlanDetails
 
 
 class SubscribersAdmin(admin.ModelAdmin):
@@ -27,7 +27,13 @@ class SupportTicketAdmin(admin.ModelAdmin):
     list_display = ('title', 'content', 'ticket_id', 'affected_company', 'slug', 'completed', 'timestamp', 'updated')
     list_display_links = ('title', 'ticket_id')
     search_fields = ('title', 'content', 'ticket_id')
-    prepopulated_fields = {'slug':('title', 'ticket_id')}
+    prepopulated_fields = {'slug': ('title', 'ticket_id')}
 
 
 admin.site.register(SupportTickets, SupportTicketAdmin)
+
+
+@admin.register(PlanDetails)
+class PlanDetailsModel(admin.ModelAdmin):
+    list_display = ("name", "max_staff", "maintenance_fee", "price")
+    list_display_links = ("name",)

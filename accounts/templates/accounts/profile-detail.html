@@ -59,10 +59,83 @@
                         <a href="#">
                            <h4>{{ object.get_name }}</h4>
                         </a>
-                        <p>ROLE: <strong>{{ object.role }}</strong></p>
+                        <p>ROLE: <strong>{{ object.role }}</strong></p><hr/>
+                         <p>Staff{% if staff_count > 1 %}s{% endif %}: <strong>
+                            {% if object.plan == 'FREEMIUM' or object.plan == 'STARTUP' %}
+                                 <i class="fa fa-money"></i> Upgrade Account To Add Staff
+                            {% else %}
+                                <i class="fa fa-user"></i> {{ staff_count }}
+                            {% endif %}
+                         </strong></p> <hr/>
+                        <p>
+                            You can add <strong>{{ plan_info_obj.max_staff }} staff{% if plan_info_obj.max_staff > 1 %}s{% endif %}</strong> only
+                        </p><br/>
+                        <button class="button button-contactForm btn_1 boxed-btn" data-toggle="modal" data-target="#modalLargeDefault"
+                                {% if object.plan == 'FREEMIUM' or object.plan == 'STARTUP' or staff_count == plan_info_obj.max_staff %}disabled{% endif %}>
+                            {% if object.plan == 'FREEMIUM' or object.plan == 'STARTUP' %}
+                                <i class="fa fa-times"></i> Cannot Add Staffs
+                            {% else %}
+                                <i class="fa fa-plus"></i> Add Staffs
+                            {% endif %}
+                        </button>
                      </div>
                   </div>
                </div>
+
+                <div class="modal fade" id="modalLargeDefault" tabindex="-1" role="dialog" aria-labelledby="modalLargeDefaultLabel" data-backdrop="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h4 class="modal-title" id="modalLargeDefaultLabel">
+                            <img class="img-responsive" width="40px" height="40px" src="https://cdn.minloans.com.ng/svgs/waiter.svg" />
+                            Add Staff Users - Max Staff: <strong>{{ plan_info_obj.max_staff }} staff{% if plan_info_obj.max_staff > 1 %}s{% endif %}</strong>
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <div class="text-center">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-12 col-md-12">
+                                    <form action="{% url 'mincore-url:add-staff' %}" class="addStaffForm" method="post">
+                                        <div class="mt-10">
+                                            <input type="text" name="staff-code" list="staff-code" placeholder="Staff Code"
+                                                onfocus="this.placeholder = ''" onblur="this.placeholder = 'Staff Code'" required
+                                                class="single-input">
+                                            <datalist id="staff-code">
+                                                {% for keycode in userKeyCode %}
+                                                    <option class="form-control" value="{{ keycode }}">{{ keycode }}</option>
+                                                {% endfor %}
+                                            </datalist>
+                                        </div>
+
+                                        <div class="input-group-icon mt-10">
+                                            <div class="icon"><i class="fa fa-globe" aria-hidden="true"></i></div>
+                                            <div class="form-select" id="default-select" aria-placeholder="Select Company">
+                                                <select id="company">
+                                                    {% for comp in user_comp_qs %}
+                                                        <option class="form-control" id="company" value="{{ comp }}">{{ comp }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-10">
+                                            <textarea class="single-textarea" id="message" placeholder="Message" onfocus="this.placeholder = ''"
+                                                onblur="this.placeholder = 'Message'" required></textarea>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-default btn-block btn-primary">Add Staff</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                <div class="comments-area">
                    <h4>Minloansng Products</h4>
                    <div class="comment-list">
@@ -71,11 +144,13 @@
                     <div class="single_service wow fadeInLeft" data-wow-duration="1.2s" data-wow-delay=".5s">
                         <div class="service_icon_wrap text-center">
                             <div class="service_icon ">
-                                <img class="img-responsive" width="250px" height="100px" src="https://web4africa.com/wp-content/uploads/dotSTORE.png" alt="">
+                                <a href="#">
+                                    <img class="img-responsive" width="250px" height="100px" src="https://web4africa.com/wp-content/uploads/dotSTORE.png" alt="">
+                                </a>
                             </div>
                         </div>
                         <div class="info text-center">
-                            <span>Minmarket</span><hr/>
+                            <span><h4>Minmarket</h4></span><hr/>
                             <small style="color: #5b80b2;">
                                 <a href="#">Get customisable apps &amp; plugins to manage your business!</a>
                             </small><hr/>
@@ -92,11 +167,13 @@
                     <div class="single_service wow fadeInUp" data-wow-duration="1s" data-wow-delay=".3s">
                         <div class="service_icon_wrap text-center">
                             <div class="service_icon ">
-                                <img class="img-responsive" width="250px" height="100px" src="https://i.udemycdn.com/course/750x422/2334782_d673_2.jpg" alt="">
+                                <a href="#">
+                                    <img class="img-responsive" width="250px" height="100px" src="https://i.udemycdn.com/course/750x422/2334782_d673_2.jpg" alt="">
+                                </a>
                             </div>
                         </div>
                         <div class="info text-center">
-                            <span>Minaccounting</span><hr/>
+                            <span><h4>Minaccounting</h4></span><hr/>
                             <small style="color: #5b80b2;">
                                 <a href="#">Accounting SAAS, to help you manage your business</a>
                             </small><hr/>
@@ -114,36 +191,50 @@
 
                </div>
                <div class="comments-area">
-                  <h4>Opened Tickets ( 1 )</h4>
+                  <h4>Tickets {{ userTickets_qs.count }}</h4>
                   <div class="comment-list">
-                     <div class="single-comment justify-content-between d-flex">
-                        <div class="user justify-content-between d-flex">
-                           <div class="thumb" style="background-color: #333333">
-                              <img src="https://cdn.minloans.com.ng/min-homepage/img/svg_icon/service_1.png" class="img-responsive" alt="">
-                           </div>
-                           <div class="desc">
-                              <p class="comment">
-                                 Payment made has not yet been activated on the platform
-                              </p>
-                              <div class="d-flex justify-content-between">
-                                 <div class="d-flex align-items-center">
-                                    <h5>
-                                       <a href="#">{{ object.get_name }}</a>
-                                    </h5>
-                                    <p class="date">{{ object.timestamp|timesince }}</p>
-                                 </div>
-                                 <div class="reply-btn">
-                                    <a href="#" class="btn-reply text-uppercase">done</a>
-                                 </div>
-                              </div>
-                           </div>
+                      {% for ticket_obj in userTickets_qs %}
+                        <div class="single-comment justify-content-between d-flex">
+                            <div class="user justify-content-between d-flex">
+                               <div class="thumb">
+                                  <img src="https://cdn.minloans.com.ng/svgs/ticket.svg" width="50px" height="50px" class="img-responsive" />
+                               </div>
+                               <div class="desc">
+                                  <p class="comment">
+                                     {{ ticket_obj.title }}
+                                  </p>
+                                  <div class="d-flex justify-content-between">
+                                     <div class="d-flex align-items-center">
+                                        <h5>
+                                           <a href="#">{{ ticket_obj.user }}</a>
+                                        </h5>
+                                        <p class="date">{{ ticket_obj.timestamp|timesince }}</p>
+                                     </div>
+                                     <div class="reply-btn">
+                                        <a href="#" class="btn-reply text-uppercase">
+                                            {% if ticket_obj.completed %}
+                                                <strong>DONE</strong>
+                                            {% else %}
+                                                <strong>UNSOLVED</strong>
+                                            {% endif %}
+                                        </a>
+                                     </div>
+                                  </div>
+                               </div>
+                            </div>
                         </div>
-                     </div>
+                      {% empty %}
+                          <div class="desc">
+                              <p class="comment">
+                                  <strong>You Have NO Ticket History</strong>
+                              </p>
+                          </div>
+                      {% endfor %}
                   </div>
                </div>
                <div class="comment-form">
                   <h4>Open A Ticket</h4>
-                  <form class="form-contact comment_form" action="#" id="commentForm">
+                  <form class="form-contact comment_form" method="post" action="{% url 'mincore-url:support-ticket' %}" id="commentForm">
                      <div class="row">
                         <div class="col-12">
                            <div class="form-group">
@@ -159,9 +250,9 @@
                         <div class="col-sm-4">
                            <div class="form-group">
                                <select class="form-control" id="company" name="text">
-                                    <option class="form-control" value=" "> Select Affected Company  . </option>
+                                    <option class="form-control" id="company" value=" "> Select Affected Company  . </option>
                                    {% for comp in user_comp_qs %}
-                                       <option class="form-control" value="{{ comp }}">{{ comp }}</option>
+                                       <option class="form-control" id="company" value="{{ comp }}">{{ comp }}</option>
                                    {% endfor %}
                                </select>
                            </div>
@@ -187,25 +278,65 @@
                      </h4>
                      <ul class="list cat-list">
                         {% for comp in user_comp_qs %}
-                            <li>
-                               <a href="{{ comp.get_absolute_url }}" class="d-flex">
-                                  <p>{{ comp }}</p>
-                               </a>
-                            </li>
+                            {% if comp.name %}
+                                <li>
+                                   <a href="{{ comp.get_absolute_url }}" class="d-flex">
+                                      <p>
+                                          <img src="https://cdn.minloans.com.ng/svgs/company.svg" width="40px" height="40px" class="img-responsive" />
+                                          {{ comp }}
+                                      </p>
+                                   </a>
+                                </li>
+                            {% else %}
+                                <a href="{% url 'company-url:update-company-profile' comp.slug %}" class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn">
+                                    Get A Company
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                     </ul>
+                  </aside>
+                  <aside class="single_sidebar_widget post_category_widget">
+                     <h4 class="widget_title">
+                         I Work For:
+                     </h4>
+                     <ul class="list cat-list">
+                        {% for comp in works_for %}
+                            {% if comp.name %}
+                                <li>
+                                   <a href="{{ comp.get_absolute_url }}" class="d-flex">
+                                      <p>
+                                          <img src="https://cdn.minloans.com.ng/svgs/company.svg" width="40px" height="40px" class="img-responsive" />
+                                          {{ comp }}
+                                      </p>
+                                   </a>
+                                </li>
+                            {% endif %}
+                        {% empty %}
+                            <li><p><strong>Not An Employee</strong></p></li>
                         {% endfor %}
                      </ul>
                   </aside>
                   <aside class="single_sidebar_widget popular_post_widget">
-                     <h3 class="widget_title">Access Token</h3>
+                     <h3 class="widget_title">
+                         <img class="img-responsive" width="40px" height="40px" src="https://cdn.minloans.com.ng/svgs/key.svg" />
+                         Access Token
+                     </h3>
                      <div class="media post_item">
                         <small><em>{{ object.token }}</em></small>
+                     </div><hr/>
+                     <div class="media post_item">
+                         <strong>KeyCode: </strong><small><em>{{ object.keycode }}</em></small>
                      </div>
                   </aside>
                   <aside class="single_sidebar_widget tag_cloud_widget">
-                     <h4 class="widget_title">Current Plan</h4>
+                     <h4 class="widget_title">
+                         <img src="https://cdn.minloans.com.ng/svgs/credit-card.svg" class="img-responsive" width="40px" height="40px"/>
+                         Current Plan
+                     </h4>
                      <div class="well well-sm">
-                         ACTIVE: <strong>{{ user_plan }}</strong> <i class="fa fa-check"></i>
-                         <hr/> <small> Expires in <strong>{{ object.trial_days }}</strong></small>
+                         {{ plan_title }}: <strong>{{ user_plan }}</strong>
+                         {% if plan_title == 'ACTIVE' %} <i class="fa fa-check"></i> {% else %} <i class="fa fa-times"></i> {% endif %}
+                         <hr/> <small> {% if plan_title == 'ACTIVE' %} Expires in <strong>{{ object.trial_days }}</strong> {% else %} Expired {% endif %} </small>
                          {% if user_plan == 'FREEMIUM' %}
                              <hr/>
                              <a href="#" style="color: #efefef" class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn">
@@ -253,6 +384,68 @@
    <script src="https://cdn.minloans.com.ng/min-homepage/js/main.js"></script>
 
    {% include 'js/dashjs.html' %}
+
+   <script>
+       $(function () {
+            'use strict';
+            $(document).ready(function () {
+                const addStaffForm = $('.addStaffForm');
+                const addStaffFormMethod = addStaffForm.attr('method');
+                const addStaffFormEndpoint = addStaffForm.attr('action');
+                const addStaffFormSubmitBtn = addStaffForm.find("[type='submit']");
+                const addStaffFormSubmitBtnText = addStaffFormSubmitBtn.text();
+
+                function displaySubmitting(submitBtn, defaultText, doSubmit) {
+                    if (doSubmit) {
+                        submitBtn.addClass("disabled");
+                        submitBtn.html("<i class='fa fa-spin fa-spinner'></i> Adding Staff ...");
+                    } else {
+                        submitBtn.removeClass("disabled");
+                        submitBtn.add(defaultText);
+                    }
+                }
+
+                addStaffForm.submit(function (event) {
+                    event.preventDefault();
+
+                    {% include 'csrf_ajax/csrf_ajax_token.js' %}
+
+                    const addStaffFormData = {
+                        "message": $('#message').val(),
+                        "staffCode": $('.single-input').val(),
+                        "company": $('#company').val(),
+                    };
+                    console.log(addStaffFormData);
+                    const thisForm = $(this);
+
+                    displaySubmitting(addStaffFormSubmitBtn, "", true);
+
+                    $.ajax({
+                        method: addStaffFormMethod,
+                        url: addStaffFormEndpoint,
+                        data: addStaffFormData,
+                        contentType: 'application/x-www-form-urlencoded',
+                        dataType: 'json',
+
+                        success: function (data) {
+                            addStaffForm[0].reset();
+                            setTimeout(function () {
+                                window.location.replace("{% url 'success' %}");
+                            }, 3000);
+                        }, error: function (error) {
+                            console.log(error);
+                            addStaffForm[0].reset();
+                            //alert would be here
+                            displaySubmitting(addStaffFormSubmitBtn, addStaffFormSubmitBtnText, false);
+                        }
+                    })
+
+                })
+            })
+        })
+   </script>
+
+   {% include 'js/support.html' %}
 
 </body>
 

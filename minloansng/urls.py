@@ -30,9 +30,17 @@ urlpatterns = [
     path('system/handler/', include(('mincore.urls', 'mincore-url'), namespace='mincore-url')),
     path('login/', LoginView.as_view(), name='login'),
     path('register/', RegisterView.as_view(), name='register'),
+
+    path('admin/', admin.site.urls),
+
     path('', TemplateView.as_view(template_name='index.html'), name='homepage'),
     path('page-not-found/', TemplateView.as_view(template_name='404_.html'), name='404_'),
-    path('admin/', admin.site.urls),
+    path('success/', TemplateView.as_view(template_name='url-holder/success.html'), name='success'),
+    path('about-us/', TemplateView.as_view(template_name='about.html'), name='about'),
+    path('features/', TemplateView.as_view(template_name='features.html'), name='features'),
+    path('terms-and-conditions/', TemplateView.as_view(template_name='tac.html'), name='tac'),
+    path('contact-us/', TemplateView.as_view(template_name='contact.html'), name='contact'),
+    path('privacy-policy/', TemplateView.as_view(template_name='privacy.html'), name='privacy'),
 ]
 
 if settings.DEBUG:

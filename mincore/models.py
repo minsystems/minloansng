@@ -78,9 +78,24 @@ class SupportTickets(models.Model):
     class Meta:
         verbose_name = 'Support Ticket'
         verbose_name_plural = 'Support Ticket'
+        ordering = ("-timestamp", "-updated",)
 
     def __str__(self):
         return self.title
 
     def get_absolute_url(self):
-        return reverse('mincore-url:support-ticket', kwargs={'slug':self.slug})
+        return reverse('mincore-url:support-ticket', kwargs={'slug': self.slug})
+
+
+class PlanDetails(models.Model):
+    name = models.CharField(max_length=100, blank=True, null=True)
+    max_staff = models.PositiveIntegerField(blank=True, null=True)
+    maintenance_fee = models.IntegerField(blank=True, null=True)
+    price = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Pricing Plan'
+        verbose_name_plural = 'Pricing Plans'
+
+    def __str__(self):
+        return self.name

@@ -1,0 +1,9 @@
+Hello,
+You Have An Email Notification.
+
+A support ticket has been opened please confirm and attend to all opened tickets.
+
+NB: This is an automated message from mincore systems, please do not reply!
+
+Thank you,
+MinSystem Core Support.

@@ -160,8 +160,8 @@
                             body: 'Company Updated Successfully.'
                           });
                         setTimeout(function () {
-                            window.location.replace("{% url 'company-url:dashboard' object.slug %}");
-                        }, 5000);
+                            window.location.replace("{% url 'success' %}");
+                        }, 3000);
                     }, error: function (error) {
                         console.log(error);
                         companyForm[0].reset();

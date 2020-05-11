@@ -17,7 +17,8 @@ from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 from sendgrid import Mail, SendGridAPIClient
 
-from minloansng.utils import unique_key_generator, get_trial_days, unique_slug_generator_by_email, random_string_generator
+from minloansng.utils import unique_key_generator, get_trial_days, unique_slug_generator_by_email, \
+    random_string_generator
 from minloansng import email_settings
 
 DEFAULT_ACTIVATION_DAYS = getattr(settings, 'DEFAULT_ACTIVATION_DAYS', 7)
@@ -225,7 +226,6 @@ PAYMENT_PLAN = (
     ('FREEMIUM', 'FREEMIUM'),
     ('STARTUP', 'STARTUP'),
     ('BUSINESS', 'BUSINESS'),
-    ('COMPANY', 'COMPANY'),
     ('ENTERPRISE', 'ENTERPRISE'),
 )
 
@@ -234,6 +234,8 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = PhoneNumberField(blank=True, null=True)
     image = CloudinaryField(upload_image_path, null=True, blank=True)
+    keycode = models.CharField(max_length=10, blank=True, null=True, unique=True)
+    working_for = models.ManyToManyField(to='company.Company')
     is_premium = models.BooleanField(default=False)
     trial_days = models.DateTimeField(default=get_trial_days)
     token = models.CharField(max_length=300, blank=True, null=True)
@@ -247,7 +249,7 @@ class Profile(models.Model):
         db_table = "profile"
         verbose_name = "Profile"
         verbose_name_plural = "Profiles"
-        unique_together = ('phone', 'slug')
+        unique_together = ('phone', 'slug', 'keycode',)
 
     def __str__(self):
         return str(self.user.email)
@@ -289,7 +291,8 @@ def post_save_user_create_reciever(sender, instance, created, *args, **kwargs):
     if created:
         obj = EmailActivation.objects.create(user=instance, email=instance.email)
         obj.send_activation()
-        Profile.objects.create(user=instance, slug=unique_slug_generator_by_email(instance), token=random_string_generator(45))
+        Profile.objects.create(user=instance, slug=unique_slug_generator_by_email(instance),
+                               token=random_string_generator(45), keycode=random_string_generator(4))
 
 
 post_save.connect(post_save_user_create_reciever, sender=User)
@@ -303,4 +306,3 @@ class GuestEmail(models.Model):
 
     def __str__(self):
         return self.email
-

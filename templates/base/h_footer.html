@@ -1,0 +1,145 @@
+{% load static %}
+
+<div class="brad_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="brad_active owl-carousel">
+                    <div class="single_brand wow fadeInUp" data-wow-duration="1s" data-wow-delay=".2s">
+                        <img src="https://cdn.minloans.com.ng/min-homepage/img/brand/1.png" alt="">
+                    </div>
+                    <div class="single_brand wow fadeInUp" data-wow-duration="1s" data-wow-delay=".3s">
+                        <img src="https://cdn.minloans.com.ng/min-homepage/img/brand/2.png" alt="">
+                    </div>
+                    <div class="single_brand wow fadeInUp" data-wow-duration="1s" data-wow-delay=".4s">
+                        <img src="https://cdn.minloans.com.ng/min-homepage/img/brand/3.png" alt="">
+                    </div>
+                    <div class="single_brand wow fadeInUp" data-wow-duration="1s" data-wow-delay=".5s">
+                        <img src="https://cdn.minloans.com.ng/min-homepage/img/brand/4.png" alt="">
+                    </div>
+                    <div class="single_brand wow fadeInUp" data-wow-duration="1s" data-wow-delay=".6s">
+                        <img src="https://cdn.minloans.com.ng/min-homepage/img/brand/5.png" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="apply_loan overlay">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 col-md-7">
+                <div class="loan_text wow fadeInLeft" data-wow-duration="1s" data-wow-delay=".3s">
+                    <h3>
+                        Don't see a feature or have different requirements?
+                    </h3>
+                    <small style="color: beige;">
+                        Send us an email at support@minloans.com.ng. We do customizations on a paid basis.
+                    </small>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-5">
+                <div class="loan_btn wow fadeInUp" data-wow-duration="1.2s" data-wow-delay=".4s">
+                    <a class="boxed-btn3" href="{% url 'login' %}">Get Started - It's Free</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'footer/home-footer.html' %}
+
+<!-- link that opens popup -->
+<!-- JS here -->
+<script src="https://cdn.minloans.com.ng/min-homepage/js/vendor/modernizr-3.5.0.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/vendor/jquery-1.12.4.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/popper.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/bootstrap.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/owl.carousel.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/isotope.pkgd.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/ajax-form.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/waypoints.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.counterup.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/imagesloaded.pkgd.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/scrollIt.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.scrollUp.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/wow.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/nice-select.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.slicknav.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.magnific-popup.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/plugins.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/gijgo.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/slick.min.js"></script>
+<script src="https://use.fontawesome.com/7eea54d94f.js"></script>
+
+
+
+<!--contact js-->
+<script src="https://cdn.minloans.com.ng/min-homepage/js/contact.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.ajaxchimp.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.form.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.validate.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-homepage/js/mail-script.js"></script>
+
+
+<script src="https://cdn.minloans.com.ng/min-homepage/js/main.js"></script>
+
+<script>
+    $(function () {
+        'use strict';
+        $(document).ready(function () {
+            const newsletterForm = $('.newsletter_form');
+            const newsletterFormMethod = newsletterForm.attr('method');
+            const newsletterFormEndpoint = newsletterForm.attr('action');
+            const newsletterFormSubmitBtn = newsletterForm.find("[type='submit']");
+            const newsletterFormSubmitBtnText = newsletterFormSubmitBtn.text();
+
+            function displaySubmitting(submitBtn, defaultText, doSubmit) {
+                if (doSubmit) {
+                    submitBtn.addClass("disabled");
+                    submitBtn.html("<i class='fa fa-spin fa-spinner'></i> Subscribing ...");
+                } else {
+                    submitBtn.removeClass("disabled");
+                    submitBtn.add(defaultText);
+                }
+            }
+
+            newsletterForm.submit(function (event) {
+                event.preventDefault();
+
+                {% include 'csrf_ajax/csrf_ajax_token.js' %}
+
+                const newsletterFormData = {
+                    "email": $('#mailList').val(),
+                };
+                console.log(newsletterFormData);
+                const thisForm = $(this);
+
+                displaySubmitting(newsletterFormSubmitBtn, "", true);
+
+                $.ajax({
+                    method: newsletterFormMethod,
+                    url: newsletterFormEndpoint,
+                    data: newsletterFormData,
+                    contentType: 'application/x-www-form-urlencoded',
+                    dataType: 'json',
+
+                    success: function (data) {
+                        newsletterForm[0].reset();
+                        setTimeout(function () {
+                            window.location.replace("/");
+                        }, 3000);
+                    }, error: function (error) {
+                        console.log(error);
+                        newsletterForm[0].reset();
+                        //alert would be here
+                        displaySubmitting(newsletterFormSubmitBtn, newsletterFormSubmitBtnText, false);
+                    }
+                })
+
+            })
+
+        })
+    })
+</script>

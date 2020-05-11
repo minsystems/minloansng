@@ -55,7 +55,7 @@ admin.site.register(EmailActivation, EmailActivationAdmin)
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'is_premium', 'phone', 'trial_days', 'plan', 'slug', 'token', 'updated')
+    list_display = ('user', 'is_premium', 'phone', 'keycode', 'trial_days', 'plan', 'slug', 'token', 'updated')
     list_display_links = ('user',)
     list_filter = ('user', 'phone')
     readonly_fields = ('image_tag',)
@@ -64,7 +64,7 @@ class ProfileAdmin(admin.ModelAdmin):
     ordering = ('-timestamp',)
     fieldsets = (
         ('Basic Information', {'description': "Basic User Profile Information",
-                               'fields': (('user',), 'image_tag', 'image', 'phone')}),
+                               'fields': (('user',), 'image_tag', 'image', 'keycode', 'phone', 'working_for',)}),
         ('Complete Full Information',
          {'classes': ('collapse',), 'fields': ('role', 'is_premium', 'trial_days', 'slug', 'plan', 'token')}),)
 

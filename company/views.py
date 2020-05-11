@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -30,9 +30,68 @@ class Dashboard(View):
                         print(user_plan)
                         if request.user.profile.is_premium:
                             if user_plan == "STARTUP":
-                                print("STARTUP")
+                                if timezone.now() > user_profile_obj.trial_days:
+                                    # return redirect to payment page
+                                    messages.error(request,
+                                                   "Account Expired!, Your Account Has Been Expired You Would Be "
+                                                   "Redirected To The Payment Portal Upgrade Your Payment")
+                                    # jQuery Handles Redirect
+                                    user_companies_qs = request.user.profile.company_set.all()
+                                    company_msg = Messages.objects.all().filter(to_obj=company_obj)
+                                    context = {
+                                        'company': company_obj,
+                                        'object': company_obj,
+                                        'userCompany_qs': user_companies_qs,
+                                        'msg': company_msg,
+                                    }
+                                    return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
+                                else:
+                                    remaining_days = user_profile_obj.trial_days - timezone.now()
+                                    messages.warning(request,
+                                                     "You Have %s Days Left Before Account Suspension, Please Upgrade "
+                                                     "Your Account" % (remaining_days.days))
+                                    user_companies_qs = request.user.profile.company_set.all()
+                                    company_msg = Messages.objects.all().filter(to_obj=company_obj)
+                                    context = {
+                                        'company': company_obj,
+                                        'object': company_obj,
+                                        'userCompany_qs': user_companies_qs,
+                                        'msg': company_msg,
+                                    }
+                                    return render(request, "company/dashboard.html", context)
                             elif user_plan == "BUSINESS":
-                                print("BUSINESS")
+                                if timezone.now() > user_profile_obj.trial_days:
+                                    # return redirect to payment page
+                                    messages.error(request,
+                                                   "Account Expired!, Your Account Has Been Expired You Would Be "
+                                                   "Redirected To The Payment Portal Upgrade Your Payment")
+                                    # jQuery Handles Redirect
+                                    user_companies_qs = request.user.profile.company_set.all()
+                                    company_msg = Messages.objects.all().filter(to_obj=company_obj)
+                                    context = {
+                                        'company': company_obj,
+                                        'object': company_obj,
+                                        'userCompany_qs': user_companies_qs,
+                                        'msg': company_msg,
+                                    }
+                                    return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
+                                else:
+                                    remaining_days = user_profile_obj.trial_days - timezone.now()
+                                    if remaining_days == 7:
+                                        messages.warning(request,
+                                                         "You Have %s Days Left Before Account Suspension, Please Upgrade "
+                                                         "Your Account" % (remaining_days.days))
+                                    else:
+                                        messages.info(request, "Welcome, you are logged in as %s" % (request.user))
+                                    user_companies_qs = request.user.profile.company_set.all()
+                                    company_msg = Messages.objects.all().filter(to_obj=company_obj)
+                                    context = {
+                                        'company': company_obj,
+                                        'object': company_obj,
+                                        'userCompany_qs': user_companies_qs,
+                                        'msg': company_msg,
+                                    }
+                                    return render(request, "company/dashboard.html", context)
                             elif user_plan == "ENTERPRISE":
                                 print("ENTERPRISE")
                             else:
@@ -72,7 +131,124 @@ class Dashboard(View):
                         return redirect(
                             reverse('company-url:update-company-profile', kwargs={'slug': company_obj.slug}))
                 except Company.DoesNotExist:
-                    return redirect('404_')
+                    print("You work here!")
+                    target_comp = Company.objects.get(slug=kwargs.get('slug'))
+                    company_array = list()
+                    user_profile_obj = Profile.objects.get(user=request.user)
+                    for company_inst in user_profile_obj.working_for.all():
+                        company_array.append(str(company_inst))
+
+                    for comp_ in company_array:
+                        if comp_ == str(target_comp):
+                            if target_comp.name:
+                                user_plan = str(target_comp.user.plan)
+                                print(user_plan)
+                                if target_comp.user.is_premium:
+                                    if user_plan == "STARTUP":
+                                        if timezone.now() > target_comp.user.trial_days:
+                                            # return redirect to payment page
+                                            messages.error(request,
+                                                           "Account Expired!, Your Account Has Been Expired You Would Be "
+                                                           "Redirected To The Payment Portal Upgrade Your Payment")
+                                            # jQuery Handles Redirect
+                                            user_companies_qs = target_comp.user.user.profile.company_set.all()
+                                            company_msg = Messages.objects.all().filter(to_obj=target_comp)
+                                            context = {
+                                                'company': target_comp,
+                                                'object': target_comp,
+                                                'userCompany_qs': user_companies_qs,
+                                                'msg': company_msg,
+                                            }
+                                            return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
+                                        else:
+                                            remaining_days = target_comp.user.trial_days - timezone.now()
+                                            messages.warning(request,
+                                                             "You Have %s Days Left Before Account Suspension, Please Upgrade "
+                                                             "Your Account" % (remaining_days.days))
+                                            user_companies_qs = target_comp.user.user.profile.company_set.all()
+                                            company_msg = Messages.objects.all().filter(to_obj=target_comp)
+                                            context = {
+                                                'company': target_comp,
+                                                'object': target_comp,
+                                                'userCompany_qs': user_companies_qs,
+                                                'msg': company_msg,
+                                            }
+                                            return render(request, "company/dashboard.html", context)
+                                    elif user_plan == "BUSINESS":
+                                        if timezone.now() > target_comp.user.trial_days:
+                                            # return redirect to payment page
+                                            messages.error(request,
+                                                           "Account Expired!, Your Account Has Been Expired You Would Be "
+                                                           "Redirected To The Payment Portal Upgrade Your Payment")
+                                            # jQuery Handles Redirect
+                                            user_companies_qs = target_comp.user.user.profile.company_set.all()
+                                            company_msg = Messages.objects.all().filter(to_obj=target_comp)
+                                            context = {
+                                                'company': target_comp,
+                                                'object': target_comp,
+                                                'userCompany_qs': user_companies_qs,
+                                                'msg': company_msg,
+                                            }
+                                            return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
+                                        else:
+                                            remaining_days = target_comp.user.trial_days - timezone.now()
+                                            if remaining_days == 5:
+                                                messages.warning(request,
+                                                                 "You Have %s Days Left Before Account Suspension, Please Upgrade "
+                                                                 "Your Account" % (remaining_days.days))
+                                            else:
+                                                messages.info(request, "Welcome, you are logged in as %s" %(request.user))
+                                            user_companies_qs = target_comp.user.user.profile.company_set.all()
+                                            company_msg = Messages.objects.all().filter(to_obj=target_comp)
+                                            context = {
+                                                'company': target_comp,
+                                                'object': target_comp,
+                                                'userCompany_qs': user_companies_qs,
+                                                'msg': company_msg,
+                                            }
+                                            return render(request, "company/dashboard.html", context)
+                                    elif user_plan == "ENTERPRISE":
+                                        print("ENTERPRISE")
+                                    else:
+                                        return redirect(reverse('404_'))
+                                elif user_plan == "FREEMIUM":
+                                    if timezone.now() > target_comp.user.trial_days:
+                                        # return redirect to payment page
+                                        messages.error(request,
+                                                       "Account Expired!, Your Account Has Been Expired You Would Be "
+                                                       "Redirected To The Payment Portal Upgrade Your Payment")
+                                        # jQuery Handles Redirect
+                                        user_companies_qs = target_comp.user.user.profile.company_set.all()
+                                        company_msg = Messages.objects.all().filter(to_obj=target_comp)
+                                        context = {
+                                            'company': target_comp,
+                                            'object': target_comp,
+                                            'userCompany_qs': user_companies_qs,
+                                            'msg': company_msg,
+                                        }
+                                        return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
+                                    else:
+                                        remaining_days = target_comp.user.trial_days - timezone.now()
+                                        messages.warning(request,
+                                                         "You Have %s Days Left Before Account Suspension, Please Upgrade "
+                                                         "Your Account" % (remaining_days.days))
+                                        user_companies_qs = target_comp.user.user.profile.company_set.all()
+                                        company_msg = Messages.objects.all().filter(to_obj=target_comp)
+                                        context = {
+                                            'company': target_comp,
+                                            'object': target_comp,
+                                            'userCompany_qs': user_companies_qs,
+                                            'msg': company_msg,
+                                        }
+                                        return render(request, "company/dashboard.html", context)
+                                else:
+                                    return redirect(reverse('404_'))
+                            else:
+                                return redirect(reverse('404_'))
+                            return render(request, "company/dashboard.html", context)
+                        else:
+                            redirect(reverse('404_'))
+                    return reverse('404_')
             else:
                 return redirect(reverse('account:user-update'))
         else:
@@ -114,6 +290,13 @@ class UpdateCompanyProfileView(GetObjectMixin, DetailView):
 
     def render_to_response(self, context, **response_kwargs):
         if context:
+            user_profile_obj = Profile.objects.get(user=self.request.user)
+            if timezone.now() > user_profile_obj.trial_days:
+                # return redirect to payment page
+                messages.error(self.request,
+                               "Account Expired!, Your Account Has Been Expired You Would Be "
+                               "Redirected To The Payment Portal Upgrade Your Payment")
+                return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
             if self.request.user.is_authenticated:
                 thisUser = str(self.get_object().user)
                 currentUser = str(self.request.user)
@@ -127,7 +310,7 @@ class UpdateCompanyProfileView(GetObjectMixin, DetailView):
                         if self.get_object().user.phone is None:
                             print("Redirect To Profile Update!")
                         else:
-                            messages.warning(self.request,
+                            messages.info(self.request,
                                              "Update Company Information")  # jQuery lets you update this information
             else:
                 return redirect(reverse('404_'))

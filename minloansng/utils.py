@@ -68,6 +68,20 @@ def random_string_generator(size=10, chars=string.ascii_lowercase + string.digit
     return ''.join(random.choice(chars) for _ in range(size))
 
 
+def unique_id_generator(instance):
+    """
+    This is for a Django project with an key field
+    """
+    size = random.randint(30, 45)
+    key = random_string_generator(size=size)
+
+    Klass = instance.__class__
+    qs_exists = Klass.objects.filter(id=key).exists()
+    if qs_exists:
+        return unique_slug_generator(instance)
+    return key
+
+
 def unique_key_generator(instance):
     """
     This is for a Django project with an key field
@@ -127,7 +141,7 @@ def unique_slug_generator_by_email(instance, new_slug=None):
         slug = slugify(instance.email)
 
     Klass = instance.__class__
-    qs_exists = Klass.objects.filter(slug=slug).exists()
+    qs_exists = Klass.objects.filter(email=slug).exists()
     if qs_exists:
         new_slug = "{slug}-{randstr}".format(
             slug=slug,

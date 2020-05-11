@@ -42,40 +42,58 @@
 
     {% include 'nav/home-nav.html' %}
 
-      <!-- bradcam_area  -->
+    <!-- bradcam_area  -->
       <div class="bradcam_area bradcam_bg_1">
         <div class="container">
             <div class="row">
                 <div class="col-xl-12">
                     <div class="bradcam_text">
-                        <h3>Password Reset Complete!</h3>
+                        <h3>About Minloans, Minaccounts &amp; Minmarket</h3>
                     </div>
                 </div>
             </div>
         </div>
       </div>
-      <!--/ bradcam_area  -->
+    <!--/ bradcam_area  -->
 
-    <!-- service_area_start  -->
-    <div class="service_area">
+    <!-- about_area_start  -->
+    <div class="about_area plus_padding">
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-6">
-                    <div class="section_title text-center mb-90">
-                        <span class="wow fadeInUp" data-wow-duration="1s" data-wow-delay=".1s"></span>
-                        <h4 class="wow fadeInUp" data-wow-duration="1s" data-wow-delay=".2s">
-                            Password Reset Successfully!
-                            <img class="img-responsive" width="40px" height="40px" src="https://cdn.minloans.com.ng/svgs/tick.svg" />
-                        </h4>
+            <div class="row align-items-center">
+                <div class="col-lg-6 col-md-6">
+                    <div class="about_img wow fadeInLeft" data-wow-duration="1s" data-wow-delay=".3s">
+                        <img src="https://www.cdn.minloans.com.ng/min-homepage/img/about/about.png" alt="">
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="about_info pl-68">
+                        <div class="section_title wow fadeInUp" data-wow-duration="1.2s" data-wow-delay=".3s">
+                            <h3>We Simplify Lending!</h3>
+                        </div>
+                        <p class="wow fadeInUp" data-wow-duration="1.2s" data-wow-delay=".4s">
+                            Cloud based customisable loan management system for microfinance and lending companies.
+                            Manage loans and savings accounts of your borrowers. View charts and reports.
+                        </p>
+                        <div class="about_list">
+                            <ul>
+                                <li class="wow fadeInRight" data-wow-duration="1s" data-wow-delay=".5s">Loans.</li>
+                                <li class="wow fadeInRight" data-wow-duration="1s" data-wow-delay=".6s">Savings &amp; Expenses</li>
+                                <li class="wow fadeInRight" data-wow-duration="1s" data-wow-delay=".7s">Payroll &amp; Accounting</li>
+                                <li class="wow fadeInRight" data-wow-duration="1s" data-wow-delay=".9s">Integrated Apps &amp; Store</li>
+                            </ul>
+                        </div>
+                        <div class="about_btn wow fadeInRight" data-wow-duration="1.3s" data-wow-delay=".5s">
+                            <a class="boxed-btn3" href="{% url 'login' %}">Give Us A Try, Start Using Minloans</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- service_area_end  -->
+    <!-- about_area_end  -->
 
     {% include 'base/h_footer.html' %}
+
 </body>
 
 </html>
-

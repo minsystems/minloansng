@@ -1,15 +1,18 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse, HttpResponseRedirect
 
 # Create your views here.
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.datetime_safe import date
 from django.utils.text import slugify
 from django.views.generic import DetailView, ListView
 from django_countries import countries
 from django_countries.fields import Country
 
+from accounts.models import Profile
 from banks.models import BankCode
 from borrowers.forms import BorrowerUpdateForm
 from borrowers.models import Borrower, BorrowerGroup
@@ -29,8 +32,18 @@ class BorrowerCreateView(GetObjectMixin, LoginRequiredMixin, DetailView):
         context['borrower_group_qs'] = self.get_object().borrowergroup_set.all()
         context['banks'] = BankCode.objects.all()
         context['country_qs'] = countries
-
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        if context:
+            user_profile_obj = Profile.objects.get(user=self.request.user)
+            if timezone.now() > user_profile_obj.trial_days:
+                # return redirect to payment page
+                messages.error(self.request,
+                               "Account Expired!, Your Account Has Been Expired You Would Be "
+                               "Redirected To The Payment Portal Upgrade Your Payment")
+                return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
+        return super(BorrowerCreateView, self).render_to_response(context, **response_kwargs)
 
     def post(self, *args, **kwargs):
         bank_inst = BankCode.objects.get(name__exact=self.request.POST.get('bank'))
@@ -98,10 +111,18 @@ class BorrowerUpdateView(LoginRequiredMixin, DetailView):
 
     def render_to_response(self, context, **response_kwargs):
         if context:
+            user_profile_obj = Profile.objects.get(user=self.request.user)
+            if timezone.now() > user_profile_obj.trial_days:
+                # return redirect to payment page
+                messages.error(self.request,
+                               "Account Expired!, Your Account Has Been Expired You Would Be "
+                               "Redirected To The Payment Portal Upgrade Your Payment")
+                return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
             staff_array = list()
             for user_obj in self.get_object().staffs.all():
                 staff_array.append(str(user_obj))
-            if self.request.user.email in staff_array or self.request.user.email == str(self.get_object().user.user.email):
+            if self.request.user.email in staff_array or self.request.user.email == str(
+                    self.get_object().user.user.email):
                 pass
             else:
                 redirect(reverse('404_'))
@@ -127,6 +148,17 @@ class BorrowerGroupCreateView(GetObjectMixin, LoginRequiredMixin, DetailView):
         context['borrower_group_qs'] = self.get_object().borrowergroup_set.all()
         return context
 
+    def render_to_response(self, context, **response_kwargs):
+        if context:
+            user_profile_obj = Profile.objects.get(user=self.request.user)
+            if timezone.now() > user_profile_obj.trial_days:
+                # return redirect to payment page
+                messages.error(self.request,
+                               "Account Expired!, Your Account Has Been Expired You Would Be "
+                               "Redirected To The Payment Portal Upgrade Your Payment")
+                return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
+        return super(BorrowerGroupCreateView, self).render_to_response(context, **response_kwargs)
+
     def post(self):
         return JsonResponse({'message': 'Submitted For Processing'})
 
@@ -144,6 +176,17 @@ class BorrowerListView(LoginRequiredMixin, ListView):
         context['object'] = owner_company_obj
         return context
 
+    def render_to_response(self, context, **response_kwargs):
+        if context:
+            user_profile_obj = Profile.objects.get(user=self.request.user)
+            if timezone.now() > user_profile_obj.trial_days:
+                # return redirect to payment page
+                messages.error(self.request,
+                               "Account Expired!, Your Account Has Been Expired You Would Be "
+                               "Redirected To The Payment Portal Upgrade Your Payment")
+                return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
+        return super(BorrowerListView, self).render_to_response(context, **response_kwargs)
+
 
 class BorrowerGroupsListView(LoginRequiredMixin, ListView):
     template_name = 'borrowers/borrower-group_list.html'
@@ -153,6 +196,17 @@ class BorrowerGroupsListView(LoginRequiredMixin, ListView):
         context['userCompany_qs'] = self.request.user.profile.company_set.all()
         context['object'] = self.request.user.profile.company_set.all().first()
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        if context:
+            user_profile_obj = Profile.objects.get(user=self.request.user)
+            if timezone.now() > user_profile_obj.trial_days:
+                # return redirect to payment page
+                messages.error(self.request,
+                               "Account Expired!, Your Account Has Been Expired You Would Be "
+                               "Redirected To The Payment Portal Upgrade Your Payment")
+                return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
+        return super(BorrowerGroupsListView, self).render_to_response(context, **response_kwargs)
 
     def get_queryset(self):
         owner_company_qs = self.request.user.profile.company_set.all()

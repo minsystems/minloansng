@@ -1,13 +1,18 @@
+from __future__ import print_function
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.http import JsonResponse
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import CreateView, FormView, DetailView, View, UpdateView
 from django.views.generic.edit import FormMixin
 from django.shortcuts import render, redirect
 from django.utils.safestring import mark_safe
 
 from company.models import Company
+from mincore.models import PlanDetails, SupportTickets
 from minloansng.mixins import NextUrlMixin, RequestFormAttachMixin
 from .forms import LoginForm, RegisterForm, GuestForm, ReactivateEmailForm, UserDetailChangeForm
 from .models import EmailActivation, Profile
@@ -96,7 +101,11 @@ class LoginView(NextUrlMixin, RequestFormAttachMixin, FormView):
         if context:
             if self.request.user.is_authenticated:
                 profile_obj = Profile.objects.get(user=self.request.user)
-                company_obj = Company.objects.get(user=profile_obj)
+                try:
+                    company_obj = Company.objects.get(user=profile_obj)
+                except Company.MultipleObjectsReturned:
+                    company_qs = Company.objects.filter(user=profile_obj)
+                    company_obj = company_qs.first()
                 return redirect(reverse('company-url:dashboard', kwargs={'slug': company_obj.slug}))
             else:
                 pass
@@ -121,8 +130,20 @@ class UserDetailUpdateView(LoginRequiredMixin, UpdateView):
         context['title'] = 'Change Your Account Details'
         return context
 
+    def post(self, *args, **kwargs):
+        form = UserDetailChangeForm(self.request.POST or None, instance=self.get_object())
+        user_profile_obj = Profile.objects.get(user=self.get_object())
+        phone = self.request.POST.get("phone")
+        full_name = self.request.POST.get("full_name")
+        if form.is_valid():
+            user_profile_obj.phone = phone
+            user_profile_obj.save()
+            self.get_object().full_name = full_name
+            form.save()
+        return JsonResponse({'message': 'Success!'})
+
     def get_success_url(self):
-        return reverse("account:home")
+        return reverse("account:profile-detail", kwargs={'slug': self.get_object().profile.slug})
 
 
 class ProfileDetailView(LoginRequiredMixin, DetailView):
@@ -133,4 +154,25 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         context = super(ProfileDetailView, self).get_context_data(**kwargs)
         context['user_comp_qs'] = self.object.user.profile.company_set.all()
         context['user_plan'] = self.object.user.profile.get_plan_display()  # .plan #get_modelfield_display()
+        context['works_for'] = self.object.user.profile.working_for.all()
+        staffs_ = list()
+        for staff_obj in self.object.user.profile.company_set.all():
+            staffs_.append(staff_obj)
+        context['staff_count'] = (len(staffs_))
+
+        if timezone.now() <= self.object.user.profile.trial_days:
+            context["plan_title"] = "ACTIVE"
+        else:
+            context["plan_title"] = "EXPIRED"
+
+        context['plan_info_obj'] = PlanDetails.objects.get(name__iexact=self.object.user.profile.get_plan_display())
+
+        user_code = list()
+        for code_obj in Profile.objects.all():
+            user_code.append(code_obj.keycode)
+
+        context["userKeyCode"] = user_code
+
+        context['userTickets_qs'] = SupportTickets.objects.filter(user__exact=self.object)[:10]
+
         return context

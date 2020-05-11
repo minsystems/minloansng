@@ -47,7 +47,7 @@ class Company(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     name = models.CharField(max_length=300, blank=True, null=True, default='')
     email = models.CharField(max_length=300, blank=True, null=True, default='')
-    staffs = models.ManyToManyField(Profile, related_name='workers')
+    staffs = models.ManyToManyField(to='accounts.Profile', related_name='workers')
     logo = CloudinaryField(upload_image_path, null=True, blank=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
     active = models.BooleanField(default=True)
@@ -76,6 +76,11 @@ class Company(models.Model):
 
     def get_absolute_url(self):
         return reverse("company-url:dashboard", kwargs={"slug": self.slug})
+
+    def get_email(self):
+        if self.email is not None:
+            return self.email
+        return self.user.user.email
 
 
 def post_save_user_create_reciever(sender, instance, created, *args, **kwargs):

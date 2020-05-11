@@ -64,7 +64,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'loans-url:loan-list' object.slug %}" class="nav-link">
+                <a href="{% if request.path == '/account/details/' %}#{% else %}{% url 'loans-url:loan-list' object.slug %} {% endif %}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Loan List</p>
                 </a>

@@ -49,7 +49,11 @@
                                 Customisable Cloud Based Loan Management System Built For Microfinance Industry
                             </h3>
                             <div class="sldier_btn wow fadeInLeft" data-wow-duration="1s" data-wow-delay=".2s">
-                                <a href="#" class="boxed-btn3">Free 30 Day Trial</a>
+                                {% if request.user.is_authenticated %}
+                                    <a href="https://feeds.minloans.com.ng" target="_blank" class="boxed-btn3">Check Out Minblog For Updates</a>
+                                {% else %}
+                                    <a href="#" class="boxed-btn3">Free 30 Day Trial</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -66,7 +70,11 @@
                             <hr/>
                             <div class="submit_btn">
                                 <a class="boxed-btn3 btn-block" type="submit">
-                                    Free For 30 days <i class="fa fa-arrow-right"></i>
+                                    {% if request.user.is_authenticated %}
+                                        Welcome Mr. {{ request.user.profile.get_name }}
+                                    {% else %}
+                                        Free For 30 days <i class="fa fa-arrow-right"></i>
+                                    {% endif %}
                                 </a>
                             </div>
                         </div>
@@ -105,7 +113,7 @@
                         <div class="info text-center">
                             <span>Loan Management</span>
                             <small style="color: beige;">
-                                Loan details including repayments and more
+                                Loan details, Loan Management, Money Lending &amp; Records including repayments and more
                             </small>
                         </div>
                         <div class="service_content">
@@ -114,6 +122,9 @@
                                 <li> Manage Loans</li>
                                 <li> Overdue Loans &amp; Collaterals</li>
                                 <li> Agreement Template</li>
+                                <li> Staffs, Branches, Customers..</li>
+                                <li> Plugable Apps for customisation</li>
+                                <li> And More</li>
                             </ul>
                         </div>
                     </div>
@@ -126,17 +137,21 @@
                             </div>
                         </div>
                         <div class="info text-center">
-                            <span>Savings Account</span>
+                            <span>Cloud Accounting</span>
                             <small style="color: beige;">
                                 Create savings account for your borrowers and add
-                                transactions such as deposits and withdrawals.
+                                transactions such as deposits and withdrawals, manage your money, funds and more using our top
+                                cloud accounting software.
                             </small>
                         </div>
                         <div class="service_content">
                             <ul>
-                                <li> Borrow - $350 over 3 months </li>
-                                <li> Interest rate - 292% pa fixed</li>
-                                <li>Total amount payable - $525.12</li>
+                                <li> Manage Finances </li>
+                                <li> Plug and Play Apps</li>
+                                <li> Payroll Systems</li>
+                                <li> Reporting, Charts and Graphs</li>
+                                <li> Customer Based Login</li>
+                                <li> And More</li>
                             </ul>
                         </div>
                     </div>
@@ -157,9 +172,13 @@
                         </div>
                         <div class="service_content">
                             <ul>
-                                <li> Borrow - $350 over 3 months </li>
-                                <li> Interest rate - 292% pa fixed</li>
-                                <li>Total amount payable - $525.12</li>
+                                <li> Custom Apps </li>
+                                <li> Subscribe for Modern Apps</li>
+                                <li> Money Recovery Systems</li>
+                                <li> Apps From Various Gateways</li>
+                                <li> Credit Scoring Applications</li>
+                                <li> One Account Login</li>
+                                <li> And More</li>
                             </ul>
                         </div>
                     </div>
@@ -192,12 +211,16 @@
                             <ul>
                                 <li class="wow fadeInRight" data-wow-duration="1s" data-wow-delay=".5s">Ease Of Use - Simple &amp; Straight Forward</li>
                                 <li class="wow fadeInRight" data-wow-duration="1s" data-wow-delay=".6s">Great Customer Service - With 24/7hrs Active Response</li>
-                                <li class="wow fadeInRight" data-wow-duration="1s" data-wow-delay=".7s">Manage Borrowers and Loans In One Catch</li class="wow fadeInRight" data-wow-duration="1s" data-wow-delay=".8s">
+                                <li class="wow fadeInRight" data-wow-duration="1s" data-wow-delay=".7s">Manage Borrowers and Loans In One Catch</li>
                                 <li class="wow fadeInRight" data-wow-duration="1s" data-wow-delay=".9s">MinMarket Store - Buy Freemium &amp; Premium Apps</li>
                             </ul>
                         </div>
                         <div class="about_btn wow fadeInRight" data-wow-duration="1.3s" data-wow-delay=".5s">
-                            <a class="boxed-btn3 btn-block" href="#">Still Not Convinced ?</a>
+                            {% if request.user.is_authenticated %}
+                                <a class="boxed-btn3 btn-block" href="#">Chat With Us On Our Live Support</a>
+                            {% else %}
+                                <a class="boxed-btn3 btn-block" href="#">Still Not Convinced ?</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -268,14 +291,16 @@
                                     <div class="card-header" id="headingOnee">
                                       <h5 class="mb-0">
                                         <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOnee" aria-expanded="true" aria-controls="collapseOnee">
-                                            Adieus who direct esteem It esteems luckily?
+                                            Is there any contract?
                                         </button>
                                       </h5>
                                     </div>
 
                                     <div id="collapseOnee" class="collapse show" aria-labelledby="headingOnee" data-parent="#accordion">
                                       <div class="card-body">
-                                        Esteem spirit temper too say adieus who direct esteem esteems luckily or picture placing drawing.
+                                        There is no contract. You can cancel anytime. If you have subscribed to monthly billing using your Credit or Debit Card,
+                                        you can login and delete your card. If you are paying manually using Paypal, simple ignore the invoice.
+                                          You can also <a href="{% url 'contact' %}">contact us </a> for cancellation.
                                       </div>
                                     </div>
                                   </div>
@@ -283,12 +308,16 @@
                                         <div class="card-header" id="headingOne">
                                             <h5 class="mb-0">
                                                 <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                                    Who direct esteem It esteems?
+                                                    What are the payment options?
                                                 </button>
                                             </h5>
                                         </div>
                                         <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion" style="">
-                                            <div class="card-body">Esteem spirit temper too say adieus who direct esteem esteems luckily or picture placing drawing.
+                                            <div class="card-body">
+                                                You can pay using Credit/Debit Card or Paypal. Once invoice is generated,
+                                                you will be sent an email and you can pay by clicking the Pay via Credit or Debit Card button
+                                                or Pay via Paypal in the invoice email. You can also subscribe to automated monthly payments
+                                                using your Credit or Debit Card.
                                             </div>
                                         </div>
                                     </div>
@@ -296,12 +325,14 @@
                                         <div class="card-header" id="headingThree">
                                             <h5 class="mb-0">
                                                 <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                                    Duis consectetur feugiat auctor?
+                                                    Is your system secure?
                                                 </button>
                                             </h5>
                                         </div>
                                         <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion" style="">
-                                            <div class="card-body">Esteem spirit temper too say adieus who direct esteem esteems luckily or picture placing drawing.
+                                            <div class="card-body">
+                                                We employ various security systems to keep your data safe including using SSL, firewalls, and anti-virus solutions.
+                                                All data is backed up regularly.
                                             </div>
                                         </div>
                                     </div>
@@ -309,12 +340,13 @@
                                         <div class="card-header" id="headingThree4">
                                             <h5 class="mb-0">
                                                 <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree4" aria-expanded="false" aria-controls="collapseThree4">
-                                                    Consectetur feugiat auctor?
+                                                    What are the payment terms?
                                                 </button>
                                             </h5>
                                         </div>
                                         <div id="collapseThree4" class="collapse" aria-labelledby="headingThree4" data-parent="#accordion" style="">
-                                            <div class="card-body">Esteem spirit temper too say adieus who direct esteem esteems luckily or picture placing drawing.
+                                            <div class="card-body">
+                                                Please visit <a href="{% url 'mincore-url:account-upgrade' %}">billing/system upgrade portal</a> for that detailed information.
                                             </div>
                                         </div>
                                     </div>
@@ -336,14 +368,14 @@
                                 <div class="col-lg-11">
                                     <div class="single_testmonial d-flex align-items-center">
                                         <div class="thumb">
-                                            <img src="https://cdn.minloans.com.ng/min-homepage/img/testmonial/author.png" alt="">
+                                            <img src="https://image.shutterstock.com/image-photo/african-american-businessman-on-phone-260nw-75245902.jpg" width="150px" height="150px" alt="">
                                             <div class="quote_icon">
                                                 <i class="Flaticon flaticon-quote"></i>
                                             </div>
                                         </div>
                                         <div class="info">
-                                            <p>"Working in conjunction with humanitarian aid agencies, we have supported programmes to help alleviate human suffering through animal welfare when people might depend on livestock as their only source of income or food.</p>
-                                            <span>- Micky Mouse</span>
+                                            <p>"Started Small, Easy plan and Now I run exclusive on their plans, I would choose minloans anyday, they have it all, All I want in one".</p>
+                                            <span>- Jesse, CEO Diggo Loans</span>
                                         </div>
                                     </div>
                                 </div>
@@ -354,14 +386,15 @@
                                 <div class="col-lg-11">
                                     <div class="single_testmonial d-flex align-items-center">
                                         <div class="thumb">
-                                            <img src="https://cdn.minloans.com.ng/min-homepage/img/testmonial/author.png" alt="">
+                                            <img src="https://st3.depositphotos.com/11841524/15952/v/600/depositphotos_159522568-stock-video-african-american-business-man-using.jpg" width="150px" height="150px" alt="">
                                             <div class="quote_icon">
                                                 <i class=" Flaticon flaticon-quote"></i>
                                             </div>
                                         </div>
                                         <div class="info">
-                                            <p>"Working in conjunction with humanitarian aid agencies, we have supported programmes to help alleviate human suffering through animal welfare when people might depend on livestock as their only source of income or food.</p>
-                                            <span>- Micky Mouse</span>
+                                            <p>"I was looking for a loan software to use, was trying to startup a loan business when
+                                                I stumbled into minloans NG, I got all I wanted.. I would say they are simply the best for any business scale"</p>
+                                            <span>- Aruwoye John, HR Verticle</span>
                                         </div>
                                     </div>
                                 </div>
@@ -372,14 +405,14 @@
                                 <div class="col-lg-11">
                                     <div class="single_testmonial d-flex align-items-center">
                                         <div class="thumb">
-                                            <img src="https://cdn.minloans.com.ng/min-homepage/img/testmonial/author.png" alt="">
+                                            <img src="https://image.shutterstock.com/image-photo/concerned-african-american-employee-talking-260nw-1576853197.jpg" width="150px" height="150px" alt="">
                                             <div class="quote_icon">
                                                 <i class="Flaticon flaticon-quote"></i>
                                             </div>
                                         </div>
                                         <div class="info">
-                                            <p>"Working in conjunction with humanitarian aid agencies, we have supported programmes to help alleviate human suffering through animal welfare when people might depend on livestock as their only source of income or food.</p>
-                                            <span>- Micky Mouse</span>
+                                            <p>"Simplest of words, talk loans, talk business, talk accounting.. Start Using Minloans NG".</p>
+                                            <span>- Akpan Peters, CEO/Owmer Small Money Loans</span>
                                         </div>
                                     </div>
                                 </div>
@@ -392,149 +425,7 @@
     </div>
     <!-- /testimonial_area  -->
 
-    <div class="brad_area">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="brad_active owl-carousel">
-                        <div class="single_brand wow fadeInUp" data-wow-duration="1s" data-wow-delay=".2s">
-                            <img src="https://cdn.minloans.com.ng/min-homepage/img/brand/1.png" alt="">
-                        </div>
-                        <div class="single_brand wow fadeInUp" data-wow-duration="1s" data-wow-delay=".3s">
-                            <img src="https://cdn.minloans.com.ng/min-homepage/img/brand/2.png" alt="">
-                        </div>
-                        <div class="single_brand wow fadeInUp" data-wow-duration="1s" data-wow-delay=".4s">
-                            <img src="https://cdn.minloans.com.ng/min-homepage/img/brand/3.png" alt="">
-                        </div>
-                        <div class="single_brand wow fadeInUp" data-wow-duration="1s" data-wow-delay=".5s">
-                            <img src="https://cdn.minloans.com.ng/min-homepage/img/brand/4.png" alt="">
-                        </div>
-                        <div class="single_brand wow fadeInUp" data-wow-duration="1s" data-wow-delay=".6s">
-                            <img src="https://cdn.minloans.com.ng/min-homepage/img/brand/5.png" alt="">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="apply_loan overlay">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-8 col-md-7">
-                    <div class="loan_text wow fadeInLeft" data-wow-duration="1s" data-wow-delay=".3s">
-                        <h3>
-                            Don't see a feature or have different requirements?
-                        </h3>
-                        <small style="color: beige;">
-                            Send us an email at support@minloans.com.ng. We do customizations on a paid basis.
-                        </small>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-5">
-                    <div class="loan_btn wow fadeInUp" data-wow-duration="1.2s" data-wow-delay=".4s">
-                        <a class="boxed-btn3" href="#">Get Started - It's Free</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {% include 'footer/home-footer.html' %}
-
-    <!-- link that opens popup -->
-    <!-- JS here -->
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/vendor/modernizr-3.5.0.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/vendor/jquery-1.12.4.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/popper.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/bootstrap.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/owl.carousel.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/isotope.pkgd.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/ajax-form.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/waypoints.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.counterup.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/imagesloaded.pkgd.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/scrollIt.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.scrollUp.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/wow.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/nice-select.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.slicknav.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.magnific-popup.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/plugins.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/gijgo.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/slick.min.js"></script>
-    <script src="https://use.fontawesome.com/7eea54d94f.js"></script>
-
-
-
-    <!--contact js-->
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/contact.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.ajaxchimp.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.form.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/jquery.validate.min.js"></script>
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/mail-script.js"></script>
-
-
-    <script src="https://cdn.minloans.com.ng/min-homepage/js/main.js"></script>
-
-    <script>
-        $(function () {
-            'use strict';
-            $(document).ready(function () {
-                const newsletterForm = $('.newsletter_form');
-                const newsletterFormMethod = newsletterForm.attr('method');
-                const newsletterFormEndpoint = newsletterForm.attr('action');
-                const newsletterFormSubmitBtn = newsletterForm.find("[type='submit']");
-                const newsletterFormSubmitBtnText = newsletterFormSubmitBtn.text();
-
-                function displaySubmitting(submitBtn, defaultText, doSubmit) {
-                    if (doSubmit) {
-                        submitBtn.addClass("disabled");
-                        submitBtn.html("<i class='fa fa-spin fa-spinner'></i> Subscribing ...");
-                    } else {
-                        submitBtn.removeClass("disabled");
-                        submitBtn.add(defaultText);
-                    }
-                }
-
-                newsletterForm.submit(function (event) {
-                    event.preventDefault();
-
-                    {% include 'csrf_ajax/csrf_ajax_token.js' %}
-
-                    const newsletterFormData = {
-                        "email": $('#mailList').val(),
-                    };
-                    console.log(newsletterFormData);
-                    const thisForm = $(this);
-
-                    displaySubmitting(newsletterFormSubmitBtn, "", true);
-
-                    $.ajax({
-                        method: newsletterFormMethod,
-                        url: newsletterFormEndpoint,
-                        data: newsletterFormData,
-                        contentType: 'application/x-www-form-urlencoded',
-                        dataType: 'json',
-
-                        success: function (data) {
-                            newsletterForm[0].reset();
-                            setTimeout(function () {
-                                window.location.replace("/");
-                            }, 3000);
-                        }, error: function (error) {
-                            console.log(error);
-                            newsletterForm[0].reset();
-                            //alert would be here
-                            displaySubmitting(newsletterFormSubmitBtn, newsletterFormSubmitBtnText, false);
-                        }
-                    })
-
-                })
-
-            })
-        })
-    </script>
+    {% include 'base/h_footer.html' %}
 </body>
 
 </html>

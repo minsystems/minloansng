@@ -1,9 +1,11 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.text import slugify
 from django.views.generic import DetailView, ListView
 
@@ -26,6 +28,17 @@ class LoanCreateView(LoginRequiredMixin, DetailView):
         context['borrowers_qs'] = self.get_object().borrower_set.all()
         context['borrower_group_qs'] = self.get_object().borrowergroup_set.all()
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        if context:
+            user_profile_obj = Profile.objects.get(user=self.request.user)
+            if timezone.now() > user_profile_obj.trial_days:
+                # return redirect to payment page
+                messages.error(self.request,
+                               "Account Expired!, Your Account Has Been Expired You Would Be "
+                               "Redirected To The Payment Portal Upgrade Your Payment")
+                return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
+        return super(LoanCreateView, self).render_to_response(context, **response_kwargs)
 
     def get_object(self, *args, **kwargs):
         slug = self.kwargs.get(self.slug_url_kwarg)
@@ -87,6 +100,13 @@ class LoanListView(LoginRequiredMixin, ListView):
 
     def render_to_response(self, context, **response_kwargs):
         if context:
+            user_profile_obj = Profile.objects.get(user=self.request.user)
+            if timezone.now() > user_profile_obj.trial_days:
+                # return redirect to payment page
+                messages.error(self.request,
+                               "Account Expired!, Your Account Has Been Expired You Would Be "
+                               "Redirected To The Payment Portal Upgrade Your Payment")
+                return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
             staff_array = list()
             for user_obj in context.get('object').staffs.all():
                 staff_array.append(str(user_obj))
@@ -118,6 +138,13 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
     def render_to_response(self, context, **response_kwargs):
         print(context)
         if context:
+            user_profile_obj = Profile.objects.get(user=self.request.user)
+            if timezone.now() > user_profile_obj.trial_days:
+                # return redirect to payment page
+                messages.error(self.request,
+                               "Account Expired!, Your Account Has Been Expired You Would Be "
+                               "Redirected To The Payment Portal Upgrade Your Payment")
+                return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
             staff_array = list()
             for user_obj in context.get('object').staffs.all():
                 staff_array.append(str(user_obj))
