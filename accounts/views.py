@@ -165,7 +165,12 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         else:
             context["plan_title"] = "EXPIRED"
 
-        context['plan_info_obj'] = PlanDetails.objects.get(name__iexact=self.object.user.profile.get_plan_display())
+        try:
+            context['plan_info_obj'] = PlanDetails.objects.get(name__iexact=self.object.user.profile.get_plan_display())
+        except:
+            context['plan_info_obj'] = "No Fee Plan"
+
+
 
         user_code = list()
         for code_obj in Profile.objects.all():

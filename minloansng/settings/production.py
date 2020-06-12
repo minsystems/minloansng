@@ -30,7 +30,8 @@ ALLOWED_HOSTS = ['*']
 BASE_URL = 'https://www.minloans.com.ng'
 
 MANAGERS = (
-    ('Minloansng', "minloansnigeria@gmail.com"),
+    ('Minloans NG', "minloansnigeria@gmail.com"),
+    ('Minloans NG', "customer@minloans.com.ng")
 )
 
 ADMINS = MANAGERS
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     # 'django_jenkins',
 
     # third party apps

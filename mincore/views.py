@@ -190,7 +190,8 @@ class MessageDetail(LoginRequiredMixin, View):
 
 class AccountUpgrade(View):
     def get(self, *args, **kwargs):
-        return render(self.request, template_name="payment-upgrade/account-upgrade.html", context={})
+        user = self.request.user.get_full_name()
+        return render(self.request, template_name="payment-upgrade/account-upgrade.html", context={"user":user})
 
 
 class AddStaffProcessor(View):

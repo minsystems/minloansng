@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 # Register your models here.
-from loans.models import LoanType, Collateral, LoanTerms, Loan, ModeOfRepayments, Penalty, CollateralFiles, CollateralType
+from loans.models import LoanType, Collateral, LoanTerms, Loan, ModeOfRepayments, Penalty, CollateralFiles, \
+    CollateralType
 
 
 @admin.register(Collateral)
@@ -22,8 +23,18 @@ class LoanTypeAdmin(admin.ModelAdmin):
     list_display_links = ('package', 'timestamp')
 
 
+class LoanAdmin(admin.ModelAdmin):
+    list_display = ('account_officer', 'company', 'borrower', 'loan_type', 'loan_key', 'principal_amount', 'interest')
+    list_display_links = ('account_officer', 'borrower')
+    list_filter = ('loan_key', 'principal_amount')
+    search_fields = ('loan_key', 'borrower')
+
+    class Meta:
+        model = Loan
+
+
 admin.site.register(LoanTerms)
-admin.site.register(Loan)
+admin.site.register(Loan, LoanAdmin)
 admin.site.register(ModeOfRepayments)
 admin.site.register(Penalty)
 admin.site.register(CollateralFiles)

@@ -6,6 +6,9 @@ import string
 from django.utils import timezone
 from django.utils.text import slugify
 
+from amortization.amount import calculate_amortization_amount
+from amortization.schedule import amortization_schedule
+
 
 def get_last_month_data(today):
     """
@@ -24,8 +27,8 @@ def get_trial_days():
 
 def get_month_data_range(months_ago=1, include_this_month=False):
     """
-    A method that generates a list of dictionaires
-    that describe any given amout of monthly data.
+    A method that generates a list of dictionaries
+    that describe any given amount of monthly data.
     """
     today = datetime.datetime.now().today()
     dates_ = []
@@ -170,3 +173,23 @@ def unique_slug_by_name(instance, new_slug=None):
         )
         return unique_slug_generator(instance, new_slug=new_slug)
     return slug
+
+
+def digitExtract(char):
+    return ''.join(filter(str.isdigit, char))
+    # return re.findall(r'\d+', char) - would return data as a list encapsulated data
+
+
+def secondWordExtract(char):
+    """
+    extract the second word from a string sequence
+    :type char: str
+    """
+    return char.split(' ', 2)[1]
+
+
+# Amortization Loan Calculator
+def repaymentFee(principal_amount, interest, period):
+    amount_fee = calculate_amortization_amount(principal_amount, interest, period)
+    return amount_fee * period
+

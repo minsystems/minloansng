@@ -1,15 +1,18 @@
 from cloudinary.models import CloudinaryField
+from dateutil.relativedelta import relativedelta
 from django.db import models
 
 # Create your models here.
 from django.db.models.signals import post_save
 from django.urls import reverse
+from django.utils import timezone
+from django.utils.datetime_safe import datetime
 
 from accounts.models import Profile, upload_image_path
 from borrowers.models import Borrower
 from company.models import Company
-from minloansng.utils import unique_slug_by_name
-from minmarkets.models import LoanPackage
+from minloansng.utils import unique_slug_by_name, digitExtract, secondWordExtract
+from minmarkets.models import LoanPackage, LoanCollectionPackage
 
 INTEREST_PLAN = (
     ('Per Year', 'Per Year'),
@@ -36,7 +39,8 @@ LOAN_STATUS = (
     ('OPEN', 'OPEN'),
     ('PARTIAL', 'PARTIAL'),
     ('CLOSED', 'CLOSED'),
-    ('COMPLETED', 'COMPLETED')
+    ('COMPLETED', 'COMPLETED'),
+    ('OVERDUE/EXPIRED', 'OVERDUE/EXPIRED')
 )
 
 COLLATERAL_STATUS = (
@@ -65,16 +69,24 @@ class LoanTerms(models.Model):
 
 
 class ModeOfRepayments(models.Model):
-    name = models.CharField(max_length=300, blank=True, null=True)
-    describe = models.TextField(blank=True, null=True)
+    package = models.OneToOneField(LoanCollectionPackage, on_delete=models.CASCADE, blank=True, null=True)
+    bought_by = models.ManyToManyField(Profile,)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
+    updated = models.DateTimeField(auto_now_add=False, auto_now=True)
 
     class Meta:
         verbose_name = 'Mode Of Repayment'
         verbose_name_plural = 'Mode Of Repayments'
 
     def __str__(self):
-        return self.name
+        return self.package.name
+
+    def image_tag(self):
+        from django.utils.html import mark_safe
+        return mark_safe('<img src="%s" width="150" height="200" />' % self.package.image.url)
+
+    image_tag.short_description = 'Package Image'
+    image_tag.allow_tags = True
 
 
 class Penalty(models.Model):
@@ -221,14 +233,32 @@ class Loan(models.Model):
         verbose_name_plural = "loans"
         ordering = ("-timestamp",)
 
-    # def get_absolute_url(self, company_inst):
-    #     return reverse('loans-url:loan-detail', kwargs={'slug': company_inst.slug, 'loan_slug': self.slug})
+    def get_absolute_url(self, company_inst):
+        return reverse('loans-url:loan-detail', kwargs={'slug': company_inst.slug, 'loan_slug': self.slug})
 
     def __str__(self):
         return self.loan_key
 
     def get_opened_loans_by_company(self):
         return self.objects.opened_loans().filter(company=self.company)
+
+    # model methods
+    def get_installments(self):
+        return digitExtract(self.number_repayments)
+
+    def get_interest_rate(self):
+        return "{rate}% {period}".format(rate=self.interest, period=self.interest_period)
+
+    # def get_loan_status(self):
+    #     if self.get_end_date() < datetime.now():
+    #         return "EXPIRED/OVERDUE"
+    #     return self.loan_status
+    #
+    # # override the save method! each time a save method is called!
+    # def save(self, *args, **kwargs):
+    #     if self.get_end_date() < datetime.now():
+    #         self.loan_status = "EXPIRED/OVERDUE"
+    #     super(Loan, self).save(*args, **kwargs)
 
 
 def post_save_user_create_reciever(sender, instance, created, *args, **kwargs):

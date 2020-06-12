@@ -168,6 +168,19 @@
                     <input type="text" name="insurance-fee" class="form-control" id="insurance-fee" placeholder="Insurance Fee" style="width: 100%;">
                   </div>
 
+                  <hr/>
+
+                  <div class="form-group">
+                    <label for="borrower">Choose Mode Of Loan Collection</label>
+                    <select class="form-control select2" style="width: 100%;" id="mode_of_collection" required>
+                        {% for pkgs in user_collection_pkgs %}
+                            <option value="{{ pkgs }}">{{ pkgs }}</option>
+                        {% endfor %}
+                    </select>
+                     <br/>
+                     <a href="#" class="btn btn-primary">Buy Loan Collection Methods</a>
+                  </div>
+
                 </div>
 
                 <!-- /.card-body -->
@@ -189,7 +202,7 @@
                   </div>
                   <!-- /.card-header -->
                   <div class="card-body">
-                      <img src="https://cdn.minloans.com.ng/min-homepage/img/logo.png" width="200px" height="200px" class="mx-auto d-block img-responsive img-rounded" id="loan-package-type-image" /><hr/>
+                      <img src="https://cdn.minloans.com.ng/min-homepage/img/logo.png" width="200px" height="250px" class="mx-auto d-block img-responsive img-rounded" id="loan-package-type-image" /><hr/>
                       <h3 class="text-center text-capitalize text-primary" id="loan-package-type-title">Loan Package Title</h3>
                       <p class="text-center" id="loan-package-type-description">Loan Package Description</p>
                   </div>
@@ -365,277 +378,6 @@ $(document).ready(function () {
     $(function () {
         'use strict';
         $(document).ready(function () {
-            $('#repayment-interval').change(function () {
-                const loanDurationFigure = $('#loan-duration-figure').val();
-                const loanDurationPeriod = $('#loan-duration-period').val();
-                const repaymentInterval = $(this).val();
-
-                // <!-- Repayment Circle is auto calculated = loan_duration X repayment circle -->
-                // <!-- Example 6 months duration and pay back weekly = 24 weeks -->
-                // <!-- 6 X 1 month = 6 X 4 weeks = 24 weeks -->
-
-                if (loanDurationPeriod === 'Years'){
-                    if (repaymentInterval === 'Yearly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
-                    } else if (repaymentInterval === 'Monthly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 12;
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
-                    } else if (repaymentInterval === 'Weekly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 52;
-                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                    } else if (repaymentInterval === 'Daily') {
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 365;
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
-                    }
-                } else if (loanDurationPeriod === 'Months'){
-                    if (repaymentInterval === 'Yearly'){
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
-                    } else if (repaymentInterval === 'Monthly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
-                    } else if (repaymentInterval === 'Weekly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 4;
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
-                    } else if (repaymentInterval === 'Daily') {
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 30;
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
-                    }
-                } else if (loanDurationPeriod === 'Weeks'){
-                    if (repaymentInterval === 'Yearly'){
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
-                    } else if (repaymentInterval === 'Monthly'){
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
-                    } else if (repaymentInterval === 'Weekly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
-                    } else if (repaymentInterval === 'Daily') {
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 7;
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
-                    }
-                } else if (loanDurationPeriod === 'Days') {
-                    if (repaymentInterval === 'Yearly') {
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
-                    } else if (repaymentInterval === 'Monthly') {
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
-                    } else if (repaymentInterval === 'Weekly') {
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
-                    } else if (repaymentInterval === 'Daily') {
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
-                    }
-                }
-            });
-            $('#loan-duration-figure').change(function () {
-                const loanDurationFigure = $('#loan-duration-figure').val();
-                const loanDurationPeriod = $('#loan-duration-period').val();
-                const repaymentInterval = $('#repayment-interval').val();
-
-                // <!-- Repayment Circle is auto calculated = loan_duration X repayment circle -->
-                // <!-- Example 6 months duration and pay back weekly = 24 weeks -->
-                // <!-- 6 X 1 month = 6 X 4 weeks = 24 weeks -->
-
-                if (loanDurationPeriod === 'Years'){
-                    if (repaymentInterval === 'Yearly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
-                    } else if (repaymentInterval === 'Monthly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 12;
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
-                    } else if (repaymentInterval === 'Weekly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 52;
-                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                    } else if (repaymentInterval === 'Daily') {
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 365;
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
-                    }
-                } else if (loanDurationPeriod === 'Months'){
-                    if (repaymentInterval === 'Yearly'){
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
-                    } else if (repaymentInterval === 'Monthly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
-                    } else if (repaymentInterval === 'Weekly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 4;
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
-                    } else if (repaymentInterval === 'Daily') {
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 30;
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
-                    }
-                } else if (loanDurationPeriod === 'Weeks'){
-                    if (repaymentInterval === 'Yearly'){
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
-                    } else if (repaymentInterval === 'Monthly'){
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
-                    } else if (repaymentInterval === 'Weekly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
-                    } else if (repaymentInterval === 'Daily') {
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 7;
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
-                    }
-                } else if (loanDurationPeriod === 'Days') {
-                    if (repaymentInterval === 'Yearly') {
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
-                    } else if (repaymentInterval === 'Monthly') {
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
-                    } else if (repaymentInterval === 'Weekly') {
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
-                    } else if (repaymentInterval === 'Daily') {
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
-                    }
-                }
-            });
-            $('#loan-duration-period').change(function () {
-                const loanDurationFigure = $('#loan-duration-figure').val();
-                const loanDurationPeriod = $('#loan-duration-period').val();
-                const repaymentInterval = $('#repayment-interval').val();
-
-                // <!-- Repayment Circle is auto calculated = loan_duration X repayment circle -->
-                // <!-- Example 6 months duration and pay back weekly = 24 weeks -->
-                // <!-- 6 X 1 month = 6 X 4 weeks = 24 weeks -->
-
-                if (loanDurationPeriod === 'Years'){
-                    if (repaymentInterval === 'Yearly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
-                    } else if (repaymentInterval === 'Monthly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 12;
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
-                    } else if (repaymentInterval === 'Weekly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 52;
-                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                    } else if (repaymentInterval === 'Daily') {
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 365;
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
-                    }
-                } else if (loanDurationPeriod === 'Months'){
-                    if (repaymentInterval === 'Yearly'){
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
-                    } else if (repaymentInterval === 'Monthly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
-                    } else if (repaymentInterval === 'Weekly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 4;
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
-                    } else if (repaymentInterval === 'Daily') {
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 30;
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
-                    }
-                } else if (loanDurationPeriod === 'Weeks'){
-                    if (repaymentInterval === 'Yearly'){
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
-                    } else if (repaymentInterval === 'Monthly'){
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
-                    } else if (repaymentInterval === 'Weekly'){
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
-                    } else if (repaymentInterval === 'Daily') {
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 7;
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
-                    }
-                } else if (loanDurationPeriod === 'Days') {
-                    if (repaymentInterval === 'Yearly') {
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
-                    } else if (repaymentInterval === 'Monthly') {
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
-                    } else if (repaymentInterval === 'Weekly') {
-                        const repaymentIntervalFigure = 'Impossible';
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
-                    } else if (repaymentInterval === 'Daily') {
-                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
-                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
-                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
-                    }
-                }
-            });
-
-            $('#loan-package-type').change(function () {
-                const changed_data = $(this).val();
-                console.log(changed_data);
-
-                if (changed_data === 'Remita Direct Debit') {
-                    const dd_loanDescription = '<b>Remita Direct Debit</b> lets your customers pay you in a more convenient and flexible manner, without suffering the financial burden of one-off payment.\n' +
-                        'With this installment payment option, the customer gives an instruction to their bank, authorizing that a biller is paid an amount of money over a specified period of time. ' +
-                        'The amount can be for fixed or varied.';
-                    const imgLink = 'https://netstorage-legit.akamaized.net/images/vllkyt7nki3c742g7.jpg';
-                    $('#loan-package-type-image').attr("src", imgLink);
-                    $('#loan-package-type-title').html($(this).val());
-                    $('#loan-package-type-description').html(dd_loanDescription);
-                } else if (changed_data === 'Personal Loan') {
-                    const dd_loanDescription = 'Get the most out of life with DEFAULT PERSONAL LOANS – an unsecured personal installment loan designed to help you fulfill your dreams and live life to the max';
-                    const imgLink = 'https://cdn.minloans.com.ng/min-homepage/img/logo.png';
-                    $('#loan-package-type-image').attr("src", imgLink);
-                    $('#loan-package-type-title').html($(this).val());
-                    $('#loan-package-type-description').html(dd_loanDescription);
-                }
-            });
-
             // initialize local data
             const loanForm = $('#quickForm');
             const loanFormMethod = loanForm.attr('method');
@@ -653,6 +395,340 @@ $(document).ready(function () {
 
             const loanFormSubmitBtn = loanForm.find("[type='submit']");
             const loanFormSubmitBtnText = loanFormSubmitBtn.text();
+
+            $('#repayment-interval').change(function () {
+                const loanDurationFigure = $('#loan-duration-figure').val();
+                const loanDurationPeriod = $('#loan-duration-period').val();
+                const repaymentInterval = $(this).val();
+
+                // <!-- Repayment Circle is auto calculated = loan_duration X repayment circle -->
+                // <!-- Example 6 months duration and pay back weekly = 24 weeks -->
+                // <!-- 6 X 1 month = 6 X 4 weeks = 24 weeks -->
+
+                if (loanDurationPeriod === 'Years'){
+                    if (repaymentInterval === 'Yearly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Monthly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 12;
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Weekly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 52;
+                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Daily') {
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 365;
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    }
+                } else if (loanDurationPeriod === 'Months'){
+                    if (repaymentInterval === 'Yearly'){
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Monthly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Weekly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 4;
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Daily') {
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 30;
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    }
+                } else if (loanDurationPeriod === 'Weeks'){
+                    if (repaymentInterval === 'Yearly'){
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Monthly'){
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Weekly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Daily') {
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 7;
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    }
+                } else if (loanDurationPeriod === 'Days') {
+                    if (repaymentInterval === 'Yearly') {
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Monthly') {
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Weekly') {
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Daily') {
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    }
+                }
+            });
+            $('#loan-duration-figure').change(function () {
+                const loanDurationFigure = $('#loan-duration-figure').val();
+                const loanDurationPeriod = $('#loan-duration-period').val();
+                const repaymentInterval = $('#repayment-interval').val();
+
+                // <!-- Repayment Circle is auto calculated = loan_duration X repayment circle -->
+                // <!-- Example 6 months duration and pay back weekly = 24 weeks -->
+                // <!-- 6 X 1 month = 6 X 4 weeks = 24 weeks -->
+
+                if (loanDurationPeriod === 'Years'){
+                    if (repaymentInterval === 'Yearly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Monthly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 12;
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Weekly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 52;
+                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Daily') {
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 365;
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    }
+                } else if (loanDurationPeriod === 'Months'){
+                    if (repaymentInterval === 'Yearly'){
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Monthly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Weekly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 4;
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Daily') {
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 30;
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    }
+                } else if (loanDurationPeriod === 'Weeks'){
+                    if (repaymentInterval === 'Yearly'){
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Monthly'){
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Weekly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Daily') {
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 7;
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    }
+                } else if (loanDurationPeriod === 'Days') {
+                    if (repaymentInterval === 'Yearly') {
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Monthly') {
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Weekly') {
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Daily') {
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    }
+                }
+            });
+            $('#loan-duration-period').change(function () {
+                const loanDurationFigure = $('#loan-duration-figure').val();
+                const loanDurationPeriod = $('#loan-duration-period').val();
+                const repaymentInterval = $('#repayment-interval').val();
+
+                // <!-- Repayment Circle is auto calculated = loan_duration X repayment circle -->
+                // <!-- Example 6 months duration and pay back weekly = 24 weeks -->
+                // <!-- 6 X 1 month = 6 X 4 weeks = 24 weeks -->
+
+                if (loanDurationPeriod === 'Years'){
+                    if (repaymentInterval === 'Yearly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Monthly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 12;
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Weekly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 52;
+                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Daily') {
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 365;
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    }
+                } else if (loanDurationPeriod === 'Months'){
+                    if (repaymentInterval === 'Yearly'){
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Monthly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Weekly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 4;
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Daily') {
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 30;
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    }
+                } else if (loanDurationPeriod === 'Weeks'){
+                    if (repaymentInterval === 'Yearly'){
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Monthly'){
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Weekly'){
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    } else if (repaymentInterval === 'Daily') {
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure) * 7;
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    }
+                } else if (loanDurationPeriod === 'Days') {
+                    if (repaymentInterval === 'Yearly') {
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Years To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Monthly') {
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Months To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Weekly') {
+                        const repaymentIntervalFigure = 'Impossible';
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Weeks To Complete Repayment");
+                        loanFormSubmitBtn.addClass("disabled");
+                    } else if (repaymentInterval === 'Daily') {
+                        const repaymentIntervalFigure = parseInt(loanDurationFigure);
+                        $('#repayment-interval-figure').val(repaymentIntervalFigure);
+                        $('#repayment-interval-figure-period').val("Days To Complete Repayment");
+                        loanFormSubmitBtn.removeClass("disabled");
+                    }
+                }
+            });
+
+            $('#loan-package-type').change(function () {
+                const changed_data = $(this).val();
+                console.log(changed_data);
+
+                if (changed_data === 'Data Referencing Powered Loans') {
+                    const dd_loanDescription = '<b>Data Referencing Loans</b> To simplify the pay day loan process, ' +
+                        '<strong>SystemSpecs</strong>, the Nigerian software giant has been working with lenders, ' +
+                        'using its data reference service to automate the loan process. ' +
+                        'The solution facilitates quick affordability assessments by allowing individuals customer to ' +
+                        'authorize <strong>Remita</strong> to share their payment data with the lenders.';
+                    const imgLink = 'http://res.cloudinary.com/hbnufshgh/image/upload/v1589730463/opxgo3sudmpet4fwkog7.jpg';
+                    $('#loan-package-type-image').attr("src", imgLink);
+                    $('#loan-package-type-title').html($(this).val());
+                    $('#loan-package-type-description').html(dd_loanDescription);
+                } else if (changed_data === 'Personal Loan') {
+                    const dd_loanDescription = 'We are in the business of helping you improve the quality of your life. ' +
+                        'That\'s why we offer you a personal, unsecured loan to help you fulfil those dreams and live life to the full.\n' +
+                        '\n' +
+                        'Whether to buy a car, pay school fees for a post-graduate degree or for home improvement needs, ' +
+                        'our personal loan offers you a quick, convenient personal financing solution.';
+                    const imgLink = 'http://res.cloudinary.com/hbnufshgh/image/upload/v1589729900/bivqkhfwbcwvpqwnvwzk.jpg';
+                    $('#loan-package-type-image').attr("src", imgLink);
+                    $('#loan-package-type-title').html($(this).val());
+                    $('#loan-package-type-description').html(dd_loanDescription);
+                } else if (changed_data === 'PayDay Loan') {
+                    const dd_loanDescription = 'A payday loan is a type of short term high interest loan loan based on a borrower\'s ' +
+                        'income profile. A payday loan\'s principal is typically a portion of a borrower\'s next paycheck. ' +
+                        'These loans charge high interest rates for short-term immediate credit.';
+                    const imgLink = 'http://res.cloudinary.com/hbnufshgh/image/upload/v1589730176/oxj1rcv7o4kx97pdz1pi.jpg';
+                    $('#loan-package-type-image').attr("src", imgLink);
+                    $('#loan-package-type-title').html($(this).val());
+                    $('#loan-package-type-description').html(dd_loanDescription);
+                }
+            });
+
 
             loanForm.submit(function (event) {
                 event.preventDefault();
@@ -673,6 +749,7 @@ $(document).ready(function () {
                     "repaymentIntervalPeriod":$('#repayment-interval-figure-period').val(),
                     "processingFee":$('#loan-processing-fee').val(),
                     "insuranceFee":$('#insurance-fee').val(),
+                    "loanCollectionType":$('#mode_of_collection').val(),
                 };
 
                 displaySubmitting(loanFormSubmitBtn, "", true);
@@ -685,6 +762,7 @@ $(document).ready(function () {
 
                     success: function (data) {
                         loanForm[0].reset();
+                        console.log(data.urlpath);
                         $(document).Toasts('create', {
                             class: 'bg-success',
                             autohide: true,
@@ -694,7 +772,7 @@ $(document).ready(function () {
                             body: '' + data.message
                         });
                         setTimeout(function () {
-                            window.location.replace("{% url 'loans-url:loan-create' object.slug %}");
+                            window.location.replace("127.0.0.1:8000/"+ data.urlpath);
                         }, 5000);
                     }, error: function (error) {
                         loanForm[0].reset();

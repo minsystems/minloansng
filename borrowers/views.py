@@ -17,6 +17,7 @@ from banks.models import BankCode
 from borrowers.forms import BorrowerUpdateForm
 from borrowers.models import Borrower, BorrowerGroup
 from company.models import Company
+from loans.models import Loan
 from minloansng.mixins import GetObjectMixin
 from minloansng.utils import random_string_generator
 
@@ -90,10 +91,12 @@ class BorrowerUpdateView(LoginRequiredMixin, DetailView):
         context['userCompany_qs'] = self.request.user.profile.company_set.all()
         context['borrowers_qs'] = self.get_object().borrower_set.all()
         borrower_obj = Borrower.objects.get(slug=self.kwargs.get('slug_borrower'))
+        context['borrower_loan_qs'] = self.get_object().loan_set.all().filter(borrower=borrower_obj)
         context['borrower_obj'] = borrower_obj
         context['form'] = BorrowerUpdateForm(self.request.POST or None, self.request.FILES or None,
                                              instance=borrower_obj)
         context['age'] = calculate_age(borrower_obj.date_of_birth)
+
         return context
 
     def get_object(self, *args, **kwargs):

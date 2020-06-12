@@ -4,6 +4,6 @@ from borrowers.views import BorrowerCreateView, BorrowerGroupCreateView, Borrowe
 
 urlpatterns = [
     path('<slug:slug>/create/', BorrowerCreateView.as_view(), name='borrower-create'),
-    path('<slug:slug>/<slug:slug_borrower>/update/', BorrowerUpdateView.as_view(), name='borrower-update'),
+    path('<slug:slug>/<slug:slug_borrower>/detail-update/', BorrowerUpdateView.as_view(), name='borrower-update'),
     path('<slug:slug>/group/create/', BorrowerGroupCreateView.as_view(), name='borrower-group-create'),
 ]
