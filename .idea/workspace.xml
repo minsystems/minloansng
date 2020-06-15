@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6b2ceb19-997d-44ab-af94-3b88c9a4fa83" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/minloansng/settings/production.py" beforeDir="false" afterPath="$PROJECT_DIR$/minloansng/settings/production.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minloansng/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/minloansng/utils.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -30,11 +30,6 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/company/templates/company/company_detail.html">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/company/templates/company/dashboard.html">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="5232">
@@ -50,11 +45,35 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/minloansng/settings/production.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="967">
               <caret line="175" column="18" lean-forward="true" selection-start-line="175" selection-start-column="18" selection-end-line="175" selection-end-column="18" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/minloansng/utils.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2096">
+              <caret line="185" selection-start-line="185" selection-end-line="185" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/accounts/models.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="208">
+              <caret line="22" lean-forward="true" selection-start-line="22" selection-end-line="22" />
+              <folding>
+                <element signature="e#0#13#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -176,7 +195,6 @@
         <option value="$PROJECT_DIR$/minloansng/settings/local.py" />
         <option value="$PROJECT_DIR$/minmarkets/views.py" />
         <option value="$PROJECT_DIR$/mincore/views.py" />
-        <option value="$PROJECT_DIR$/minloansng/utils.py" />
         <option value="$PROJECT_DIR$/loans/admin.py" />
         <option value="$PROJECT_DIR$/loans/templates/loans/detail-loan.html" />
         <option value="$PROJECT_DIR$/minmarkets/admin.py" />
@@ -190,10 +208,11 @@
         <option value="$PROJECT_DIR$/loans/templates/loans/remita/standing-order/setupmandate.html" />
         <option value="$PROJECT_DIR$/templates/footer/home-footer.html" />
         <option value="$PROJECT_DIR$/minloansng/settings/production.py" />
+        <option value="$PROJECT_DIR$/minloansng/utils.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-8" />
     <option name="y" value="-8" />
     <option name="width" value="1382" />
@@ -222,6 +241,11 @@
             <path>
               <item name="minloansng" type="b2602c69:ProjectViewProjectNode" />
               <item name="minloansng" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="minloansng" type="b2602c69:ProjectViewProjectNode" />
+              <item name="minloansng" type="462c0819:PsiDirectoryNode" />
+              <item name="accounts" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="minloansng" type="b2602c69:ProjectViewProjectNode" />
@@ -441,7 +465,7 @@
       <workItem from="1591444127176" duration="7912000" />
       <workItem from="1591636633445" duration="1198000" />
       <workItem from="1591958988284" duration="3288000" />
-      <workItem from="1592237855658" duration="1509000" />
+      <workItem from="1592237855658" duration="1874000" />
     </task>
     <task id="LOCAL-00001" summary="First Official Dashboard Build With Sub Companies">
       <created>1582131582380</created>
@@ -461,7 +485,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="635654000" />
+    <option name="totallyTimeSpent" value="636019000" />
   </component>
   <component name="TodoView" selected-index="3">
     <todo-panel id="selected-file">
@@ -473,10 +497,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="7" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23373677" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.23373677" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -694,16 +718,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/minloansng/utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="24" column="55" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="55" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mincore/views.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2816">
@@ -718,16 +732,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="48">
           <caret line="3" column="44" selection-start-line="3" selection-start-column="44" selection-end-line="3" selection-end-column="44" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/accounts/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="528">
-          <caret line="285" lean-forward="true" selection-start-line="285" selection-end-line="285" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -939,6 +943,26 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="967">
           <caret line="175" column="18" lean-forward="true" selection-start-line="175" selection-start-column="18" selection-end-line="175" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/minloansng/utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2096">
+          <caret line="185" selection-start-line="185" selection-end-line="185" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/accounts/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="22" lean-forward="true" selection-start-line="22" selection-end-line="22" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

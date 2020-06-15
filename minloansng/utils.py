@@ -6,9 +6,6 @@ import string
 from django.utils import timezone
 from django.utils.text import slugify
 
-from amortization.amount import calculate_amortization_amount
-from amortization.schedule import amortization_schedule
-
 
 def get_last_month_data(today):
     """
@@ -186,10 +183,3 @@ def secondWordExtract(char):
     :type char: str
     """
     return char.split(' ', 2)[1]
-
-
-# Amortization Loan Calculator
-def repaymentFee(principal_amount, interest, period):
-    amount_fee = calculate_amortization_amount(principal_amount, interest, period)
-    return amount_fee * period
-
