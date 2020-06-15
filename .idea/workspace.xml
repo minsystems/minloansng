@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6b2ceb19-997d-44ab-af94-3b88c9a4fa83" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/minloansng/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/minloansng/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/loans/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/loans/views.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -66,7 +66,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/accounts/models.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="208">
@@ -78,11 +78,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/loans/templates/loans/detail-loan.html">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/loans/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3040">
-              <caret line="190" column="31" selection-start-line="190" selection-start-column="31" selection-end-line="190" selection-end-column="31" />
+            <state relative-caret-position="288">
+              <caret line="18" column="54" selection-start-line="18" selection-start-column="54" selection-end-line="18" selection-end-column="54" />
             </state>
           </provider>
         </entry>
@@ -204,11 +204,11 @@
         <option value="$PROJECT_DIR$/accounts/views.py" />
         <option value="$PROJECT_DIR$/loans/urls.py" />
         <option value="$PROJECT_DIR$/loans/templates/loans/add-loan.html" />
-        <option value="$PROJECT_DIR$/loans/views.py" />
         <option value="$PROJECT_DIR$/loans/templates/loans/remita/standing-order/setupmandate.html" />
         <option value="$PROJECT_DIR$/templates/footer/home-footer.html" />
         <option value="$PROJECT_DIR$/minloansng/settings/production.py" />
         <option value="$PROJECT_DIR$/minloansng/utils.py" />
+        <option value="$PROJECT_DIR$/loans/views.py" />
       </list>
     </option>
   </component>
@@ -465,7 +465,7 @@
       <workItem from="1591444127176" duration="7912000" />
       <workItem from="1591636633445" duration="1198000" />
       <workItem from="1591958988284" duration="3288000" />
-      <workItem from="1592237855658" duration="1874000" />
+      <workItem from="1592237855658" duration="2260000" />
     </task>
     <task id="LOCAL-00001" summary="First Official Dashboard Build With Sub Companies">
       <created>1582131582380</created>
@@ -485,7 +485,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="636019000" />
+    <option name="totallyTimeSpent" value="636405000" />
   </component>
   <component name="TodoView" selected-index="3">
     <todo-panel id="selected-file">
@@ -500,7 +500,7 @@
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.23373677" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23373677" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -850,16 +850,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/loans/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="54" column="15" selection-start-line="54" selection-start-column="15" selection-end-line="54" selection-end-column="15" />
-          <folding>
-            <element signature="e#0#48#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2000" />
@@ -963,6 +953,13 @@
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/loans/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="18" column="54" selection-start-line="18" selection-start-column="54" selection-end-line="18" selection-end-column="54" />
         </state>
       </provider>
     </entry>

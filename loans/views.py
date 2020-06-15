@@ -16,7 +16,7 @@ from borrowers.models import Borrower
 from company.models import Company
 from loans.models import Loan, LoanType, ModeOfRepayments
 from minloansng.mixins import GetObjectMixin
-from minloansng.utils import random_string_generator, repaymentFee, secondWordExtract, digitExtract
+from minloansng.utils import random_string_generator, secondWordExtract, digitExtract
 
 
 class LoanCreateView(LoginRequiredMixin, DetailView):
