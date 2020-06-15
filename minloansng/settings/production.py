@@ -39,7 +39,6 @@ ADMINS = MANAGERS
 AUTH_USER_MODEL = 'accounts.User'
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    # 'django_jenkins',
+    'django_jenkins',
 
     # third party apps
     'phonenumber_field',
