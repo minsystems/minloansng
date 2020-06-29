@@ -208,7 +208,7 @@ class Loan(models.Model):
                                         null=True)
     number_repayments = models.CharField(blank=True, null=True, max_length=300)
     release_date = models.DateTimeField(help_text='Loan Paid To Customer On:')
-    collection_date = models.DateTimeField(help_text='Each Date Loan Balance Is Been Paid Back', blank=True, null=True)
+    collection_date = models.DateTimeField(help_text='Date User Collects The Loan Money', blank=True, null=True)
     end_date = models.DateTimeField(help_text='Maturity Date', blank=True, null=True)
     processing_fee = models.CharField(blank=True, null=True, max_length=300)
     grace_period = models.IntegerField(default=1, help_text='Counts In Days')
@@ -262,7 +262,6 @@ class Loan(models.Model):
 
 
 def post_save_user_create_reciever(sender, instance, created, *args, **kwargs):
-    print(kwargs)
     print(instance.borrower)
     if created:
         Collateral.objects.get_or_create(slug=instance.loan_key)

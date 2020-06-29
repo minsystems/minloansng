@@ -22,6 +22,10 @@ def get_trial_days():
     return timezone.now() + timezone.timedelta(days=30)
 
 
+def addDays(date_, num_of_days):
+    return date_ + timezone.timedelta(days=num_of_days)
+
+
 def get_month_data_range(months_ago=1, include_this_month=False):
     """
     A method that generates a list of dictionaries

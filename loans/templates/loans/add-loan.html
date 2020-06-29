@@ -719,10 +719,20 @@ $(document).ready(function () {
                     $('#loan-package-type-title').html($(this).val());
                     $('#loan-package-type-description').html(dd_loanDescription);
                 } else if (changed_data === 'PayDay Loan') {
-                    const dd_loanDescription = 'A payday loan is a type of short term high interest loan loan based on a borrower\'s ' +
+                    const dd_loanDescription = 'A payday loan is a type of short term high interest loan. Loan is based on a borrower\'s ' +
                         'income profile. A payday loan\'s principal is typically a portion of a borrower\'s next paycheck. ' +
                         'These loans charge high interest rates for short-term immediate credit.';
                     const imgLink = 'http://res.cloudinary.com/hbnufshgh/image/upload/v1589730176/oxj1rcv7o4kx97pdz1pi.jpg';
+                    $('#loan-package-type-image').attr("src", imgLink);
+                    $('#loan-package-type-title').html($(this).val());
+                    $('#loan-package-type-description').html(dd_loanDescription);
+                } else if (changed_data === 'Quick Loans') {
+                    const dd_loanDescription = 'Quick Loans are loans powered by our MIN-ONE App, \n' +
+                        '\n' +
+                        'Quick Loans are non-collateral loans and uses system user-card-key for your loan business to help you get perform for your end users or borrowers as Quick Non-collateral Loans.\n' +
+                        '\n' +
+                        'Quick Loans is powered by MIN-ONE from MINLOANSNG';
+                    const imgLink = 'http://res.cloudinary.com/hbnufshgh/image/upload/v1592262984/ofxkuhluevobrjxr5ott.png';
                     $('#loan-package-type-image').attr("src", imgLink);
                     $('#loan-package-type-title').html($(this).val());
                     $('#loan-package-type-description').html(dd_loanDescription);
@@ -762,18 +772,18 @@ $(document).ready(function () {
 
                     success: function (data) {
                         loanForm[0].reset();
-                        console.log(data.urlpath);
+                        console.log(data.urlpath, data.loan_data);
                         $(document).Toasts('create', {
                             class: 'bg-success',
                             autohide: true,
                             delay: 750,
-                            title: 'Created!',
-                            subtitle: 'Success',
+                            title: 'Loan Created!',
+                            subtitle: 'User Loan Has Been Created Successfully!',
                             body: '' + data.message
                         });
                         setTimeout(function () {
-                            window.location.replace("127.0.0.1:8000/"+ data.urlpath);
-                        }, 5000);
+                            window.location.replace(data.urlpath);
+                        }, 3000);
                     }, error: function (error) {
                         loanForm[0].reset();
                         $(document).Toasts('create', {

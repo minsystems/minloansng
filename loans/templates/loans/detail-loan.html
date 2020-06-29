@@ -24,7 +24,9 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">{{ loan_obj.borrower }} - Loan Detail </h1>
+            <h1 class="m-0 text-dark">
+                {{ loan_obj.borrower }} - Loan Status: {{ loan_obj.loan_status }}
+            </h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -48,7 +50,10 @@
       <!-- Default box -->
       <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Loan Key - <strong class="text-capitalize text-primary">{{ loan_obj.loan_key }}</strong> Detail</h3>
+            <h3 class="card-title">
+                Loan Key - <strong class="text-capitalize text-primary">{{ loan_obj.loan_key }}</strong> Detail <br/>
+                <small class="well well-sm"><strong>Note: the loan {{ loan_obj }} should be completed before maturity date: {{ loan_obj.end_date }}, System automatically calculates penalty after maturity date.</strong></small>
+            </h3>
 
           <div class="card-tools">
             <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
@@ -83,41 +88,70 @@
                   <div class="info-box bg-light">
                     <div class="info-box-content">
                       <span class="info-box-text text-center text-muted">Maturity Date</span>
-                      <span class="info-box-number text-center text-muted mb-0">{{ loan_obj.end_date }} <span>
+                      <span class="info-box-number text-center text-muted mb-0">{{ loan_obj.end_date }} </span>
                     </div>
                   </div>
                 </div>
               </div>
               <div class="row">
                 <div class="col-12">
-                  <h4>Loan Activity</h4>
+                  <h4>Loan / Branch Information</h4>
                     <div class="post clearfix">
                       <div class="user-block">
-                        <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
+                        <img class="img-circle img-bordered-sm" src="{{ loan_obj.borrower.get_image }}" alt="user image">
                         <span class="username">
-                          <a href="#">Jonathan Burke Jr.</a>
+                          <a href="#">{{ loan_obj.borrower }}</a>
                         </span>
-                        <span class="description">Shared publicly - 7:45 PM today</span>
+                        <span class="description">Loan Type - {{ loan_obj.loan_type }}</span>
                       </div>
                       <!-- /.user-block -->
-                      <p>
-                        Lorem ipsum represents a long-held tradition for designers,
-                        typographers and the like. Some people hate it and argue for
-                        its demise, but others ignore.
-                      </p>
 
+                      <div class="row">
+                          <div class="col-sm-4">
+                              <strong>Repayment: </strong> {{ loan_obj.mode_of_repayments }}<br/>
+                              <strong>Status: </strong> {{ loan_obj.loan_status }}<br/>
+                              <strong>Occupancy: </strong> {{ loan_obj.borrower.get_address }}<br/>
+                              <strong>Phone: </strong> <a href="tel:{{ loan_obj.borrower.phone }}" >{{ loan_obj.borrower.phone }}</a><br/>
+                          </div>
+                          <div class="col-sm-4">
+                              <strong>Number Of Repayments: </strong> {{ loan_obj.number_repayments }}<br/>
+                              <strong>Mandate Reference: </strong> {{ dd_obj.mandateId }}<br/>
+                              <strong>Grace Period: </strong> {{ loan_obj.grace_period }} {% if loan_obj.grace_period == 1 %} Day {% else %} Days {% endif %} <br/>
+                              <strong>Payer Bank: </strong> {{ loan_obj.borrower.bank.get_short_name }} / {{ loan_obj.borrower.bank.code }}<br/>
+                              <strong>Loan Interest: </strong> {{ loan_obj.interest }}% {{ loan_obj.interest_period }}<br/>
+                          </div>
+                          <div class="col-sm-4">
+                              <strong>Penalty: </strong> Overdue Loan Penalty {{ loan_obj.penalty }} <a href="#" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modal-sm-penalty-change">Modify</a> | <a href="#" data-toggle="modal" data-target="#modal-sm-penalty"> <i class="fas fa-eye" style="color: #2aabd2"></i> </a> |
+                                  <a href="#" data-toggle="modal" data-target="#modal-sm-penalty-knowledge">
+                                      <i class="fas fa-book" style="color: #eea236"></i>
+                                  </a> <hr/>
+                                <strong>Repayment: </strong>
+                                    {% if loan_obj.balance_due == 'Modify/Change Loan' %}
+                                        <a href="#" class="btn btn-xs btn-outline-warning">Update Repayment Balance</a>
+                                    {% else %}
+                                        {{ loan_obj.balance_due }}
+                                    {% endif %}
+                          </div>
+                      </div>
+                      <br/>
                       <p>
-                        <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 1 v2</a>
+                        <a href="#" class="link-black text-sm">
+                            <i class="fas fa-building mr-1"></i> Branch: {{ loan_obj.company.branch.address }}
+                        </a><br/>
+                        <a href="#" class="link-black text-sm">
+                            <i class="fas fa-user mr-1"></i> Processing Manager: {{ loan_obj.account_officer.get_name }}
+                        </a>
                       </p>
                     </div>
 
+                    <h4>Loan / Customer Activity</h4>
                     <div class="post clearfix">
                       <div class="user-block">
-                        <img class="img-circle img-bordered-sm" src="../../dist/img/user7-128x128.jpg" alt="User Image">
+                        <img class="img-circle img-bordered-sm" src="{{ loan_obj.account_officer.get_image }}" alt="{{ loan_obj.account_officer.get_name }} Image">
                         <span class="username">
-                          <a href="#">Sarah Ross</a>
+                          <a href="#">{{ loan_obj.account_officer.get_name }}</a>
                         </span>
-                        <span class="description">Sent you a message - 3 days ago</span>
+                        <span class="description">Made First Payment - 3 days ago</span>
                       </div>
                       <!-- /.user-block -->
                       <p>
@@ -126,49 +160,69 @@
                         its demise, but others ignore.
                       </p>
                       <p>
-                        <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 2</a>
+                        <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Modify Content</a>
                       </p>
                     </div>
 
-                    <div class="post">
-                      <div class="user-block">
-                        <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
-                        <span class="username">
-                          <a href="#">Jonathan Burke Jr.</a>
-                        </span>
-                        <span class="description">Shared publicly - 5 days ago</span>
-                      </div>
-                      <!-- /.user-block -->
-                      <p>
-                        Lorem ipsum represents a long-held tradition for designers,
-                        typographers and the like. Some people hate it and argue for
-                        its demise, but others ignore.
-                      </p>
-
-                      <p>
-                        <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Demo File 1 v1</a>
-                      </p>
-                    </div>
                 </div>
               </div>
             </div>
             <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2">
               <h3 class="text-primary"><i class="fas fa-credit-card"></i> {{ loan_obj.loan_type.package.name }} </h3>
-              <p class="text-muted">
-                  Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua
-                  butcher retro keffiyeh dreamcatcher synth. Cosby sweater eu banh mi, qui irure terr.
+              <p>
+                  <small>
+                      <i class="fas fa-warning" style="color: #eea236"></i>
+                      Calculate Loan Packages Before Updating Loan Repayment Balance
+                  </small>
+                  <br/>
+                  <small>
+                      You Can Buy More Loan Package From The <a href="#" class="btn btn-primary btn-xs"><i class="fas fa-shopping-cart" style="color: #fffee8"></i> MINSTORE</a>
+                  </small>
               </p>
-              <br>
+              <hr/>
               <div class="text-muted">
-                <p class="text-sm">Client Company
-                  <b class="d-block">Deveint Inc</b>
+                <p class="text-sm">Client Work Profile/Business
+                  <b class="d-block">Gender: {{ loan_obj.borrower.gender }}</b>
+                  <b class="d-block">Address: {{ loan_obj.borrower.get_address }}</b>
+                  <b class="d-block">Country/State:{{ loan_obj.borrower.country }} / {{ loan_obj.borrower.state }}</b>
+                  <b class="d-block">Working Status: {{ loan_obj.borrower.working_status }}</b>
+                  <b class="d-block">Email: {{ loan_obj.borrower.email }}</b>
+                  <b class="d-block">SSN/Unique Identifier: {{ loan_obj.borrower.unique_identifier }}</b>
+                  <b class="d-block">Age: {{ loan_obj.borrower.get_age }} years old</b>
                 </p>
-                <p class="text-sm">Project Leader
-                  <b class="d-block">Tony Chicken</b>
+
+                <p class="text-sm">Loan / Mandate Information
+                  <b class="d-block">Mandate Hash: <pre>{{ dd_obj.hash_key }}</pre></b>
+                  <b class="d-block">Mandate Type: {{ loan_obj.mode_of_repayments }}</b>
+                  <b class="d-block">Merchant ID: {{ company_creds.merchantId }}</b>
+                  <b class="d-block">Request ID: {{ dd_obj.requestId }}</b>
+                  <b class="d-block">Service Type ID: {{ dd_obj.serviceTypeId }}</b>
+                  <b class="d-block">Mandate Start Date: {{ dd_obj.start_date }}</b>
+                  <b class="d-block">Mandate End Date: {{ dd_obj.end_date }}</b>
+                  <b class="d-block">Status Code: {{ dd_obj.statuscode }}</b>
+                  <b class="d-block">Mandate ID: {{ dd_obj.mandateId }}</b>
+                  <b class="d-block">Status: {{ dd_obj.status }}</b>
+                </p>
+
+                <p class="text-sm">Loan Terms / Loan Collateral
+                  <b class="d-block">Collateral:
+                      {%  if loan_obj.collateral.name == None %}
+                          <a href="#" class="btn btn-xs btn-outline-warning">Validate Loan Collateral</a>
+                      {% else %}
+                          <a href="#" class="btn btn-xs btn-outline-primary">View Collateral</a>
+                      {% endif %}
+                  </b>
+                  <b class="d-block">Terms &amp; Conditions:
+                      {%  if loan_obj.loan_terms.package == None %}
+                          <a href="#" class="btn btn-xs btn-outline-warning">Validate Terms</a>
+                      {% else %}
+                          <a href="#" class="btn btn-xs btn-outline-primary">View Terms &amp; Condition</a>
+                      {% endif %}
+                  </b>
                 </p>
               </div>
 
-              <h5 class="mt-5 text-muted">Project files</h5>
+              <h5 class="mt-5 text-muted">Loan Documents Received</h5>
               <ul class="list-unstyled">
                 <li>
                   <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-word"></i> Functional-requirements.docx</a>
@@ -188,7 +242,7 @@
               </ul>
               <div class="text-center mt-5 mb-3">
                 <a href="#" class="btn btn-sm btn-primary">Add files</a>
-                <a href="#" class="btn btn-sm btn-warning">Report contact</a>
+                <a href="#" class="btn btn-sm btn-warning">Report Borrower</a>
               </div>
             </div>
           </div>
@@ -196,6 +250,87 @@
         <!-- /.card-body -->
       </div>
       <!-- /.card -->
+
+
+
+    <div class="modal fade" id="modal-sm-penalty">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><small>Standard Penalty - {{ loan_obj.penalty.title }}</small></h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>{{ loan_obj.penalty.describe | safe }}</p>
+
+              <hr/>
+              <strong><i class="fas fa-building"></i> Company: </strong> {{ loan_obj.company }}<br/>
+              <strong><i class="fas fa-outdent"></i> Branch Code: </strong> {{ loan_obj.company.branch }}<br/>
+              <strong><i class="fas fa-location-arrow"></i> Branch Address: </strong> {{ loan_obj.company.branch.address }}<br/>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <small class="well well-sm"><i class="fas fa-warning"></i> For Borrower's View If Physically Present* </small>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
+
+
+    <div class="modal fade" id="modal-sm-penalty-knowledge">
+        <div class="modal-dialog">
+          <div class="modal-content bg-info">
+            <div class="modal-header">
+              <h4 class="modal-title"><small>Loan Penalty</small></h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+              <small style="color: #fffee8">
+                  Learning about loan penalties on <strong>MINLOANSNG</strong>, We would give you a quick guide reference.
+                  The software system auto-calculates standard loan penalty for the lenders using international lending rules, as
+                  attached to the STANDARD LENDING GUIDANCE SYSTEM (SLGS), for loans that are part maturity date.
+                  However lenders can re-attach or modify current legal punishment to fit their own mode of business depending on the
+                  borrower. The SLGS standard is automatically created for each borrower once a loan instance is created.
+              </small>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <small class="well well-sm" style="color: #fffee8"><i class="fas fa-warning"></i> For Lenders View Only* </small>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <!-- /.modal -->
+
+
+    <div class="modal fade" id="modal-sm-penalty-change">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><small>Change Loan Penalty</small></h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p></p>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="submit" class="btn btn-outline-success btn-block">Submit</button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
 
     </section>
     <!-- /.content -->

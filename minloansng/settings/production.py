@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 SECRET_KEY = '(=vw2)fyh)4uit)gty2z7g-icg$3a^zc3w-eb)v+)@tncxd%))'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -175,4 +175,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "static", "media_root")
 
 PROTECTED_ROOT = os.path.join(BASE_DIR, "static", "protected_media")
 
-# from minloansng.ssl_config import *
+from minloansng.ssl_config import *

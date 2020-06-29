@@ -190,7 +190,10 @@ class MessageDetail(LoginRequiredMixin, View):
 
 class AccountUpgrade(View):
     def get(self, *args, **kwargs):
-        user = self.request.user.get_full_name()
+        if self.request.user.is_anonymous:
+            user = "Guest User"
+        else:
+            user = self.request.user.get_full_name()
         return render(self.request, template_name="payment-upgrade/account-upgrade.html", context={"user":user})
 
 

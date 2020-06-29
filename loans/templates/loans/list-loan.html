@@ -58,6 +58,7 @@
                   <th>Interest</th>
                   <th>Status</th>
                   <th>Account Officer</th>
+                  <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -70,12 +71,17 @@
                   <td>{{ loan_obj.interest }}<b>%</b> {{ loan_obj.interest_period }}</td>
                   <td><em>{{ loan_obj.loan_status }}</em></td>
                   <td>{{ loan_obj.account_officer.get_name }}</td>
+                  <td>
+                      <i class="fas fa-trash" style="color: #ba2121"></i> |
+                      <a href="/loans/{{ object.slug }}/{{ loan_obj.slug }}/detail/"><i class="fas fa-eye" style="color: #2aabd2"></i></a> |
+                      <i class="fas fa-edit" style="color: #d58512"></i>
+                  </td>
                 </tr>
                 {% empty %}
                   <td></td>
                   <td></td>
                   <td></td>
-                    <td><strong class="text-primary text-capitalize"><em>Empty Database Content..</em></strong></td>
+                  <td><strong class="text-primary text-capitalize"><em>Empty Database Content..</em></strong></td>
                   <td></td>
                   <td></td>
                   <td></td>
@@ -90,6 +96,7 @@
                   <th>Interest</th>
                   <th>Status</th>
                   <th>Account Officer</th>
+                  <th>Actions</th>
                 </tr>
                 </tfoot>
               </table>

@@ -1,4 +1,5 @@
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse, HttpResponseRedirect
@@ -10,14 +11,22 @@ from django.utils import timezone
 from django.utils.datetime_safe import datetime
 from django.utils.text import slugify
 from django.views.generic import DetailView, ListView
+from django.views.generic.base import View
 
 from accounts.models import Profile
+from banks.models import BankCode
 from borrowers.models import Borrower
-from company.models import Company
-from loans.models import Loan, LoanType, ModeOfRepayments
+from company.models import Company, RemitaCredentials, RemitaMandateActivationData
+from loans.models import Loan, LoanType, ModeOfRepayments, Penalty, Collateral, LoanTerms
+from minloansng.minmarket.packages.remita import remita_dd_url, statuscode_success
 from minloansng.mixins import GetObjectMixin
-from minloansng.utils import random_string_generator, secondWordExtract, digitExtract
+from minloansng.utils import random_string_generator, secondWordExtract, digitExtract, addDays
 
+DESCRIPTION = "If a loan payment is due " \
+              "and is not paid within the specified time constraints, " \
+              "the payment will be considered past due. Late fees are " \
+              "one of the most expensive penalties that can occur for a " \
+              "past due bill. Lenders can charge anywhere from NGN500 to NGN1,000 for a late payment"
 
 class LoanCreateView(LoginRequiredMixin, DetailView):
     model = Company
@@ -110,11 +119,26 @@ class LoanCreateView(LoginRequiredMixin, DetailView):
             mode_of_repayments=loan_collection_type,
             slug=loan_slug,
         )
+
+        base_url = getattr(settings, 'BASE_URL', 'https://www.minloans.com.ng')
+
         if str(loan_collection_type) == "Remita Direct Debit":
-            urlpath = reverse('loans-url:loan-standing-order-create', kwargs={'slug': self.get_object().slug, 'loan_slug': loan_slug, 'loan_key': loan_key_value})
+            urlpath = reverse('loans-url:loan-standing-order-create',
+                              kwargs={'slug': self.get_object().slug, 'loan_slug': loan_slug,
+                                      'loan_key': loan_key_value})
+            finalpath = "{base}{path}".format(base=base_url, path=urlpath)
+            print(finalpath)
+            loan_data = {'companySlug': self.get_object().slug, 'loanSlug': loan_slug, 'loanKey': loan_key_value}
         elif str(loan_collection_type) == "Data Referencing":
             urlpath = ""
-        return JsonResponse({'message': 'Submitted For Processing', 'urlpath': urlpath, 'loanKey': loan_key_value})
+            finalpath = ""
+            loan_data = ""
+        elif str(loan_collection_type) == "Quick Loans":
+            urlpath = ""
+            finalpath = ""
+            loan_data = ""
+        return JsonResponse({'message': 'Submitted For Processing', 'urlpath': finalpath, 'loanKey': loan_key_value,
+                             'loan_data': loan_data})
 
 
 class LoanListView(LoginRequiredMixin, ListView):
@@ -159,16 +183,42 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
     template_name = 'loans/detail-loan.html'
 
     def get_context_data(self, *args, **kwargs):
-        print(args, kwargs)
         context = super(LoanDetailView, self).get_context_data(*args, **kwargs)
         company_inst = Company.objects.get(slug=self.kwargs.get('slug'))
         context['company'] = context['object'] = company_inst
         context['loan_obj'] = self.get_object()
+        if self.get_object().mode_of_repayments == " Remita Direct Debit":
+            context['dd_obj'] = RemitaMandateActivationData.objects.get(loan_key=self.get_object())
+            context['company_creds'] = RemitaCredentials.objects.get(connected_firm=company_inst)
+        else:
+            context['dd_obj'] = RemitaMandateActivationData.objects.get(loan_key=self.get_object())
+            context['company_creds'] = RemitaCredentials.objects.get(connected_firm=company_inst)
         return context
 
     def render_to_response(self, context, **response_kwargs):
-        print(context)
         if context:
+            if self.get_object().penalty is None:
+                loan_penalty = Penalty.objects.get(title__exact=self.get_object().loan_key)
+                loan_penalty.company = context.get('company')
+                loan_penalty.describe = DESCRIPTION
+                loan_penalty.punishment_fee = 500
+                loan_penalty.re_occuring = True
+                loan_penalty.value_on_period = 500
+                loan_penalty.period = "Per Week"
+                loan_penalty.save()
+                instance = Loan.objects.get(loan_key=self.get_object())
+                instance.penalty = loan_penalty
+                instance.save()
+            if self.get_object().collateral is None:
+                loan_collateral = Collateral.objects.get(slug=self.get_object().loan_key)
+                instance = Loan.objects.get(loan_key=self.get_object())
+                instance.collateral = loan_collateral
+                instance.save()
+            if self.get_object().loan_terms is None:
+                loan_tc = LoanTerms.objects.get(title__exact=self.get_object().loan_key)
+                instance = Loan.objects.get(loan_key=self.get_object())
+                instance.loan_terms = loan_tc
+                instance.save()
             user_profile_obj = Profile.objects.get(user=self.request.user)
             if timezone.now() > user_profile_obj.trial_days:
                 # return redirect to payment page
@@ -214,9 +264,22 @@ class RemitaStandingOrder(LoginRequiredMixin, DetailView):
         context['borrower_group_qs'] = self.get_object().borrowergroup_set.all()
 
         context['loan_key'] = self.kwargs.get('loan_key')
+
+        # get the user and their account number from the loankey
+        loan_obj = Loan.objects.get(loan_key__iexact=self.kwargs.get('loan_key'))
+        context['loan_obj'] = loan_obj
+
+        context['collection_date'] = loan_obj.collection_date
+        context['num_of_repayments'] = digitExtract(loan_obj.number_repayments)
+        context['borrower'] = loan_obj.borrower
+
+        context['remitaCredential_obj'] = RemitaCredentials.objects.get(connected_firm=self.get_object())
+        context['dd_url'] = remita_dd_url
+
         return context
 
     def render_to_response(self, context, **response_kwargs):
+        print(context, **response_kwargs)
         if context:
             user_profile_obj = Profile.objects.get(user=self.request.user)
             if timezone.now() > user_profile_obj.trial_days:
@@ -225,6 +288,17 @@ class RemitaStandingOrder(LoginRequiredMixin, DetailView):
                                "Account Expired!, Your Account Has Been Expired You Would Be "
                                "Redirected To The Payment Portal Upgrade Your Payment")
                 return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
+            try:
+                loan_obj_remita_dd = RemitaMandateActivationData.objects.get(
+                    loan_key__iexact=self.kwargs.get('loan_key'))
+                if loan_obj_remita_dd:
+                    messages.error(self.request, "Mandate Has Been Activated On This Loan Already!")
+                    return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
+                else:
+                    messages.warning(self.request, "Mandate Activation Can Only Be Done Once On A Loan Instance")
+            except:
+                messages.warning(self.request, "Mandate Activation Can Only Be Done Once On A Loan Instance")
+
         return super(RemitaStandingOrder, self).render_to_response(context, **response_kwargs)
 
     def get_object(self, *args, **kwargs):
@@ -239,3 +313,52 @@ class RemitaStandingOrder(LoginRequiredMixin, DetailView):
         except:
             return redirect(reverse('404_'))
         return company_obj
+
+    def post(self, *args, **kwargs):
+        payer_obj = Borrower.objects.get(phone__exact=self.request.POST.get("payerPhone"))
+        payerName = payer_obj.get_borrowers_full_name()
+        payerEmail = Borrower.objects.get(email__exact=self.request.POST.get("payerEmail")).email
+        payerBankCode = BankCode.objects.get(code__exact=self.request.POST.get("payerBankCode")).code
+        loan_instance = Loan.objects.get(loan_key__iexact=self.request.POST.get("loanKey"))
+        loanKey = loan_instance.loan_key
+
+        RemitaMandateActivationData.objects.create(
+            connected_firm=self.get_object(),
+            amount=self.request.POST.get("amount"),
+            start_date=self.request.POST.get("startDate"),
+            end_date=self.request.POST.get("endDate"),
+            max_number_of_debits=self.request.POST.get("maxNoOfDebits"),
+            mandate_type=self.request.POST.get("mandateType"),
+            payer_account=self.request.POST.get("payerAccount"),
+            payer_bank_code=payerBankCode,
+            payer_name=payerName,
+            payer_email=payerEmail,
+            payer_phone=self.request.POST.get("payerPhone"),
+            requestId=self.request.POST.get("requestId"),
+            merchantId=self.request.POST.get("merchantId"),
+            hash_key=self.request.POST.get("hash"),
+            serviceTypeId=self.request.POST.get("serviceTypeId"),
+            loan_key=loan_instance,
+        )
+
+        # update the date of the loan date
+        loan_instance.number_repayments = self.request.POST.get("maxNoOfDebits")
+        loan_instance.release_date = datetime.strptime(self.request.POST.get('startDate'), "%d/%m/%Y")
+        loan_instance.end_date = datetime.strptime(self.request.POST.get("endDate"), "%d/%m/%Y")
+        loan_instance.save()
+
+        return JsonResponse({'message': 'Submitted To DB, Processing to Remita Server..'})
+
+
+class RemitaMandateUpdate(View):
+    def post(self, *args, **kwargs):
+        print(self.request.POST)
+        print(self.request.POST['statuscode'])
+        if self.request.POST['statuscode'] == statuscode_success:
+            mandate_dd = RemitaMandateActivationData.objects.get(requestId=self.request.POST['requestId'])
+            mandate_dd.status = self.request.POST['status']
+            mandate_dd.statuscode = self.request.POST['statuscode']
+            mandate_dd.mandateId = self.request.POST['mandateId']
+            mandate_dd.save()
+            return JsonResponse({'message': 'Mandate Activation Updated!', 'status': '007'})
+        return JsonResponse({'message': 'Mandate Failed To Update Please Redo Process', 'status': '003'})

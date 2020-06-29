@@ -1,13 +1,14 @@
 from cloudinary.models import CloudinaryField
+from datetime import date
 from django.db import models
 
 # Create your models here.
+from django.utils import timezone
 from django_countries.fields import CountryField
 from phonenumber_field.modelfields import PhoneNumberField
 
 from accounts.models import upload_image_path
 from banks.models import BankCode
-from company.models import Company
 
 GENDER = (
     ('Male', 'Male'),
@@ -28,7 +29,7 @@ WORKING_STATUS = (
 
 
 class Borrower(models.Model):
-    registered_to = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
+    registered_to = models.ForeignKey(to='company.Company', on_delete=models.CASCADE, blank=True, null=True)
     first_name = models.CharField(blank=True, null=True, max_length=300)
     last_name = models.CharField(blank=True, null=True, max_length=300)
     photo = CloudinaryField(upload_image_path, null=True, blank=True)
@@ -49,7 +50,7 @@ class Borrower(models.Model):
     slug = models.SlugField(unique=True, blank=True, null=True)
     account_number = models.CharField(blank=True, null=True, max_length=11)
     bvn = models.CharField(blank=True, null=True, max_length=300, help_text='Bank Verification Number')
-    date_of_birth = models.DateField( null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
 
@@ -59,8 +60,12 @@ class Borrower(models.Model):
     def __str__(self):
         return "{title}, {f_name} {l_name}".format(title=self.title, f_name=self.first_name, l_name=self.last_name)
 
+    def get_borrowers_full_name(self):
+        return "{title}, {f_name} {l_name}".format(title=self.title, f_name=self.first_name, l_name=self.last_name)
+
     def get_address(self):
-        return "{address}, {lga} {state} {country}".format(address=self.address, lga=self.lga, state=self.state, country=self.country)
+        return "{address}, {lga} {state} {country}".format(address=self.address, lga=self.lga, state=self.state,
+                                                           country=self.country)
 
     def image_tag(self):
         from django.utils.html import mark_safe
@@ -75,12 +80,19 @@ class Borrower(models.Model):
             return self.photo.url
         return "https://img.icons8.com/officel/2x/user.png"
 
+    def get_age(self):
+        if self.date_of_birth:
+            today = date.today()
+            return today.year - self.date_of_birth.year - ((today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day))
+        return "Not Specified"
+
 
 class BorrowerGroup(models.Model):
-    registered_to = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
+    registered_to = models.ForeignKey(to='company.Company', on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField(blank=True, null=True, max_length=300)
     borrowers = models.ManyToManyField(Borrower, related_name='members')
-    group_leader = models.ForeignKey(Borrower, blank=True, null=True, on_delete=models.CASCADE, related_name='group_leader')
+    group_leader = models.ForeignKey(Borrower, blank=True, null=True, on_delete=models.CASCADE,
+                                     related_name='group_leader')
     collector = models.ForeignKey(Borrower, blank=True, null=True, on_delete=models.CASCADE)
     meeting_schedule = models.DateTimeField(blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True, null=True)

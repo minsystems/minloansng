@@ -7,8 +7,8 @@ from loans.models import LoanType, Collateral, LoanTerms, Loan, ModeOfRepayments
 
 @admin.register(Collateral)
 class CollateralAdmin(admin.ModelAdmin):
-    list_display = ('collateral_type', 'name', 'registered_date', 'status', 'value', 'condition', 'collateral_files')
-    list_display_links = ('collateral_type', 'name')
+    list_display = ('slug', 'collateral_type', 'name', 'registered_date', 'status', 'value', 'condition', 'collateral_files')
+    list_display_links = ('collateral_type', 'name', 'slug')
     list_editable = ('status',)
     list_filter = ('collateral_type', 'name', 'registered_date', 'status', 'condition')
     search_fields = ('name',)

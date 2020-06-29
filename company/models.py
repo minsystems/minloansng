@@ -6,6 +6,7 @@ from django.db.models.signals import post_save
 from django.urls import reverse
 
 from accounts.models import Profile, upload_image_path
+from banks.models import BankCode
 from minloansng.utils import unique_slug_generator
 
 
@@ -89,3 +90,46 @@ def post_save_user_create_reciever(sender, instance, created, *args, **kwargs):
 
 
 post_save.connect(post_save_user_create_reciever, sender=Profile)
+
+
+class RemitaCredentials(models.Model):
+    connected_firm = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
+    merchantId = models.CharField(max_length=200, blank=True, null=True)
+    serviceTypeId = models.CharField(max_length=200, blank=True, null=True)
+    apiKey = models.CharField(max_length=200, blank=True, null=True)
+    mandateType = models.CharField(max_length=100, default="DD")
+
+    class Meta:
+        verbose_name = "Remita Credentials"
+        verbose_name_plural = "Remita Credentials"
+
+    def __str__(self):
+        return self.connected_firm.name
+
+
+class RemitaMandateActivationData(models.Model):
+    connected_firm = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
+    loan_key = models.ForeignKey(to="loans.Loan", on_delete=models.CASCADE, blank=True, null=True)
+    amount = models.CharField(max_length=100, blank=True, null=True)
+    hash_key = models.CharField(max_length=200, blank=True, null=True)
+    mandate_type = models.CharField(max_length=200, blank=True, null=True)
+    max_number_of_debits = models.CharField(max_length=100, blank=True, null=True)
+    merchantId = models.CharField(max_length=200, blank=True, null=True)
+    payer_name = models.CharField(max_length=200, blank=True, null=True)
+    payer_phone = models.CharField(max_length=200, blank=True, null=True)
+    payer_account = models.CharField(max_length=200, blank=True, null=True)
+    payer_bank_code = models.CharField(max_length=200, blank=True, null=True)
+    payer_email = models.CharField(max_length=200, blank=True, null=True)
+    requestId = models.CharField(max_length=200, blank=True, null=True)
+    serviceTypeId = models.CharField(max_length=200, blank=True, null=True)
+    start_date = models.CharField(max_length=200, blank=True, null=True)
+    end_date = models.CharField(max_length=200, blank=True, null=True)
+    statuscode = models.CharField(max_length=200, blank=True, null=True)
+    mandateId = models.CharField(max_length=200, blank=True, null=True)
+    status = models.CharField(max_length=200, blank=True, null=True)
+
+    def __str__(self):
+        return self.requestId
+
+
+

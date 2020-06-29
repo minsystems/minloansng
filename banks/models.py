@@ -12,3 +12,11 @@ class BankCode(models.Model):
     def __str__(self):
         return self.name
         # return '{bank}: {code}'.format(bank=self.name, code=self.code)
+
+    def get_short_name(self):
+        line = self.name
+        chars = ""
+        words = line.split()
+        for word in words:
+            chars = chars + word[0]
+        return ".".join(chars).upper()

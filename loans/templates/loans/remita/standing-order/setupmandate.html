@@ -1,4 +1,10 @@
 {% extends 'base.html' %}
+{% load humanize %}
+{% load l10n %}
+
+{% localize on %}
+    {{ value }}
+{% endlocalize %}
 
 
 {% block title %} {{ object }} {% endblock title %}
@@ -52,27 +58,85 @@
         <div class="col-md-8">
           <div class="card card-primary">
             <div class="card-header">
-              <h3 class="card-title">Activate Remita Standing Order</h3>
+              <h3 class="card-title">Activate Remita Standing Order/DD</h3>
 
               <div class="card-tools">
                 <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
                   <i class="fas fa-minus"></i></button>
               </div>
             </div>
-            <div class="card-body">
-              <div class="form-group">
-                <label for="inputName">Amount To Debit AT Intervals</label>
-                <input type="number" id="inputName" class="form-control">
+
+            <!-- form start -->
+            <form role="form" id="mandateActivationForm" method="post" action="{% url 'loans-url:loan-standing-order-create' object.slug loan_obj.slug loan_obj.loan_key %}">
+              {% csrf_token %}
+
+              <div class="card-body">
+                <div class="form-group">
+                <label for="inputName">Amount To Debit At Intervals</label>
+                <input type="number" id="inputAmount" class="form-control" value="" required>
+
+                <br/>
+
+                <label for="inputName">Mandate Start Date/Loan Start Date</label>
+                <input type="text" id="inputStartDate" class="form-control" value="" placeholder="dd/mm/yyyy" required>
+
+                <br/>
+
+                <label for="inputName">Maximum Number Of Debits</label>
+                <input type="number" id="inputMaxNoOfDebits" class="form-control" value="{{ num_of_repayments }}" required>
+
+                <br/>
+
+                <label for="inputName">Mandate End Date/Loan End Date</label>
+                <input type="text" id="inputEndDate" class="form-control" value="" required>
+
+                <br/>
+
+                <label for="inputName">Mandate Type</label>
+                <input type="text" id="inputMandateType" class="form-control" value="DD" disabled>
+
+                <br/>
+
+                <label for="inputName">Payer Account Number</label>
+                <input type="number" id="inputPayerAccount" class="form-control" value="{{ borrower.account_number }}" disabled>
+
+                <br/>
+
+                <label for="inputName">Payer Bank Code</label>
+                <input type="number" id="inputPayerBankCode" class="form-control" value="{{ borrower.bank.code }}" disabled>
+
+                <br/>
+
+                <label for="inputName">Payer Name</label>
+                <input type="text" id="inputPayerName" class="form-control" value="{{ borrower }}" disabled>
+
+                <br/>
+
+                <label for="inputName">Payer Email</label>
+                <input type="text" id="inputPayerEmail" class="form-control" value="{{ borrower.email }}" disabled>
+
+                <br/>
+
+                <label for="inputName">Payer Phone</label>
+                <input type="text" id="inputPayerPhone" class="form-control" value="{{ borrower.phone }}" disabled>
+
               </div>
-            </div>
-            <!-- /.card-body -->
+              </div>
+              <!-- /.card-body -->
+              <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-arrow-right"></i> Send Mandate Activation Request
+                </button>
+              </div>
+            </form>
+            <!-- form end -->
           </div>
           <!-- /.card -->
         </div>
         <div class="col-md-4">
           <div class="card card-secondary">
             <div class="card-header">
-              <h3 class="card-title">Field Description</h3>
+              <h3 class="card-title">Fields Description</h3>
 
               <div class="card-tools">
                 <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
@@ -84,8 +148,56 @@
                     <strong>Amount</strong>:
                 </p>
                 <p>
-                    Amount to be debited from user at interval where mandate is activated!
+                    Amount to be debited from user at interval when mandate is activated, also when multiplied with
+                    maximum number of debits, should add up to repayment fee.
+                    <p class="well well-sm mx-auto">
+                        <small>system estimated: </small><strong>NGN {{ loan_obj.principal_amount|localize|intcomma }}</strong>
+                    </p>
                 </p>
+
+                <hr/>
+
+                <p class="mx-auto">
+                    <strong>Start Date/ Mandate Start Date</strong>:
+                </p>
+                <p>
+                    Date for the required loan to start, which is also the same date the mandate is deemed to start
+                    <p class="well well-sm mx-auto">
+                        <small>system estimated: </small><strong>{{ loan_obj.collection_date }}</strong>
+                    </p>
+                </p>
+
+                <hr/>
+
+                <p class="mx-auto">
+                    <strong>End Date/ Mandate End Date</strong>:
+                </p>
+                <p>
+                    Date for the required loan to end, which is also the same date the mandate is deemed to stop
+                    <p class="well well-sm mx-auto">
+                        <small>system estimated: </small><strong>{{ loan_obj.end_date }}</strong>
+                    </p>
+                </p>
+
+                <hr/>
+
+                <p class="mx-auto">
+                    <strong>Mandate Type</strong>:
+                </p>
+                <p>
+                    Remita Mandate Type, for the external system to know what type of debit would run on the user account<br/>
+                    Either Standing Order (S.O) Or Direct Debit (D.D)
+                </p>
+
+                <hr/>
+
+                <p class="mx-auto">
+                    <strong>Maximum Number Of Debits</strong>:
+                </p>
+                <p>
+                    The number of successful debits to be done on the borrower's account before the debit is complete and loan repayed
+                </p>
+
             </div>
             <!-- /.card-body -->
           </div>
@@ -98,12 +210,13 @@
           <input type="submit" value="Create new Porject" class="btn btn-success float-right">
         </div>
       </div>
+      <br/>
     </section>
     <!-- /.content -->
 
 {% endblock content %}
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js" type="text/javascript"></script>
+{% block js_links %}
 <!-- jQuery -->
 <script src="https://cdn.minloans.com.ng/min-dash/plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
@@ -131,11 +244,233 @@
 <script src="https://cdn.minloans.com.ng/min-dash/dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="https://cdn.minloans.com.ng/min-dash/dist/js/demo.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.26.0/moment-with-locales.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha512/0.8.0/sha512.js"></script>
 <script>
     $(function () {
         'use strict';
         $(document).ready(function (event) {
-            console.log(event);
+            // Calendar Selector
+            $('#inputStartDate').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                minYear: 1910,
+                maxYear: parseInt(moment().format('YYYY'),10),
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+               }, function(start, end, label) {
+                var years = moment().diff(start, 'years');
+            });
+
+            $('#inputEndDate').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                minYear: 1910,
+                maxYear: parseInt(moment().format('YYYY'),10),
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+               }, function(start, end, label) {
+                var years = moment().diff(start, 'years');
+            });
+
+            // initialize local data
+            const mandateActivationForm = $('#mandateActivationForm');
+            const mandateActivationFormMethod = mandateActivationForm.attr('method');
+            const mandateActivationFormEndpoint = mandateActivationForm.attr('action');
+
+            function displaySubmitting(submitBtn, defaultText, doSubmit) {
+                if (doSubmit) {
+                    submitBtn.addClass("disabled");
+                    submitBtn.html("<i class='fa fa-spin fa-spinner'></i> Activating...");
+                } else {
+                    submitBtn.removeClass("disabled");
+                    submitBtn.add(defaultText);
+                }
+            }
+
+            function jsonExtract(stringData){
+                let payload = stringData.substring(stringData.lastIndexOf('(')+1, stringData.lastIndexOf(')'));
+                return JSON.parse(payload)
+            }
+
+            const mandateActivationFormSubmitBtn = mandateActivationForm.find("[type='submit']");
+            const mandateActivationFormSubmitBtnText = mandateActivationFormSubmitBtn.text();
+
+            const date_ = new Date();
+            const requestId = date_.getTime();
+            const merchantId = "{{ remitaCredential_obj.merchantId|safe }}";
+            const serviceTypeId = "{{ remitaCredential_obj.serviceTypeId|safe }}";
+            const apiKey = "{{ remitaCredential_obj.apiKey|safe }}";
+
+            mandateActivationForm.submit(function (event) {
+                event.preventDefault();
+
+                const amount_ = $('#inputAmount').val();
+
+                const concatenatedString = merchantId + serviceTypeId + requestId + amount_ + apiKey;
+                const hash_ = sha512(concatenatedString);
+
+                {% include 'csrf_ajax/csrf_ajax_token.js' %}
+
+                const mandateActivationFormData = {
+                    "amount":amount_,
+                    "startDate":$('#inputStartDate').val(),
+                    "endDate":$('#inputEndDate').val(),
+                    "maxNoOfDebits":$('#inputMaxNoOfDebits').val(),
+                    "mandateType":$('#inputMandateType').val(),
+                    "payerAccount":$('#inputPayerAccount').val(),
+                    "payerBankCode":$('#inputPayerBankCode').val(),
+                    "payerName":$('#inputPayerName').val(),
+                    "payerEmail":$('#inputPayerEmail').val(),
+                    "payerPhone":$('#inputPayerPhone').val(),
+                    "requestId":requestId,
+                    "merchantId":merchantId,
+                    "hash":hash_,
+                    "serviceTypeId":serviceTypeId,
+                };
+
+                const mandateActivationFormData_new = {
+                    "amount":amount_,
+                    "startDate":$('#inputStartDate').val(),
+                    "endDate":$('#inputEndDate').val(),
+                    "maxNoOfDebits":$('#inputMaxNoOfDebits').val(),
+                    "mandateType":$('#inputMandateType').val(),
+                    "payerAccount":$('#inputPayerAccount').val(),
+                    "payerBankCode":$('#inputPayerBankCode').val(),
+                    "payerName":$('#inputPayerName').val(),
+                    "payerEmail":$('#inputPayerEmail').val(),
+                    "payerPhone":$('#inputPayerPhone').val(),
+                    "requestId":requestId,
+                    "merchantId":merchantId,
+                    "hash":hash_,
+                    "serviceTypeId":serviceTypeId,
+                    "loanKey":"{{ loan_obj.loan_key|safe }}",
+                };
+
+                displaySubmitting(mandateActivationFormSubmitBtn, "", true);
+                const finalData = JSON.stringify(mandateActivationFormData);
+                console.log(finalData);
+
+                $.ajax({
+                    method: mandateActivationFormMethod,
+                    url: mandateActivationFormEndpoint,
+                    data: mandateActivationFormData_new,
+                    contentType: 'application/x-www-form-urlencoded',
+
+                    success: function (data) {
+                        mandateActivationForm[0].reset();
+                        $(document).Toasts('create', {
+                            class: 'bg-success',
+                            autohide: true,
+                            delay: 750,
+                            title: 'Mandate Data Processing!',
+                            subtitle: 'Mandate Data Activation In Progress',
+                            body: '' + data.message
+                        });
+
+                        // Send data to remita server
+                        $.ajax({
+                            method: mandateActivationFormMethod,
+                            url: '{{ dd_url|safe }}',
+                            data: finalData,
+                            contentType: 'application/json',
+
+                            success: function (data) {
+                                mandateActivationForm[0].reset();
+                                const payload_data = jsonExtract(data);
+                                $(document).Toasts('create', {
+                                    class: 'bg-success',
+                                    autohide: true,
+                                    delay: 3500,
+                                    title: 'Mandate Activated!',
+                                    subtitle: 'Activated Successfully!',
+                                    body: '' + payload_data.status + ', ' + 'Mandate Activation Key: ' + payload_data.mandateId
+                                });
+
+                                // update mandate_dd data
+                                $.ajax({
+                                    method: "post",
+                                    url: "{% url 'loans-url:loan-mandate-update' object.slug loan_obj.slug loan_obj.loan_key %}",
+                                    data: payload_data,
+                                    contentType: 'application/x-www-form-urlencoded',
+
+                                    success: function (data) {
+                                        console.log(data.message);
+                                        if (data.status === '007') {
+                                            $(document).Toasts('create', {
+                                                class: 'bg-success',
+                                                autohide: true,
+                                                delay: 3500,
+                                                title: 'Mandate Updated!',
+                                                subtitle: 'Updated Successfully!',
+                                                body: '' + data.message
+                                            });
+
+                                            // redirect to loan details
+                                            setTimeout(function () {
+                                                window.location.replace("{% url 'loans-url:loan-detail' object.slug loan_obj.slug %}");
+                                            }, 3000);
+                                        } else {
+                                             $(document).Toasts('create', {
+                                                class: 'bg-danger',
+                                                autohide: true,
+                                                delay: 3500,
+                                                title: 'Mandate Failed!',
+                                                subtitle: 'Failed To Update!',
+                                                body: '' + data.message
+                                            });
+
+                                            // redirect to loan recreate the standing order
+                                            setTimeout(function () {
+                                                window.location.replace("{% url 'loans-url:loan-standing-order-create' object.slug loan_obj.slug loan_obj.loan_key %}");
+                                            }, 3000);
+                                        }
+
+                                    }, error: function (error) {
+                                        $(document).Toasts('create', {
+                                            class: 'bg-danger',
+                                            autohide: true,
+                                            delay: 2500,
+                                            title: 'An Error!',
+                                            subtitle: 'Error! Updating..',
+                                            body: 'An Error Occurred During Mandate Activation Update!'
+                                        });
+                                    }
+                                });
+
+                            }, error: function (error) {
+                                console.log(error);
+                                mandateActivationForm[0].reset();
+                                $(document).Toasts('create', {
+                                    class: 'bg-danger',
+                                    autohide: true,
+                                    delay: 2500,
+                                    title: 'An Error Connect..!',
+                                    subtitle: 'Error! To External Server',
+                                    body: 'An Error Occurred During Server Communication!'
+                                });
+                                displaySubmitting(mandateActivationFormSubmitBtn, mandateActivationFormSubmitBtnText, false);
+                            }
+                        });
+                    }, error: function (error) {
+                        mandateActivationForm[0].reset();
+                        $(document).Toasts('create', {
+                            class: 'bg-danger',
+                            autohide: true,
+                            delay: 750,
+                            title: 'Error!',
+                            subtitle: 'An Error Occurred',
+                            body: 'An Error Occurred During Mandate Processing!'
+                        });
+                        displaySubmitting(mandateActivationFormSubmitBtn, mandateActivationFormSubmitBtnText, false);
+                    }
+                })
+
+            })
+
         })
     })
 </script>
+{% endblock js_links %}
