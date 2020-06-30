@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="6b2ceb19-997d-44ab-af94-3b88c9a4fa83" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/minloansng/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/minloansng/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/footer/home-footer.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/footer/home-footer.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -54,11 +53,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/minloansng/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="35" column="97" lean-forward="true" selection-start-line="35" selection-start-column="97" selection-end-line="35" selection-end-column="97" />
+            <state relative-caret-position="181">
+              <caret line="36" column="116" lean-forward="true" selection-start-line="36" selection-start-column="116" selection-end-line="36" selection-end-column="116" />
               <folding>
                 <element signature="e#634#666#0" expanded="true" />
               </folding>
@@ -75,11 +74,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/minloansng/settings/production.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="487">
-              <caret line="178" lean-forward="true" selection-start-line="178" selection-end-line="178" />
+            <state relative-caret-position="245">
+              <caret line="176" lean-forward="true" selection-start-line="176" selection-end-line="176" />
             </state>
           </provider>
         </entry>
@@ -221,9 +220,9 @@
         <option value="$PROJECT_DIR$/loans/admin.py" />
         <option value="$PROJECT_DIR$/loans/views.py" />
         <option value="$PROJECT_DIR$/loans/templates/loans/detail-loan.html" />
-        <option value="$PROJECT_DIR$/minloansng/urls.py" />
         <option value="$PROJECT_DIR$/templates/footer/home-footer.html" />
         <option value="$PROJECT_DIR$/minloansng/settings/production.py" />
+        <option value="$PROJECT_DIR$/minloansng/urls.py" />
       </list>
     </option>
   </component>
@@ -419,7 +418,7 @@
       <workItem from="1592237855658" duration="47897000" />
       <workItem from="1592411515231" duration="88159000" />
       <workItem from="1593086916163" duration="1894000" />
-      <workItem from="1593438636995" duration="3637000" />
+      <workItem from="1593438636995" duration="3875000" />
     </task>
     <task id="LOCAL-00001" summary="First Official Dashboard Build With Sub Companies">
       <created>1582131582380</created>
@@ -439,7 +438,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="775732000" />
+    <option name="totallyTimeSpent" value="775970000" />
   </component>
   <component name="TodoView" selected-index="3">
     <todo-panel id="selected-file">
@@ -468,7 +467,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.3289689" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50226927" side_tool="true" weight="0.95090014" />
-      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4977307" weight="0.30605564" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4977307" visible="true" weight="0.30605564" />
       <window_info anchor="bottom" id="Python Console" order="12" weight="0.3289689" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -913,16 +912,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/minloansng/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="35" column="97" lean-forward="true" selection-start-line="35" selection-start-column="97" selection-end-line="35" selection-end-column="97" />
-          <folding>
-            <element signature="e#634#666#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/footer/home-footer.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="434">
@@ -932,8 +921,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/minloansng/settings/production.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="487">
-          <caret line="178" lean-forward="true" selection-start-line="178" selection-end-line="178" />
+        <state relative-caret-position="245">
+          <caret line="176" lean-forward="true" selection-start-line="176" selection-end-line="176" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/minloansng/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="181">
+          <caret line="36" column="116" lean-forward="true" selection-start-line="36" selection-start-column="116" selection-end-line="36" selection-end-column="116" />
+          <folding>
+            <element signature="e#634#666#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
