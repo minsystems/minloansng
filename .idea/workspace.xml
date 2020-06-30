@@ -2,26 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6b2ceb19-997d-44ab-af94-3b88c9a4fa83" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/banks/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/banks/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/borrowers/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/borrowers/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/company/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/company/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/company/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/company/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db_minloansng.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db_minloansng.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loans/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/loans/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loans/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/loans/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loans/templates/loans/add-loan.html" beforeDir="false" afterPath="$PROJECT_DIR$/loans/templates/loans/add-loan.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loans/templates/loans/detail-loan.html" beforeDir="false" afterPath="$PROJECT_DIR$/loans/templates/loans/detail-loan.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loans/templates/loans/list-loan.html" beforeDir="false" afterPath="$PROJECT_DIR$/loans/templates/loans/list-loan.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loans/templates/loans/remita/standing-order/setupmandate.html" beforeDir="false" afterPath="$PROJECT_DIR$/loans/templates/loans/remita/standing-order/setupmandate.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loans/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/loans/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loans/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/loans/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mincore/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/mincore/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mincore/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/mincore/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minloansng/minmarket/packages/remita.py" beforeDir="false" afterPath="$PROJECT_DIR$/minloansng/minmarket/packages/remita.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minloansng/settings/production.py" beforeDir="false" afterPath="$PROJECT_DIR$/minloansng/settings/production.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minloansng/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/minloansng/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minmarkets/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/minmarkets/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minloansng/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/minloansng/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/footer/home-footer.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/footer/home-footer.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -61,22 +43,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/minloansng/utils.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="304">
-              <caret line="25" column="55" selection-start-line="25" selection-start-column="55" selection-end-line="25" selection-end-column="55" />
-              <folding>
-                <element signature="e#0#15#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/loans/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="528">
-              <caret line="322" column="40" lean-forward="true" selection-start-line="322" selection-start-column="40" selection-end-line="322" selection-end-column="40" />
+            <state relative-caret-position="386">
+              <caret line="194" column="41" lean-forward="true" selection-start-line="194" selection-start-column="41" selection-end-line="194" selection-end-column="41" />
               <folding>
                 <element signature="e#0#48#0" expanded="true" />
               </folding>
@@ -85,10 +55,22 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/minloansng/settings/local.py">
+        <entry file="file://$PROJECT_DIR$/minloansng/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="320">
-              <caret line="44" selection-start-line="44" selection-end-line="71" selection-end-column="1" />
+            <state relative-caret-position="391">
+              <caret line="35" column="97" lean-forward="true" selection-start-line="35" selection-start-column="97" selection-end-line="35" selection-end-column="97" />
+              <folding>
+                <element signature="e#634#666#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/footer/home-footer.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="434">
+              <caret line="95" column="9" selection-start-line="95" selection-start-column="9" selection-end-line="95" selection-end-column="9" />
             </state>
           </provider>
         </entry>
@@ -96,8 +78,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/minloansng/settings/production.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="528">
-              <caret line="68" column="1" selection-start-line="68" selection-start-column="1" selection-end-line="68" selection-end-column="1" />
+            <state relative-caret-position="487">
+              <caret line="178" lean-forward="true" selection-start-line="178" selection-end-line="178" />
             </state>
           </provider>
         </entry>
@@ -105,8 +87,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/banks/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="21" column="38" selection-start-line="21" selection-start-column="38" selection-end-line="21" selection-end-column="38" />
+            <state relative-caret-position="80">
+              <caret line="5" column="29" lean-forward="true" selection-start-line="5" selection-start-column="29" selection-end-line="5" selection-end-column="29" />
             </state>
           </provider>
         </entry>
@@ -114,8 +96,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/company/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1824">
-              <caret line="123" column="4" selection-start-line="123" selection-start-column="4" selection-end-line="128" selection-end-column="68" />
+            <state relative-caret-position="288">
+              <caret line="120" column="41" selection-start-line="120" selection-start-column="41" selection-end-line="120" selection-end-column="41" />
               <folding>
                 <element signature="e#0#45#0" expanded="true" />
               </folding>
@@ -196,7 +178,6 @@
         <option value="$PROJECT_DIR$/accounts/templates/accounts/detail-update-view.html" />
         <option value="$PROJECT_DIR$/accounts/forms.py" />
         <option value="$PROJECT_DIR$/templates/url-holder/success.html" />
-        <option value="$PROJECT_DIR$/minloansng/urls.py" />
         <option value="$PROJECT_DIR$/company/templates/company/company_detail.html" />
         <option value="$PROJECT_DIR$/accounts/models.py" />
         <option value="$PROJECT_DIR$/mincore/admin.py" />
@@ -223,7 +204,6 @@
         <option value="$PROJECT_DIR$/minmarkets/admin.py" />
         <option value="$PROJECT_DIR$/minmarkets/migrations/0002_auto_20200517_0945.py" />
         <option value="$PROJECT_DIR$/accounts/views.py" />
-        <option value="$PROJECT_DIR$/templates/footer/home-footer.html" />
         <option value="$PROJECT_DIR$/mincore/models.py" />
         <option value="$PROJECT_DIR$/minmarkets/models.py" />
         <option value="$PROJECT_DIR$/minloansng/utils.py" />
@@ -241,6 +221,8 @@
         <option value="$PROJECT_DIR$/loans/admin.py" />
         <option value="$PROJECT_DIR$/loans/views.py" />
         <option value="$PROJECT_DIR$/loans/templates/loans/detail-loan.html" />
+        <option value="$PROJECT_DIR$/minloansng/urls.py" />
+        <option value="$PROJECT_DIR$/templates/footer/home-footer.html" />
         <option value="$PROJECT_DIR$/minloansng/settings/production.py" />
       </list>
     </option>
@@ -289,36 +271,13 @@
             <path>
               <item name="minloansng" type="b2602c69:ProjectViewProjectNode" />
               <item name="minloansng" type="462c0819:PsiDirectoryNode" />
-              <item name="minmarkets" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="minloansng" type="b2602c69:ProjectViewProjectNode" />
-              <item name="minloansng" type="462c0819:PsiDirectoryNode" />
               <item name="templates" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="minloansng" type="b2602c69:ProjectViewProjectNode" />
-              <item name="minloansng" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="base" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="minloansng" type="b2602c69:ProjectViewProjectNode" />
               <item name="minloansng" type="462c0819:PsiDirectoryNode" />
               <item name="templates" type="462c0819:PsiDirectoryNode" />
               <item name="footer" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="minloansng" type="b2602c69:ProjectViewProjectNode" />
-              <item name="minloansng" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="js" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="minloansng" type="b2602c69:ProjectViewProjectNode" />
-              <item name="minloansng" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="nav" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -460,7 +419,7 @@
       <workItem from="1592237855658" duration="47897000" />
       <workItem from="1592411515231" duration="88159000" />
       <workItem from="1593086916163" duration="1894000" />
-      <workItem from="1593438636995" duration="600000" />
+      <workItem from="1593438636995" duration="3637000" />
     </task>
     <task id="LOCAL-00001" summary="First Official Dashboard Build With Sub Companies">
       <created>1582131582380</created>
@@ -480,7 +439,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="772695000" />
+    <option name="totallyTimeSpent" value="775732000" />
   </component>
   <component name="TodoView" selected-index="3">
     <todo-panel id="selected-file">
@@ -509,7 +468,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.3289689" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50226927" side_tool="true" weight="0.95090014" />
-      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4977307" weight="0.95090014" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4977307" weight="0.30605564" />
       <window_info anchor="bottom" id="Python Console" order="12" weight="0.3289689" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -714,23 +673,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/minloansng/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="640">
-          <caret line="45" selection-start-line="45" selection-end-line="52" />
-          <folding>
-            <element signature="e#634#666#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/footer/home-footer.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="80">
-          <caret line="5" column="31" lean-forward="true" selection-start-line="5" selection-start-column="31" selection-end-line="5" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/company/templates/company/dashboard.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5232">
@@ -887,33 +829,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/minloansng/utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="25" column="55" selection-start-line="25" selection-start-column="55" selection-end-line="25" selection-end-column="55" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/banks/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="21" column="38" selection-start-line="21" selection-start-column="38" selection-end-line="21" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/company/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1824">
-          <caret line="123" column="4" selection-start-line="123" selection-start-column="4" selection-end-line="128" selection-end-column="68" />
-          <folding>
-            <element signature="e#0#45#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/loans/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2880">
@@ -944,6 +859,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/minloansng/settings/local.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="37" column="17" lean-forward="true" selection-start-line="37" selection-start-column="17" selection-end-line="37" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/minloansng/utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="304">
+          <caret line="25" column="55" selection-start-line="25" selection-start-column="55" selection-end-line="25" selection-end-column="55" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/borrowers/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="320">
@@ -954,27 +886,54 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/banks/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="80">
+          <caret line="5" column="29" lean-forward="true" selection-start-line="5" selection-start-column="29" selection-end-line="5" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/company/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="120" column="41" selection-start-line="120" selection-start-column="41" selection-end-line="120" selection-end-column="41" />
+          <folding>
+            <element signature="e#0#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/loans/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="528">
-          <caret line="322" column="40" lean-forward="true" selection-start-line="322" selection-start-column="40" selection-end-line="322" selection-end-column="40" />
+        <state relative-caret-position="386">
+          <caret line="194" column="41" lean-forward="true" selection-start-line="194" selection-start-column="41" selection-end-line="194" selection-end-column="41" />
           <folding>
             <element signature="e#0#48#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/minloansng/settings/local.py">
+    <entry file="file://$PROJECT_DIR$/minloansng/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="44" selection-start-line="44" selection-end-line="71" selection-end-column="1" />
+        <state relative-caret-position="391">
+          <caret line="35" column="97" lean-forward="true" selection-start-line="35" selection-start-column="97" selection-end-line="35" selection-end-column="97" />
+          <folding>
+            <element signature="e#634#666#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/footer/home-footer.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="434">
+          <caret line="95" column="9" selection-start-line="95" selection-start-column="9" selection-end-line="95" selection-end-column="9" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/minloansng/settings/production.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="528">
-          <caret line="68" column="1" selection-start-line="68" selection-start-column="1" selection-end-line="68" selection-end-column="1" />
+        <state relative-caret-position="487">
+          <caret line="178" lean-forward="true" selection-start-line="178" selection-end-line="178" />
         </state>
       </provider>
     </entry>

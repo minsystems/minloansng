@@ -33,7 +33,8 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
 
-    path('', TemplateView.as_view(template_name='index.html'), name='homepage'),
+    path('', TemplateView.as_view(template_name='google250ef8063aad7e98.html'), name='homepage'),
+    path('google-verify', TemplateView.as_view(template_name='google250ef8063aad7e98.html'), name='google-verify'),
     path('page-not-found/', TemplateView.as_view(template_name='404_.html'), name='404_'),
     path('success/', TemplateView.as_view(template_name='url-holder/success.html'), name='success'),
     path('about-us/', TemplateView.as_view(template_name='about.html'), name='about'),
