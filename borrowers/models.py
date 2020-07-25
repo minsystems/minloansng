@@ -47,8 +47,8 @@ class Borrower(models.Model):
     unique_identifier = models.CharField(blank=True, null=True, max_length=300,
                                          help_text='Social Security Number, License Or Registration ID')
     bank = models.ForeignKey(BankCode, on_delete=models.CASCADE)
-    slug = models.SlugField(unique=True, blank=True, null=True)
-    account_number = models.CharField(blank=True, null=True, max_length=11)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
+    account_number = models.CharField(blank=True, null=True, max_length=100)
     bvn = models.CharField(blank=True, null=True, max_length=300, help_text='Bank Verification Number')
     date_of_birth = models.DateField(null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True, blank=True, null=True)
