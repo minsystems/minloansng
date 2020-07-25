@@ -1,3 +1,5 @@
+<img src="https://cdn.minloans.com.ng/images/minloansng2.png" width="100px">
+
 # Minloansng, Minaccounts & Minmarket™
 
 [![Release](https://img.shields.io/github/v/release/akaunting/akaunting?label=release)](https://github.com/akaunting/akaunting/releases)
