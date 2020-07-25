@@ -93,7 +93,35 @@ class Dashboard(View):
                                     }
                                     return render(request, "company/dashboard.html", context)
                             elif user_plan == "ENTERPRISE":
-                                print("ENTERPRISE")
+                                if timezone.now() > user_profile_obj.trial_days:
+                                    # return redirect to payment page
+                                    messages.error(request,
+                                                   "Account Expired!, Your Account Has Been Expired You Would Be "
+                                                   "Redirected To The Payment Portal Upgrade Your Payment")
+                                    # jQuery Handles Redirect
+                                    user_companies_qs = request.user.profile.company_set.all()
+                                    company_msg = Messages.objects.all().filter(to_obj=company_obj)
+                                    context = {
+                                        'company': company_obj,
+                                        'object': company_obj,
+                                        'userCompany_qs': user_companies_qs,
+                                        'msg': company_msg,
+                                    }
+                                    return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
+                                else:
+                                    remaining_days = user_profile_obj.trial_days - timezone.now()
+                                    messages.warning(request,
+                                                     "You Have %s Days Left Before Account Suspension, Please Upgrade "
+                                                     "Your Account" % (remaining_days.days))
+                                    user_companies_qs = request.user.profile.company_set.all()
+                                    company_msg = Messages.objects.all().filter(to_obj=company_obj)
+                                    context = {
+                                        'company': company_obj,
+                                        'object': company_obj,
+                                        'userCompany_qs': user_companies_qs,
+                                        'msg': company_msg,
+                                    }
+                                    return render(request, "company/dashboard.html", context)
                             else:
                                 return redirect(reverse('404_'))
                         elif user_plan == "FREEMIUM":
