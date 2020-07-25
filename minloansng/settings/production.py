@@ -163,6 +163,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 from minloansng.cloudinary_settings import *
+from minloansng.email_settings import *
 
 STATIC_URL = '/static/'
 LOGIN_REDIRECT_URL = '/account/<username>/'

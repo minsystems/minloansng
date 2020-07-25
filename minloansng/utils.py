@@ -26,6 +26,12 @@ def addDays(date_, num_of_days):
     return date_ + timezone.timedelta(days=num_of_days)
 
 
+def get_fileType(filepath):
+    import os
+    filename, file_extension = os.path.splitext(filepath)
+    return file_extension
+
+
 def get_month_data_range(months_ago=1, include_this_month=False):
     """
     A method that generates a list of dictionaries

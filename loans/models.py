@@ -109,6 +109,8 @@ class Penalty(models.Model):
 
 class CollateralFiles(models.Model):
     file = CloudinaryField(upload_image_path, null=True, blank=True)
+    file_url = models.CharField(max_length=300, blank=True, null=True)
+    token = models.CharField(max_length=300, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
 
     class Meta:
@@ -116,7 +118,7 @@ class CollateralFiles(models.Model):
         verbose_name_plural = 'Collateral Files'
 
     def __str__(self):
-        return self.file.url
+        return self.token
 
 
 class CollateralType(models.Model):
@@ -158,6 +160,7 @@ class Collateral(models.Model):
     collateral_type = models.OneToOneField(CollateralType, on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField(blank=True, null=True, max_length=300)
     registered_date = models.DateTimeField(blank=True, null=True)
+    registered_time = models.TimeField(blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
     status = models.CharField(max_length=40, choices=COLLATERAL_STATUS, default="OPEN", blank=True, null=True)
     value = models.CharField(max_length=300, blank=True, null=True, help_text='Object Worth')
@@ -166,6 +169,7 @@ class Collateral(models.Model):
     description = models.TextField(blank=True, null=True)
     image = CloudinaryField(upload_image_path, null=True, blank=True)
     collateral_files = models.ForeignKey(CollateralFiles, on_delete=models.CASCADE, blank=True, null=True)
+    view_shader = models.CharField(blank=True, null=True, max_length=300)
 
     class Meta:
         verbose_name = 'Collateral'

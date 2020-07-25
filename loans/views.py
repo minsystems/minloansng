@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.datetime_safe import datetime
 from django.utils.text import slugify
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView
 from django.views.generic.base import View
 
@@ -17,16 +18,20 @@ from accounts.models import Profile
 from banks.models import BankCode
 from borrowers.models import Borrower
 from company.models import Company, RemitaCredentials, RemitaMandateActivationData
-from loans.models import Loan, LoanType, ModeOfRepayments, Penalty, Collateral, LoanTerms
+from loans.forms import CollateralForm, LoanFileForm
+from loans.models import Loan, LoanType, ModeOfRepayments, Penalty, Collateral, LoanTerms, CollateralFiles, \
+    CollateralType
+from minloansng.cloudinary_settings import cloudinary_upload_preset, cloudinary_url
 from minloansng.minmarket.packages.remita import remita_dd_url, statuscode_success
 from minloansng.mixins import GetObjectMixin
-from minloansng.utils import random_string_generator, secondWordExtract, digitExtract, addDays
+from minloansng.utils import random_string_generator, secondWordExtract, digitExtract, addDays, get_fileType
 
 DESCRIPTION = "If a loan payment is due " \
               "and is not paid within the specified time constraints, " \
               "the payment will be considered past due. Late fees are " \
               "one of the most expensive penalties that can occur for a " \
               "past due bill. Lenders can charge anywhere from NGN500 to NGN1,000 for a late payment"
+
 
 class LoanCreateView(LoginRequiredMixin, DetailView):
     model = Company
@@ -186,8 +191,13 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
         context = super(LoanDetailView, self).get_context_data(*args, **kwargs)
         company_inst = Company.objects.get(slug=self.kwargs.get('slug'))
         context['company'] = context['object'] = company_inst
+        context['userCompany_qs'] = self.request.user.profile.company_set.all()
         context['loan_obj'] = self.get_object()
-        if self.get_object().mode_of_repayments == " Remita Direct Debit":
+        context['form'] = LoanFileForm()
+        if self.get_object().loan_file_upload is not None:
+            file_type = get_fileType(self.get_object().loan_file_upload.url)
+            context['fileType'] = str(file_type)
+        if self.get_object().mode_of_repayments == "Remita Direct Debit":
             context['dd_obj'] = RemitaMandateActivationData.objects.get(loan_key=self.get_object())
             context['company_creds'] = RemitaCredentials.objects.get(connected_firm=company_inst)
         else:
@@ -247,6 +257,87 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
         except:
             return redirect(reverse('404_'))
         return loan_obj
+
+    def post(self, *args, **kwargs):
+        instance = self.get_object()
+        form = LoanFileForm(self.request.POST or None, self.request.FILES or None, instance=instance)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'message':'Loan File Uploaded Successfully!'})
+        return JsonResponse({'message':'form Invalid'})
+
+
+class LoanCollateralDetail(LoginRequiredMixin, DetailView):
+    model = Loan
+    template_name = 'loans/detail-loan-collateral.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(LoanCollateralDetail, self).get_context_data(*args, **kwargs)
+        company_inst = Company.objects.get(slug=self.kwargs.get('slug'))
+        context['company'] = context['object'] = company_inst
+        context['userCompany_qs'] = self.request.user.profile.company_set.all()
+        context['loan_obj'] = self.get_object()
+        context['cloudinary_upload_preset'] = cloudinary_upload_preset
+        context['cloudinary_url'] = cloudinary_url
+        context['form'] = CollateralForm()
+        c_file = CollateralFiles.objects.get_or_create(token=self.get_object().loan_key)
+        print(type(c_file))  # returns a tuple (instance, boolean)
+        c_file_instance, c_file_bool = c_file
+        if c_file_instance.file_url is not None:
+            file_type = get_fileType(c_file_instance.file_url)
+            context['fileType'] = str(file_type)
+        if c_file_bool is False:
+            # already existing and not created
+            context['collateral_file_url'] = c_file_instance.file_url
+        else:
+            context['collateral_file_url'] = c_file.file_url
+        if self.get_object().mode_of_repayments == "Remita Direct Debit":
+            context['dd_obj'] = RemitaMandateActivationData.objects.get(loan_key=self.get_object())
+            context['company_creds'] = RemitaCredentials.objects.get(connected_firm=company_inst)
+        else:
+            context['dd_obj'] = RemitaMandateActivationData.objects.get(loan_key=self.get_object())
+            context['company_creds'] = RemitaCredentials.objects.get(connected_firm=company_inst)
+        return context
+
+    def get_object(self, *args, **kwargs):
+        try:
+            loan_obj = Loan.objects.get(slug=self.kwargs.get('loan_slug'))
+        except Loan.DoesNotExist:
+            return redirect(reverse("404_"))
+        except Loan.MultipleObjectsReturned:
+            loan_qs = Loan.objects.filter(slug=self.kwargs.get('loan_slug'))
+            loan_obj = loan_qs.first()
+        except:
+            return redirect(reverse('404_'))
+        return loan_obj
+
+    @csrf_exempt
+    def post(self, *args, **kwargs):
+        imgUrl = self.request.POST.get("imageUrl")
+        file_inst = CollateralFiles.objects.get(token=self.get_object().loan_key)
+        file_inst.file_url = imgUrl
+        file_inst.save()
+        return JsonResponse({'message': 'Image Processing Complete..'})
+
+
+class CollateralFormProcessor(View):
+    def post(self, request, *args, **kwargs):
+        print(self.request.POST)
+        collateral_type_instance = CollateralType.objects.get(name__iexact=self.request.POST.get('collateralType'))
+        collateral_file_instance = CollateralFiles.objects.get(token=self.request.POST.get('collateralToken'))
+        collateral_obj = Collateral.objects.get(slug=self.request.POST.get('collateralToken'))
+        collateral_obj.collateral_type = collateral_type_instance
+        collateral_obj.name = self.request.POST.get('collateralName')
+        collateral_obj.registered_date = self.request.POST.get('registered_date')
+        collateral_obj.registered_time = self.request.POST.get('collateralTime')
+        collateral_obj.status = self.request.POST.get('collateralStatus')
+        collateral_obj.value = self.request.POST.get('collateralValue')
+        collateral_obj.condition = self.request.POST.get('collateralCondition')
+        collateral_obj.view_shader = self.request.POST.get('collateralViewShade')
+        collateral_obj.description = self.request.POST.get('collateralDescription')
+        collateral_obj.collateral_files = collateral_file_instance
+        collateral_obj.save()
+        return JsonResponse({'message': 'Data Successfully Saved!'})
 
 
 class RemitaStandingOrder(LoginRequiredMixin, DetailView):

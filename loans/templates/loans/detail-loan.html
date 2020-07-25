@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load widget_tweaks %}
 {% load humanize %}
 {% load l10n %}
 
@@ -13,6 +14,8 @@
 
   <!-- DataTables -->
   <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/datatables-bs4/css/dataTables.bootstrap4.css">
+  <!-- summernote -->
+  <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
 
 {% endblock css_links %}
 
@@ -188,7 +191,7 @@
                   <b class="d-block">Working Status: {{ loan_obj.borrower.working_status }}</b>
                   <b class="d-block">Email: {{ loan_obj.borrower.email }}</b>
                   <b class="d-block">SSN/Unique Identifier: {{ loan_obj.borrower.unique_identifier }}</b>
-                  <b class="d-block">Age: {{ loan_obj.borrower.get_age }} years old</b>
+                  <b class="d-block">Age: {{ loan_obj.borrower.get_age }} years old / {{ loan_obj.borrower.date_of_birth }}</b>
                 </p>
 
                 <p class="text-sm">Loan / Mandate Information
@@ -202,14 +205,18 @@
                   <b class="d-block">Status Code: {{ dd_obj.statuscode }}</b>
                   <b class="d-block">Mandate ID: {{ dd_obj.mandateId }}</b>
                   <b class="d-block">Status: {{ dd_obj.status }}</b>
+                  <b class="d-block">Processing Fee:{% if dd_obj.processing_fee %} {{ dd_obj.processing_fee }} <i class="fa fa-check" style="color: #5cb85c"></i> {% else %} Not Charged! <i class="fa fa-bell" style="color: #ba2121"></i> {% endif %}</b>
+                  <b class="d-block">Insurance Fee: {% if dd_obj.insurance %} {{ dd_obj.insurance }} <i class="fa fa-check" style="color: #5cb85c"></i> {% else %} Not Charged! <i class="fa fa-bell" style="color: #ba2121"></i> {% endif %}</b>
                 </p>
 
                 <p class="text-sm">Loan Terms / Loan Collateral
                   <b class="d-block">Collateral:
                       {%  if loan_obj.collateral.name == None %}
-                          <a href="#" class="btn btn-xs btn-outline-warning">Validate Loan Collateral</a>
+                          <a href="{% url 'loans-url:loan-detail-collateral' object.slug loan_obj.slug loan_obj.loan_key %}" class="btn btn-xs btn-outline-warning">
+                              Validate Loan Collateral
+                          </a>
                       {% else %}
-                          <a href="#" class="btn btn-xs btn-outline-primary">View Collateral</a>
+                          <a href="{% url 'loans-url:loan-detail-collateral' object.slug loan_obj.slug loan_obj.loan_key %}" class="btn btn-xs btn-outline-primary">View Collateral</a>
                       {% endif %}
                   </b>
                   <b class="d-block">Terms &amp; Conditions:
@@ -225,25 +232,108 @@
               <h5 class="mt-5 text-muted">Loan Documents Received</h5>
               <ul class="list-unstyled">
                 <li>
-                  <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-word"></i> Functional-requirements.docx</a>
+                    <p>Loan Documents Can Be In The Following File Types</p>
+                    <i class="far fa-fw fa-file-word"></i> | <i class="far fa-fw fa-file-pdf"></i> | <i class="far fa-fw fa-envelope"></i> | <i class="far fa-fw fa-image "></i>
                 </li>
                 <li>
-                  <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-pdf"></i> UAT.pdf</a>
-                </li>
-                <li>
-                  <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-envelope"></i> Email-from-flatbal.mln</a>
-                </li>
-                <li>
-                  <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-image "></i> Logo.png</a>
-                </li>
-                <li>
-                  <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-word"></i> Contract-10_12_2014.docx</a>
+                    <br/>
+                  {%  if loan_obj.loan_file_upload %}
+                    <a href="" class="btn-link text-secondary">
+                        {% if fileType == '.pdf' %}
+                            <i class="far fa-fw fa-file-pdf"></i>
+                        {% elif fileType == '.jpg' %}
+                            <i class="far fa-fw fa-image "></i>
+                        {% elif fileType == '.docx' %}
+                            <i class="far fa-fw fa-file-word"></i>
+                        {% else %}
+                            <i class="far fa-fw fa-envelope"></i>
+                        {% endif %}
+                        {{ loan_obj.loan_file_upload.url }}
+                    </a>
+                  {% else %}
+                    <form method="POST" enctype="multipart/form-data" novalidate>
+                      {% csrf_token %}
+
+                      {% for hidden_field in form.hidden_fields %}
+                        {{ hidden_field }}
+                      {% endfor %}
+
+                      {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                          {% for error in form.non_field_errors %}
+                            {{ error }}
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+
+                      {% for field in form.visible_fields %}
+                        <div class="form-group">
+                          {{ field.label_tag }}
+
+                          {% if form.is_bound %}
+                            {% if field.errors %}
+                              {% render_field field class="form-control is-invalid" %}
+                              {% for error in field.errors %}
+                                <div class="invalid-feedback">
+                                  {{ error }}
+                                </div>
+                              {% endfor %}
+                            {% else %}
+                              {% render_field field class="form-control is-valid" %}
+                            {% endif %}
+                          {% else %}
+                            {% render_field field class="form-control" %}
+                          {% endif %}
+
+                          {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                          {% endif %}
+                        </div>
+                      {% endfor %}
+
+                      <button type="submit" class="btn btn-primary btn-block">Update</button>
+                  </form>
+                  {% endif %}
                 </li>
               </ul>
-              <div class="text-center mt-5 mb-3">
-                <a href="#" class="btn btn-sm btn-primary">Add files</a>
-                <a href="#" class="btn btn-sm btn-warning">Report Borrower</a>
-              </div>
+                <div class="text-center mt-5 mb-3">
+                    <div class="mb-3">
+                        <textarea class="textarea" id="description-content" placeholder="Place some text here"
+                                  style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                    </div>
+                    <div class="col-md-12">
+                      <div class="card card-outline card-info">
+                        <div class="card-header">
+                          <h3 class="card-title">
+                            Perform More Loan Actions
+                            <small>Simple and fast</small>
+                          </h3>
+                          <!-- tools box -->
+                          <div class="card-tools">
+                            <button type="button" class="btn btn-tool btn-sm" data-card-widget="collapse" data-toggle="tooltip"
+                                    title="Collapse">
+                              <i class="fas fa-minus"></i></button>
+                            <button type="button" class="btn btn-tool btn-sm" data-card-widget="remove" data-toggle="tooltip"
+                                    title="Remove">
+                              <i class="fas fa-times"></i></button>
+                          </div>
+                          <!-- /. tools -->
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body pad">
+                          <div class="text-center mt-5 mb-3">
+                            <a href="#" class="btn btn-sm btn-primary">Get Started Using Minone</a>
+                            <a href="#" class="btn btn-sm btn-warning">Loan Mandate Actions</a>
+                          </div>
+                          <p class="text-sm mb-0">
+                            Oops! Store Financial Informations On
+                            <a href="#">Minaccounting</a>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- /.col-->
+                </div>
             </div>
           </div>
         </div>
@@ -335,6 +425,33 @@
     </section>
     <!-- /.content -->
 
+
+
+    <div class="modal fade" id="modal-sm-collateral-change">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><small>Validate Loan Collateral</small></h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p></p>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="submit" class="btn btn-outline-success btn-block">Process Validation</button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
+    </section>
+    <!-- /.content -->
+
 {% endblock content %}
 
 
@@ -351,11 +468,35 @@
     <script src="https://cdn.minloans.com.ng/min-dash/dist/js/adminlte.min.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="https://cdn.minloans.com.ng/min-dash/dist/js/demo.js"></script>
-    <!-- page script -->
+    <!-- Summernote -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/summernote/summernote-bs4.min.js"></script>
     <script>
       $(function () {
-          console.log("page ready!");
-      });
+        // Summernote
+        $('.textarea').summernote();
+        console.log("page ready!");
+
+
+
+        //setup before functions
+        let typingTimer;                //timer identifier
+        const doneTypingInterval = 5000;  //time in ms, 5 second for example
+        let $input = $('#description-content');
+
+        //on keyup, start the countdown
+        $input.on('keyup', function () {
+          console.log("clicked!");
+          clearTimeout(typingTimer);
+          typingTimer = setTimeout(doneTyping, doneTypingInterval);
+        });
+
+        console.log("worked! till here again");
+
+        //active-user is "finished typing," do something(Save content to server via ajax & load a saved alert message!)
+        function doneTyping (event) {
+          console.log("finished typing!")
+        }
+      })
     </script>
 
 {% endblock js_links %}
