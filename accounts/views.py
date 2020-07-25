@@ -135,12 +135,14 @@ class UserDetailUpdateView(LoginRequiredMixin, UpdateView):
         user_profile_obj = Profile.objects.get(user=self.get_object())
         phone = self.request.POST.get("phone")
         full_name = self.request.POST.get("full_name")
+        print(phone, full_name)
         if form.is_valid():
             user_profile_obj.phone = phone
             user_profile_obj.save()
             self.get_object().full_name = full_name
             form.save()
-        return JsonResponse({'message': 'Success!'})
+            return JsonResponse({'message': 'Success!'})
+        return JsonResponse({'message': 'An error has occurred!'})
 
     def get_success_url(self):
         return reverse("account:profile-detail", kwargs={'slug': self.get_object().profile.slug})
@@ -169,8 +171,6 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
             context['plan_info_obj'] = PlanDetails.objects.get(name__iexact=self.object.user.profile.get_plan_display())
         except:
             context['plan_info_obj'] = "No Fee Plan"
-
-
 
         user_code = list()
         for code_obj in Profile.objects.all():
