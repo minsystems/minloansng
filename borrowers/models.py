@@ -47,7 +47,7 @@ class Borrower(models.Model):
     unique_identifier = models.CharField(blank=True, null=True, max_length=300,
                                          help_text='Social Security Number, License Or Registration ID')
     bank = models.ForeignKey(BankCode, on_delete=models.CASCADE)
-    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
+    slug = models.SlugField(max_length=500, unique=True, blank=True, null=True)
     account_number = models.CharField(blank=True, null=True, max_length=100)
     bvn = models.CharField(blank=True, null=True, max_length=300, help_text='Bank Verification Number')
     date_of_birth = models.DateField(null=True, blank=True)
@@ -95,7 +95,7 @@ class BorrowerGroup(models.Model):
                                      related_name='group_leader')
     collector = models.ForeignKey(Borrower, blank=True, null=True, on_delete=models.CASCADE)
     meeting_schedule = models.DateTimeField(blank=True, null=True)
-    slug = models.SlugField(unique=True, blank=True, null=True)
+    slug = models.SlugField(unique=True, max_length=300, blank=True, null=True)
     description = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
