@@ -69,9 +69,8 @@ class BorrowerCreateView(GetObjectMixin, LoginRequiredMixin, DetailView):
             account_number=self.request.POST.get('accountNumber'),
             bvn=self.request.POST.get('bvn'),
             date_of_birth=self.request.POST.get('dateOfBirth'),
-            slug=slugify("{lastName}-{company}-{primaryKey}".format(
-                lastName=self.request.POST.get('lastName'),
-                company=self.get_object(), primaryKey=random_string_generator(6)
+            slug=slugify("{lastName}-{primaryKey}".format(
+                lastName=self.request.POST.get('lastName'), primaryKey=random_string_generator(4)
             ))
         )
         return JsonResponse({'message': 'Account created successfully!'})
