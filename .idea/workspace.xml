@@ -480,7 +480,7 @@
       <workItem from="1595415250168" duration="593000" />
       <workItem from="1595524709964" duration="604000" />
       <workItem from="1595659671342" duration="21936000" />
-      <workItem from="1595829054876" duration="2187000" />
+      <workItem from="1595829054876" duration="2344000" />
     </task>
     <task id="LOCAL-00001" summary="First Official Dashboard Build With Sub Companies">
       <created>1582131582380</created>
@@ -500,7 +500,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="912437000" />
+    <option name="totallyTimeSpent" value="912594000" />
   </component>
   <component name="TodoView" selected-index="3">
     <todo-panel id="selected-file">
@@ -513,7 +513,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.28441754" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
