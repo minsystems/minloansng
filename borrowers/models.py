@@ -54,9 +54,6 @@ class Borrower(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
 
-    class Meta:
-        unique_together = ('slug', 'phone', 'email')
-
     def __str__(self):
         return "{title}, {f_name} {l_name}".format(title=self.title, f_name=self.first_name, l_name=self.last_name)
 
