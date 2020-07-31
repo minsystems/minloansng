@@ -37,7 +37,7 @@ class Borrower(models.Model):
     address = models.CharField(max_length=255, blank=True, null=True, help_text='Block 32, Arizona Street')
     lga = models.CharField(max_length=255, blank=True, null=True)
     state = models.CharField(max_length=255, choices=STATE, blank=True, null=True, help_text='Province/State')
-    country = CountryField(blank=True, null=True)
+    country = CountryField(blank=True, null=True, max_length=255)
     title = models.CharField(blank=True, null=True, max_length=255)
     phone = PhoneNumberField(blank=True, null=True)
     land_line = PhoneNumberField(blank=True, null=True)

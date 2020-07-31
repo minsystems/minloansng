@@ -49,6 +49,7 @@ class BorrowerCreateView(GetObjectMixin, LoginRequiredMixin, DetailView):
     def post(self, *args, **kwargs):
         bank_inst = BankCode.objects.get(name__exact=self.request.POST.get('bank'))
         country_inst = Country(code=self.request.POST.get('country'))
+        print(country_inst, country_inst.name)
         Borrower.objects.create(
             registered_to=self.get_object(),
             first_name=self.request.POST.get('firstName'),
@@ -57,7 +58,7 @@ class BorrowerCreateView(GetObjectMixin, LoginRequiredMixin, DetailView):
             address=self.request.POST.get('address'),
             lga=self.request.POST.get('lga'),
             state=self.request.POST.get('state'),
-            country=country_inst.name,
+            country=country_inst,
             title=self.request.POST.get('title'),
             phone=self.request.POST.get('phone'),
             land_line=self.request.POST.get('landPhone'),
@@ -69,8 +70,9 @@ class BorrowerCreateView(GetObjectMixin, LoginRequiredMixin, DetailView):
             account_number=self.request.POST.get('accountNumber'),
             bvn=self.request.POST.get('bvn'),
             date_of_birth=self.request.POST.get('dateOfBirth'),
-            slug=slugify("{lastName}-{primaryKey}".format(
-                lastName=self.request.POST.get('lastName'), primaryKey=random_string_generator(4)
+            slug=slugify("{firstName}-{lastName}-{company}-{primaryKey}".format(
+                firstName=self.request.firstName,lastName=self.request.POST.get('lastName'),
+                company=self.get_object(), primaryKey=random_string_generator(4)
             ))
         )
         return JsonResponse({'message': 'Account created successfully!'})
