@@ -71,7 +71,7 @@ class BorrowerCreateView(GetObjectMixin, LoginRequiredMixin, DetailView):
             bvn=self.request.POST.get('bvn'),
             date_of_birth=self.request.POST.get('dateOfBirth'),
             slug=slugify("{firstName}-{lastName}-{company}-{primaryKey}".format(
-                firstName=self.request.get('firstName'),lastName=self.request.POST.get('lastName'),
+                firstName=self.request.POST.get('firstName'), lastName=self.request.POST.get('lastName'),
                 company=self.get_object(), primaryKey=random_string_generator(4)
             ))
         )
