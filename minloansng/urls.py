@@ -18,21 +18,34 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.generic import RedirectView, TemplateView
 
-from accounts.views import LoginView, RegisterView
+from accounts.views import LoginView, RegisterView, LogoutView
 
+# core software urls
 urlpatterns = [
-    re_path(r'^accounts/$', RedirectView.as_view(url='/account')),
-    re_path(r'^account/', include(("accounts.urls", 'accounts-url'), namespace='account')),
-    re_path(r'^accounts/', include(("accounts.passwords.urls", 'accounts-password-url'), namespace='account-password')),
     path('dashboard/', include(('company.urls', 'company-url'), namespace='company-url')),
     path('loans/', include(('loans.urls', 'loans-url'), namespace='loans-url')),
     path('borrowers/', include(('borrowers.urls', 'borrowers-url'), namespace='borrowers-url')),
     path('system/handler/', include(('mincore.urls', 'mincore-url'), namespace='mincore-url')),
     path('login/', LoginView.as_view(), name='login'),
     path('register/', RegisterView.as_view(), name='register'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+]
 
+# authentication urls
+urlpatterns += [
+    re_path(r'^accounts/$', RedirectView.as_view(url='/account')),
+    re_path(r'^account/', include(("accounts.urls", 'accounts-url'), namespace='account')),
+    re_path(r'^accounts/', include(("accounts.passwords.urls", 'accounts-password-url'), namespace='account-password')),
+    re_path(r'^accounts-reset-done/', include("accounts.passwords.urls")),
+]
+
+# administrator backend service url
+urlpatterns += [
     path('admin/', admin.site.urls),
+]
 
+# template as view urls involving company urls and all
+urlpatterns += [
     path('', TemplateView.as_view(template_name='index.html'), name='homepage'),
     path('google-verify/', TemplateView.as_view(template_name='google250ef8063aad7e98.html'), name='google-verify'),
     path('page-not-found/', TemplateView.as_view(template_name='404_.html'), name='404_'),
@@ -43,6 +56,10 @@ urlpatterns = [
     path('contact-us/', TemplateView.as_view(template_name='contact.html'), name='contact'),
     path('privacy-policy/', TemplateView.as_view(template_name='privacy.html'), name='privacy'),
 ]
+
+
+# url to catch any unmatch url used for 404 error
+urlpatterns += [re_path(r'^.*', TemplateView.as_view(template_name='404_.html'))]
 
 if settings.DEBUG:
     from django.conf.urls.static import static

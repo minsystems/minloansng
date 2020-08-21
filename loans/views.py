@@ -190,6 +190,7 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super(LoanDetailView, self).get_context_data(*args, **kwargs)
         company_inst = Company.objects.get(slug=self.kwargs.get('slug'))
+        context['accessToken'] = company_inst.user.token
         context['company'] = context['object'] = company_inst
         context['userCompany_qs'] = self.request.user.profile.company_set.all()
         context['loan_obj'] = self.get_object()

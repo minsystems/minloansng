@@ -85,11 +85,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'minloansng.urls'
-from corsheaders.defaults import default_headers
 
-CORS_ALLOW_HEADERS = default_headers + (
-    'Access-Control-Allow-Origin',
-)
 
 INTERNAL_IPS = [
     '127.0.0.1',
@@ -177,3 +173,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "static", "media_root")
 PROTECTED_ROOT = os.path.join(BASE_DIR, "static", "protected_media")
 
 from minloansng.ssl_config import *
+CORS_ORIGIN_ALLOW_ALL = True
