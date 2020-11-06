@@ -27,6 +27,7 @@ urlpatterns = [
     path('borrowers/', include(('borrowers.urls', 'borrowers-url'), namespace='borrowers-url')),
     path('config/', include(('settings.urls', 'settings-url'), namespace='settings-url')),
     path('system/handler/', include(('mincore.urls', 'mincore-url'), namespace='mincore-url')),
+    #path('transactions/', include(('transactions.urls','transactions'), namespace='transactions')),
     path('login/', LoginView.as_view(), name='login'),
     path('register/', RegisterView.as_view(), name='register'),
     path('logout/', LogoutView.as_view(), name='logout'),
