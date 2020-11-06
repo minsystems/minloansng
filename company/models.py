@@ -6,7 +6,6 @@ from django.db.models.signals import post_save
 from django.urls import reverse
 
 from accounts.models import Profile, upload_image_path
-from banks.models import BankCode
 from minloansng.utils import unique_slug_generator
 
 
@@ -109,8 +108,9 @@ class RemitaCredentials(models.Model):
 
 class RemitaMandateActivationData(models.Model):
     connected_firm = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
-    loan_key = models.ForeignKey(to="loans.Loan", on_delete=models.CASCADE, blank=True, null=True)
+    loan_key = models.OneToOneField(to="loans.Loan", on_delete=models.CASCADE, blank=True, null=True)
     amount = models.CharField(max_length=100, blank=True, null=True)
+    amount_debited_at_instance = models.CharField(max_length=100, blank=True, null=True)
     hash_key = models.CharField(max_length=200, blank=True, null=True)
     mandate_type = models.CharField(max_length=200, blank=True, null=True)
     max_number_of_debits = models.CharField(max_length=100, blank=True, null=True)
@@ -124,12 +124,65 @@ class RemitaMandateActivationData(models.Model):
     serviceTypeId = models.CharField(max_length=200, blank=True, null=True)
     start_date = models.CharField(max_length=200, blank=True, null=True)
     end_date = models.CharField(max_length=200, blank=True, null=True)
+    remitaTransRef = models.CharField(max_length=200, blank=True, null=True)
     statuscode = models.CharField(max_length=200, blank=True, null=True)
+    rrr = models.CharField(max_length=200, blank=True, null=True)
+    transactionRef = models.CharField(max_length=200, blank=True, null=True)
     mandateId = models.CharField(max_length=200, blank=True, null=True)
+    mandate_requestId = models.CharField(max_length=200, blank=True, null=True)
     status = models.CharField(max_length=200, blank=True, null=True)
+    lastStatusUpdateTime = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self):
         return self.requestId
 
 
+class RemitaMandateTransactionRecord(models.Model):
+    remita_dd_mandate_owned_record = models.ForeignKey(RemitaMandateActivationData, on_delete=models.CASCADE,
+                                                       blank=True, null=True)
+    loan = models.ForeignKey(to='loans.Loan', on_delete=models.CASCADE, blank=True, null=True)
+    total_transaction_count = models.CharField(max_length=100, blank=True, null=True)
+    total_amount = models.CharField(max_length=100, blank=True, null=True)
 
+    class Meta:
+        verbose_name = "Remita Mandate Transaction Record"
+        verbose_name_plural = "Remita Mandate Transaction Record"
+
+    def __str__(self):
+        return str(self.remita_dd_mandate_owned_record.mandate_requestId)
+
+
+class RemitaPaymentDetails(models.Model):
+    loan = models.ForeignKey(to='loans.Loan', on_delete=models.CASCADE, blank=True, null=True)
+    amount = models.CharField(max_length=100, blank=True, null=True)
+    lastStatusUpdateTime = models.CharField(max_length=100, blank=True, null=True)
+    status = models.CharField(max_length=100, blank=True, null=True)
+    statuscode = models.CharField(max_length=100, blank=True, null=True)
+    RRR = models.CharField(max_length=100, blank=True, null=True)
+    transactionRef = models.CharField(max_length=100, blank=True, null=True)
+    remita_transactions = models.ForeignKey(RemitaMandateTransactionRecord, on_delete=models.CASCADE, blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Remita Payment Details"
+        verbose_name_plural = "Remita Payment Details"
+
+    def __str__(self):
+        return self.lastStatusUpdateTime
+
+
+class RemitaMandateStatusReport(models.Model):
+    loan = models.ForeignKey(to='loans.Loan', on_delete=models.CASCADE, blank=True, null=True)
+    start_date = models.CharField(max_length=100, blank=True, null=True)
+    end_date = models.CharField(max_length=100, blank=True, null=True)
+    request_id = models.CharField(max_length=100, blank=True, null=True)
+    mandate_id = models.CharField(max_length=100, blank=True, null=True)
+    registration_date = models.CharField(max_length=100, blank=True, null=True, help_text="Mandate Registered On: ")
+    mandate_status = models.BooleanField(default=True)
+    report_status = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Remita Mandate Status Report"
+        verbose_name_plural = "Remita Mandate Status Reports"
+
+    def __str__(self):
+        return self.mandate_id

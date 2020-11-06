@@ -11,6 +11,7 @@ from django.views.generic import CreateView, FormView, DetailView, View, UpdateV
 from django.views.generic.edit import FormMixin
 from django.shortcuts import render, redirect
 from django.utils.safestring import mark_safe
+from rest_framework import status
 
 from company.models import Company
 from mincore.models import PlanDetails, SupportTickets
@@ -142,14 +143,13 @@ class UserDetailUpdateView(LoginRequiredMixin, UpdateView):
         user_profile_obj = Profile.objects.get(user=self.get_object())
         phone = self.request.POST.get("phone")
         full_name = self.request.POST.get("full_name")
-        print(phone, full_name)
         if form.is_valid():
             user_profile_obj.phone = phone
             user_profile_obj.save()
             self.get_object().full_name = full_name
             form.save()
-            return JsonResponse({'message': 'Success!'})
-        return JsonResponse({'message': 'An error has occurred!'})
+            return JsonResponse({'message': 'Success!'}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'An error has occurred!'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get_success_url(self):
         return reverse("account:profile-detail", kwargs={'slug': self.get_object().profile.slug})

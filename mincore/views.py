@@ -208,16 +208,12 @@ class AddStaffProcessor(View):
         # add user to firm
         company_obj.staffs.add(staff_obj)
 
-        # send mail notification to user
-        sg = SendGridAPIClient(email_settings.SENDGRID_API_KEY)
-        message = Mail(
-            from_email=company_obj.get_email(),
-            to_emails=staff_obj.user.email,
-            subject=messageSubject,
-            html_content=request.POST.get("message")
+        from django.core.mail import EmailMessage
+        message = EmailMessage(
+            messageSubject, request.POST.get("message"), email_settings.EMAIL_HOST_USER, [staff_obj.user.email]
         )
-        sg.send(message)
-
+        message.fail_silently = False
+        message.send()
         return JsonResponse({'message': 'Added Successfully!'})
 
 

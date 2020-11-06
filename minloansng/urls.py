@@ -25,6 +25,7 @@ urlpatterns = [
     path('dashboard/', include(('company.urls', 'company-url'), namespace='company-url')),
     path('loans/', include(('loans.urls', 'loans-url'), namespace='loans-url')),
     path('borrowers/', include(('borrowers.urls', 'borrowers-url'), namespace='borrowers-url')),
+    path('config/', include(('settings.urls', 'settings-url'), namespace='settings-url')),
     path('system/handler/', include(('mincore.urls', 'mincore-url'), namespace='mincore-url')),
     path('login/', LoginView.as_view(), name='login'),
     path('register/', RegisterView.as_view(), name='register'),
@@ -55,6 +56,11 @@ urlpatterns += [
     path('terms-and-conditions/', TemplateView.as_view(template_name='tac.html'), name='tac'),
     path('contact-us/', TemplateView.as_view(template_name='contact.html'), name='contact'),
     path('privacy-policy/', TemplateView.as_view(template_name='privacy.html'), name='privacy'),
+]
+
+# api urls
+urlpatterns += [
+    path('api/settings/', include(("settings.api.urls", 'settings-api-url'), namespace='settings-api-url')),
 ]
 
 

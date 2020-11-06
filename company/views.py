@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect
 
@@ -225,7 +226,8 @@ class Dashboard(View):
                                                                  "You Have %s Days Left Before Account Suspension, Please Upgrade "
                                                                  "Your Account" % (remaining_days.days))
                                             else:
-                                                messages.info(request, "Welcome, you are logged in as %s" %(request.user))
+                                                messages.info(request,
+                                                              "Welcome, you are logged in as %s" % (request.user))
                                             user_companies_qs = target_comp.user.user.profile.company_set.all()
                                             company_msg = Messages.objects.all().filter(to_obj=target_comp)
                                             context = {
@@ -339,7 +341,7 @@ class UpdateCompanyProfileView(GetObjectMixin, DetailView):
                             print("Redirect To Profile Update!")
                         else:
                             messages.info(self.request,
-                                             "Update Company Information")  # jQuery lets you update this information
+                                          "Update Company Information")  # jQuery lets you update this information
             else:
                 return redirect(reverse('404_'))
         return super(UpdateCompanyProfileView, self).render_to_response(context, **response_kwargs)
@@ -364,3 +366,4 @@ class UpdateCompanyProfileView(GetObjectMixin, DetailView):
 
         payload = {"success": True}
         return JsonResponse(payload)
+

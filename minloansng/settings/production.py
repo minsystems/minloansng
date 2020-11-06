@@ -39,7 +39,10 @@ ADMINS = MANAGERS
 AUTH_USER_MODEL = 'accounts.User'
 
 # Application definition
+
 INSTALLED_APPS = [
+    'admin_interface',
+    'colorfield',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -66,8 +69,11 @@ INSTALLED_APPS = [
     'loans',
     'mincore',
     'minmarkets',
+    'minone',
+    'settings',
 ]
 
+X_FRAME_OPTIONS='SAMEORIGIN'
 FORCE_SESSION_TO_ONE = False
 FORCE_INACTIVE_USER_ENDSESSION = False
 
@@ -174,3 +180,19 @@ PROTECTED_ROOT = os.path.join(BASE_DIR, "static", "protected_media")
 
 from minloansng.ssl_config import *
 CORS_ORIGIN_ALLOW_ALL = True
+
+DEFAULT_RENDERER_CLASSES = [
+    'rest_framework.renderers.JSONRenderer',
+]
+
+if DEBUG:
+    DEFAULT_RENDERER_CLASSES += [
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ]
+REST_FRAMEWORK = {
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication'
+    ],
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
+}

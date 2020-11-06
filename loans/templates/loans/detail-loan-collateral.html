@@ -44,6 +44,7 @@
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a onclick="location.href = document.referrer"><i class="fa fa-arrow-left"></i> </a></li>
               <li class="breadcrumb-item"><a href="{{ object.get_absolute_url }}">Home</a></li>
               <li class="breadcrumb-item active">{{ object.name }}</li>
             </ol>
@@ -128,18 +129,24 @@
               <!-- form start -->
               <form role="form">
                 <div class="card-body">
-                  <div class="form-group">
-                    <label for="exampleInputFile">File/Image Uploads</label>
-                    <div class="input-group">
-                      <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="exampleInputFile">
-                        <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                  {% if collateral_file_url is None %}
+                      <div class="form-group">
+                        <label for="exampleInputFile">File/Image Uploads</label>
+                        <div class="input-group">
+                          <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="exampleInputFile">
+                            <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                          </div>
+                          <div class="input-group-append">
+                            <span class="input-group-text" id="">Upload</span>
+                          </div>
+                        </div>
                       </div>
-                      <div class="input-group-append">
-                        <span class="input-group-text" id="">Upload</span>
+                  {% else %}
+                      <div class="card">
+                        <strong>File/Image/Document Uploaded!</strong>
                       </div>
-                    </div>
-                  </div>
+                  {% endif %}
                 </div>
                 <!-- /.card-body -->
               </form>
@@ -241,7 +248,7 @@
 
               <div class="bg-gray py-2 px-3 mt-4">
                 <h2 class="mb-0">
-                  {{ loan_obj.collateral.value }}
+                  NGN {{ loan_obj.collateral.value|intcomma }}
                 </h2>
                 Object/Collateral Value In FIAL Currency:
               </div>
@@ -669,6 +676,7 @@
                             subtitle: 'Collateral Updated',
                             body: '' + data.message
                         });
+                        location.reload();
                     }, error: function (error) {
                         collateralForm[0].reset();
                         $(document).Toasts('create', {

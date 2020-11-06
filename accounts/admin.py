@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from .forms import UserAdminCreationForm, UserAdminChangeForm
-from .models import GuestEmail, EmailActivation, Profile
+from .models import GuestEmail, EmailActivation, Profile, ThirdPartyCreds
 
 User = get_user_model()
 
@@ -55,7 +55,10 @@ admin.site.register(EmailActivation, EmailActivationAdmin)
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'is_premium', 'phone', 'keycode', 'trial_days', 'plan', 'slug', 'token', 'updated')
+    list_display = (
+    'user', 'duration_package', 'pkg_duration_date', 'duration_collection_package', 'pkg_collection_duration_date',
+    'is_premium', 'phone', 'keycode', 'trial_days', 'plan', 'slug', 'token', 'updated')
+    list_editable = ('duration_package',)
     list_display_links = ('user',)
     list_filter = ('user', 'phone')
     readonly_fields = ('image_tag',)
@@ -66,7 +69,9 @@ class ProfileAdmin(admin.ModelAdmin):
         ('Basic Information', {'description': "Basic User Profile Information",
                                'fields': (('user',), 'image_tag', 'image', 'keycode', 'phone', 'working_for',)}),
         ('Complete Full Information',
-         {'classes': ('collapse',), 'fields': ('role', 'is_premium', 'trial_days', 'slug', 'plan', 'token')}),)
+         {'classes': ('collapse',), 'fields': (
+         'role', 'duration_package', 'pkg_duration_date', 'duration_collection_package', 'pkg_collection_duration_date',
+         'is_premium', 'trial_days', 'slug', 'plan', 'token')}),)
 
 
 class GuestEmailAdmin(admin.ModelAdmin):
@@ -79,3 +84,12 @@ class GuestEmailAdmin(admin.ModelAdmin):
 admin.site.register(GuestEmail, GuestEmailAdmin)
 
 admin.site.site_header = 'Minloansng, Minmarket, Minaccounts'
+
+
+@admin.register(ThirdPartyCreds)
+class ThirdPartyModelAdmin(admin.ModelAdmin):
+    list_display = ('user', 'active', 'remita_dd_merchant', 'timestamp', 'updated')
+    list_display_links = ('user', 'timestamp')
+    list_editable = ('active',)
+    search_fields = ('user',)
+    list_filter = ('user',)

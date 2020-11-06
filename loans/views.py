@@ -1,3 +1,8 @@
+import json
+
+from datetime import timedelta
+
+import math
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib import messages
@@ -9,22 +14,26 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.datetime_safe import datetime
+from django.utils.decorators import method_decorator
 from django.utils.text import slugify
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView
 from django.views.generic.base import View
+from rest_framework import status
 
-from accounts.models import Profile
+from accounts.models import Profile, User
 from banks.models import BankCode
 from borrowers.models import Borrower
-from company.models import Company, RemitaCredentials, RemitaMandateActivationData
+from company.models import Company, RemitaCredentials, RemitaMandateActivationData, RemitaMandateTransactionRecord, \
+    RemitaPaymentDetails, RemitaMandateStatusReport
 from loans.forms import CollateralForm, LoanFileForm
 from loans.models import Loan, LoanType, ModeOfRepayments, Penalty, Collateral, LoanTerms, CollateralFiles, \
-    CollateralType
+    CollateralType, LoanActivityComments
 from minloansng.cloudinary_settings import cloudinary_upload_preset, cloudinary_url
 from minloansng.minmarket.packages.remita import remita_dd_url, statuscode_success
 from minloansng.mixins import GetObjectMixin
-from minloansng.utils import random_string_generator, secondWordExtract, digitExtract, addDays, get_fileType
+from minloansng.utils import random_string_generator, secondWordExtract, digitExtract, addDays, get_fileType, \
+    armotizationLoanCalculator, removeNCharFromString
 
 DESCRIPTION = "If a loan payment is due " \
               "and is not paid within the specified time constraints, " \
@@ -194,20 +203,146 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
         context['company'] = context['object'] = company_inst
         context['userCompany_qs'] = self.request.user.profile.company_set.all()
         context['loan_obj'] = self.get_object()
+        context['penalty'] = self.get_object().penalty
+        if timezone.now() >= self.get_object().end_date:
+            context['overdue'] = "active"
+        else:
+            context['overdue'] = 'notActive'
+        context['installment_repayment'] = armotizationLoanCalculator(self.get_object().principal_amount, self.get_object().interest, self.get_object().number_repayments)
+        context['loan_comment_qs'] = LoanActivityComments.objects.filter(loan=self.get_object())
         context['form'] = LoanFileForm()
         if self.get_object().loan_file_upload is not None:
             file_type = get_fileType(self.get_object().loan_file_upload.url)
             context['fileType'] = str(file_type)
-        if self.get_object().mode_of_repayments == "Remita Direct Debit":
+        if str(self.get_object().mode_of_repayments) == "Remita Direct Debit":
             context['dd_obj'] = RemitaMandateActivationData.objects.get(loan_key=self.get_object())
-            context['company_creds'] = RemitaCredentials.objects.get(connected_firm=company_inst)
+            context['loanActions'] = 'DD'
+            requestId_obj = company_inst.remitamandateactivationdata_set.all().get(loan_key=self.get_object())
+            context['requestId'] = company_inst.remitamandateactivationdata_set.all().get(loan_key=self.get_object())
+            context['loanMandateId'] = requestId_obj.mandateId
+            context['company_dd_creds'] = company_inst.user.thirdpartycreds
+            borrowerBank = BankCode.objects.get(code__exact=requestId_obj.payer_bank_code)
+            context['account_number'] = self.get_object().borrower.account_number
+            try:
+                mandateTransactionRecord = RemitaMandateTransactionRecord.objects.get(loan=self.get_object())
+                paymentDetails = RemitaPaymentDetails.objects.filter(loan=self.get_object())
+                context['mandateTransactionRecord'] = mandateTransactionRecord
+                context['paymentDetails'] = paymentDetails
+                amountArray = []
+                for amountValue in paymentDetails:
+                    amountArray.append(amountValue.amount)
+                context['amountArray'] = amountArray
+            except RemitaMandateTransactionRecord.DoesNotExist:
+                context['mandateTransactionRecord'] = "No mandate Transaction Record Found"
+                context['paymentDetails'] = "No Payment Record For This Transactiom"
+                amountArray = []
+                context['amountArray'] = amountArray
+            if borrowerBank.otp_enabled:
+                context['otpCheck'] = 1
+            else:
+                context['otpCheck'] = 0
+            try:
+                context['dd_status_report'] = RemitaMandateStatusReport.objects.get(loan=self.get_object())
+            except RemitaMandateStatusReport.DoesNotExist:
+                context['dd_status_report'] = None
         else:
             context['dd_obj'] = RemitaMandateActivationData.objects.get(loan_key=self.get_object())
             context['company_creds'] = RemitaCredentials.objects.get(connected_firm=company_inst)
+            context['loanActions'] = 'OD'
         return context
 
     def render_to_response(self, context, **response_kwargs):
         if context:
+            print(context)
+            """
+            check if loan is overdue, check should happen anytime this view is opened
+            """
+            if timezone.now() >= self.get_object().end_date:
+                messages.warning(
+                    self.request,
+                    "The loan %s has been overdue and system is scheduled to calculate penalty on current loan" % self.get_object().loan_key
+                )
+
+                # get grace period
+                grace_period = int(self.get_object().grace_period)
+
+                overdue_period = timezone.now() - self.get_object().end_date
+                total_overdue_period = overdue_period - timedelta(days=grace_period)
+
+                penalty_increment_period = self.get_object().penalty.period
+                if penalty_increment_period == "Per Week":
+                    week_delta = timedelta(days=7)
+                    value_data = total_overdue_period/week_delta
+                    period_gone = math.trunc(value_data)
+                    if period_gone > 0:
+                        # add basefee to balance and multiply period fee with period gone and add all together
+                        baseFee = int(context['penalty'].punishment_fee)
+                        balanceFee = str(digitExtract(context['loan_obj'].balance_due))
+                        balanceFee = removeNCharFromString(2, balanceFee)
+                        balanceFee = int(balanceFee)
+                        print(balanceFee)
+                        periodFee = int(context['penalty'].value_on_period)
+                        loan_ = Loan.objects.get(loan_key=context['loan_obj'])
+                        loan_.balance_due = (balanceFee + baseFee) + (periodFee * period_gone)
+                        loan_.save()
+                elif penalty_increment_period == "Per Day":
+                    week_delta = timedelta(days=1)
+                    value_data = total_overdue_period / week_delta
+                    period_gone = math.trunc(value_data)
+                    if period_gone > 0:
+                        # add basefee to balance and multiply period fee with period gone and add all together
+                        baseFee = int(context['penalty'].punishment_fee)
+                        balanceFee = str(digitExtract(context['loan_obj'].balance_due))
+                        balanceFee = removeNCharFromString(2, balanceFee)
+                        balanceFee = int(balanceFee)
+                        print(balanceFee)
+                        periodFee = int(context['penalty'].value_on_period)
+                        loan_ = Loan.objects.get(loan_key=context['loan_obj'])
+                        loan_.balance_due = (balanceFee + baseFee) + (periodFee * period_gone)
+                        loan_.save()
+                elif penalty_increment_period == "Per Month":
+                    week_delta = timedelta(days=30)
+                    value_data = total_overdue_period / week_delta
+                    period_gone = math.trunc(value_data)
+                    if period_gone > 0:
+                        # add basefee to balance and multiply period fee with period gone and add all together
+                        baseFee = int(context['penalty'].punishment_fee)
+                        balanceFee = str(digitExtract(context['loan_obj'].balance_due))
+                        balanceFee = removeNCharFromString(2, balanceFee)
+                        balanceFee = int(balanceFee)
+                        print(balanceFee)
+                        periodFee = int(context['penalty'].value_on_period)
+                        loan_ = Loan.objects.get(loan_key=context['loan_obj'])
+                        loan_.balance_due = (balanceFee + baseFee) + (periodFee * period_gone)
+                        loan_.save()
+                elif penalty_increment_period == "Per Year":
+                    week_delta = timedelta(days=365)
+                    value_data = total_overdue_period / week_delta
+                    period_gone = math.trunc(value_data)
+                    if period_gone > 0:
+                        # add basefee to balance and multiply period fee with period gone and add all together
+                        baseFee = int(context['penalty'].punishment_fee)
+                        balanceFee = str(digitExtract(context['loan_obj'].balance_due))
+                        balanceFee = removeNCharFromString(2, balanceFee)
+                        balanceFee = int(balanceFee)
+                        print(balanceFee)
+                        periodFee = int(context['penalty'].value_on_period)
+                        loan_ = Loan.objects.get(loan_key=context['loan_obj'])
+                        loan_.balance_due = (balanceFee + baseFee) + (periodFee * period_gone)
+                        loan_.save()
+                else:
+                    pass
+
+            CollateralType.objects.get_or_create(owned=self.get_object())
+            if self.get_object().balance_due == "Modify/Change Loan":
+                thisArmortizedValue = armotizationLoanCalculator(
+                    self.get_object().principal_amount,
+                    self.get_object().interest,
+                    self.get_object().number_repayments
+                )
+                newloanInstance = Loan.objects.get(loan_key=self.get_object())
+                newloanInstance.balance_due = int(thisArmortizedValue) * int(self.get_object().number_repayments)
+                newloanInstance.save()
             if self.get_object().penalty is None:
                 loan_penalty = Penalty.objects.get(title__exact=self.get_object().loan_key)
                 loan_penalty.company = context.get('company')
@@ -264,8 +399,8 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
         form = LoanFileForm(self.request.POST or None, self.request.FILES or None, instance=instance)
         if form.is_valid():
             form.save()
-            return JsonResponse({'message':'Loan File Uploaded Successfully!'})
-        return JsonResponse({'message':'form Invalid'})
+            return JsonResponse({'message': 'Loan File Uploaded Successfully!'})
+        return JsonResponse({'message': 'form Invalid'})
 
 
 class LoanCollateralDetail(LoginRequiredMixin, DetailView):
@@ -324,12 +459,13 @@ class LoanCollateralDetail(LoginRequiredMixin, DetailView):
 class CollateralFormProcessor(View):
     def post(self, request, *args, **kwargs):
         print(self.request.POST)
-        collateral_type_instance = CollateralType.objects.get(name__iexact=self.request.POST.get('collateralType'))
+        loanInstance = Loan.objects.get(loan_key=self.request.POST.get('collateralToken'))
+        collateral_type_instance = CollateralType.objects.get(owned=loanInstance)
         collateral_file_instance = CollateralFiles.objects.get(token=self.request.POST.get('collateralToken'))
         collateral_obj = Collateral.objects.get(slug=self.request.POST.get('collateralToken'))
         collateral_obj.collateral_type = collateral_type_instance
         collateral_obj.name = self.request.POST.get('collateralName')
-        collateral_obj.registered_date = self.request.POST.get('registered_date')
+        collateral_obj.registered_date = self.request.POST.get('collateralRegisteredDate')
         collateral_obj.registered_time = self.request.POST.get('collateralTime')
         collateral_obj.status = self.request.POST.get('collateralStatus')
         collateral_obj.value = self.request.POST.get('collateralValue')
@@ -339,6 +475,92 @@ class CollateralFormProcessor(View):
         collateral_obj.collateral_files = collateral_file_instance
         collateral_obj.save()
         return JsonResponse({'message': 'Data Successfully Saved!'})
+
+
+class LoanDetailAutoSaveProcessor(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(LoanDetailAutoSaveProcessor, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if self.request.is_ajax():
+            print(self.request.POST, request, *args, **kwargs)
+            loan_instance = Loan.objects.get(loan_key__iexact=self.request.POST.get('loanInstance'))
+            loan_instance.description = self.request.POST.get('description')
+            loan_instance.save()
+            return JsonResponse({'message': 'Updated!'}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'Ajax Method Required'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class LoanRepaymentProcessor(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(LoanRepaymentProcessor, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if self.request.is_ajax():
+            loan_obj = Loan.objects.get(loan_key__iexact=self.request.POST.get('loanInstance'))
+            loan_obj.balance_due = self.request.POST.get('balanceDue')
+            loan_obj.save()
+            return JsonResponse({'message': 'Repayment Balance Has Been Updated Successfully!'},
+                                status=status.HTTP_201_CREATED)
+        return JsonResponse({'message': 'Ajax Method Required'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class LoanStatusChangeProcessor(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(LoanStatusChangeProcessor, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if self.request.is_ajax():
+            loan_obj = Loan.objects.get(loan_key__iexact=self.request.POST.get('loanInstance'))
+            loan_obj.loan_status = self.request.POST.get('status')
+            loan_obj.save()
+            return JsonResponse({'message': 'Loan Status Has Been Updated Successfully!'},
+                                status=status.HTTP_201_CREATED)
+        return JsonResponse({'message': 'Ajax Method Required'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class LoanCommentProcessor(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(LoanCommentProcessor, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if self.request.is_ajax():
+            loan_instance = Loan.objects.get(loan_key__iexact=self.request.POST.get('loanInstance'))
+            userAssigned = User.objects.get(email__exact=self.request.POST.get('assignedTo'))
+            doneBy = Profile.objects.get(user=self.request.user)
+            assigned_user = Profile.objects.get(user=userAssigned)
+            LoanActivityComments.objects.create(
+                assigned_to=assigned_user,
+                done_by=doneBy,
+                loan=loan_instance,
+                comment=self.request.POST.get('taskContent')
+            )
+            return JsonResponse({'message': 'Updated!'}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'Ajax Method Required'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class LoanPenaltyRepayment(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(LoanPenaltyRepayment, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if self.request.is_ajax():
+            print(self.request.POST)
+            loan_instance = Loan.objects.get(loan_key__iexact=self.request.POST.get('linked_loan'))
+            company_obj = loan_instance.company
+            loan_penalty = Penalty.objects.get(company=company_obj, title__exact=loan_instance)
+            loan_penalty.punishment_fee = self.request.POST.get('baseFee')
+            loan_penalty.value_on_period = self.request.POST.get('continuousFee')
+            loan_penalty.period = self.request.POST.get('reoccurringPeriod')
+            loan_penalty.linked_loan = loan_instance
+            loan_penalty.save()
+            return JsonResponse({'message': 'Updated For User Loan! %s' % loan_instance}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'Ajax Method Required'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class RemitaStandingOrder(LoginRequiredMixin, DetailView):
@@ -407,7 +629,14 @@ class RemitaStandingOrder(LoginRequiredMixin, DetailView):
         return company_obj
 
     def post(self, *args, **kwargs):
-        payer_obj = Borrower.objects.get(phone__exact=self.request.POST.get("payerPhone"))
+        try:
+            payer_obj = Borrower.objects.get(phone__exact=self.request.POST.get("payerPhone"))
+        except Borrower.DoesNotExist:
+            return JsonResponse({'message': 'Borrower Does Not Exist!'}, status=status.HTTP_404_NOT_FOUND)
+        except Borrower.MultipleObjectsReturned:
+            payer_qs = Borrower.objects.filter(phone__exact=self.request.POST.get("payerPhone"))
+            payer_obj = payer_qs.last()
+
         payerName = payer_obj.get_borrowers_full_name()
         payerEmail = Borrower.objects.get(email__exact=self.request.POST.get("payerEmail")).email
         payerBankCode = BankCode.objects.get(code__exact=self.request.POST.get("payerBankCode")).code
@@ -428,6 +657,7 @@ class RemitaStandingOrder(LoginRequiredMixin, DetailView):
             payer_phone=self.request.POST.get("payerPhone"),
             requestId=self.request.POST.get("requestId"),
             merchantId=self.request.POST.get("merchantId"),
+            mandate_requestId=self.request.POST.get("requestId"),
             hash_key=self.request.POST.get("hash"),
             serviceTypeId=self.request.POST.get("serviceTypeId"),
             loan_key=loan_instance,
@@ -439,13 +669,12 @@ class RemitaStandingOrder(LoginRequiredMixin, DetailView):
         loan_instance.end_date = datetime.strptime(self.request.POST.get("endDate"), "%d/%m/%Y")
         loan_instance.save()
 
-        return JsonResponse({'message': 'Submitted To DB, Processing to Remita Server..'})
+        return JsonResponse({'message': 'Submitted To DB, Processing to Remita Server..'},
+                            status=status.HTTP_200_OK)
 
 
 class RemitaMandateUpdate(View):
     def post(self, *args, **kwargs):
-        print(self.request.POST)
-        print(self.request.POST['statuscode'])
         if self.request.POST['statuscode'] == statuscode_success:
             mandate_dd = RemitaMandateActivationData.objects.get(requestId=self.request.POST['requestId'])
             mandate_dd.status = self.request.POST['status']
@@ -454,3 +683,124 @@ class RemitaMandateUpdate(View):
             mandate_dd.save()
             return JsonResponse({'message': 'Mandate Activation Updated!', 'status': '007'})
         return JsonResponse({'message': 'Mandate Failed To Update Please Redo Process', 'status': '003'})
+
+
+class RemitaTransRefUpdate(View):
+    def post(self, *args, **kwargs):
+        if self.request.is_ajax():
+            data = self.request.body.decode("utf-8")
+            payload = json.loads(data)
+            print(type(payload), payload['loan_key'], payload['remitaTransRef'])
+            loanInstance = Loan.objects.get(loan_key=payload['loan_key'])
+            mandate_dd = RemitaMandateActivationData.objects.get(loan_key=loanInstance)
+            mandate_dd.remitaTransRef = payload['remitaTransRef']
+            mandate_dd.save()
+            return JsonResponse({'message': 'Transaction Reference Has Been Updated!'}, status=201)
+        return JsonResponse({'message': 'Method Not Allowed'}, status=501)
+
+
+class RRRandTransactionRef(View):
+    def post(self, *args, **kwargs):
+        if self.request.is_ajax():
+            data = self.request.body.decode("utf-8")
+            payload = json.loads(data)
+            print(payload)
+            loanInstance = Loan.objects.get(loan_key=payload['loan_key'])
+            mandate_dd = RemitaMandateActivationData.objects.get(loan_key=loanInstance)
+            mandate_dd.rrr = payload['rrr']
+            mandate_dd.requestId = payload['requestId']
+            mandate_dd.transactionRef = payload['transactionRef']
+            mandate_dd.save()
+            return JsonResponse({'message': 'Transaction Reference Has Been Updated!'}, status=201)
+        return JsonResponse({'message': 'Method Not Allowed'}, status=501)
+
+
+class RRRandTransactionRefAmount(View):
+    def post(self, *args, **kwargs):
+        if self.request.is_ajax():
+            data = self.request.body.decode("utf-8")
+            payload = json.loads(data)
+            print(payload)
+            loanInstance = Loan.objects.get(loan_key=payload['loan_key'])
+            mandate_dd = RemitaMandateActivationData.objects.get(loan_key=loanInstance)
+            mandate_dd.rrr = payload['rrr']
+            mandate_dd.requestId = payload['requestId']
+            mandate_dd.transactionRef = payload['transactionRef']
+            mandate_dd.amount_debited_at_instance = payload['amountDebitted']
+            mandate_dd.lastStatusUpdateTime = payload['lastStatusUpdateTime']
+            mandate_dd.save()
+            return JsonResponse({'message': 'Transaction Has Been Updated!'}, status=201)
+        return JsonResponse({'message': 'Method Not Allowed'}, status=501)
+
+
+class RemitaDDMandateTransactionRecord(View):
+    def post(self, *args, **kwargs):
+        if self.request.is_ajax():
+            data = self.request.body.decode("utf-8")
+            payload = json.loads(data)
+            print(payload['record_data']['data']['totalAmount'])
+            loanInstance = Loan.objects.get(loan_key=payload['loan_key'])
+            mandateDatas = RemitaMandateActivationData.objects.get(loan_key=loanInstance)
+            try:
+                remita_dd_history = RemitaMandateTransactionRecord.objects.get(loan=loanInstance)
+                remita_dd_history.total_amount = payload['record_data']['data']['totalAmount']
+                remita_dd_history.total_transaction_count = payload['record_data']['data']['totalTransactionCount']
+                remita_dd_history.save()
+            except RemitaMandateTransactionRecord.DoesNotExist:
+                remita_dd_history = RemitaMandateTransactionRecord.objects.create(
+                    remita_dd_mandate_owned_record=mandateDatas,
+                    loan=loanInstance,
+                    total_amount=payload['record_data']['data']['totalAmount'],
+                    total_transaction_count=payload['record_data']['data']['totalTransactionCount']
+                )
+            try:
+                exists = RemitaPaymentDetails.objects.get(lastStatusUpdateTime=payload['record_data']['data']['paymentDetails'][0]['lastStatusUpdateTime'])
+                exists.status = payload['record_data']['data']['paymentDetails'][0]['status']
+                exists.save()
+            except RemitaPaymentDetails.DoesNotExist:
+                for _ in range(int(payload['record_data']['data']['totalTransactionCount'])):
+                    RemitaPaymentDetails.objects.create(
+                        loan=loanInstance,
+                        amount=payload['record_data']['data']['paymentDetails'][0]['amount'],
+                        lastStatusUpdateTime=payload['record_data']['data']['paymentDetails'][0]['lastStatusUpdateTime'],
+                        status=payload['record_data']['data']['paymentDetails'][0]['status'],
+                        statuscode=payload['record_data']['data']['paymentDetails'][0]['statuscode'],
+                        RRR=payload['record_data']['data']['paymentDetails'][0]['RRR'],
+                        transactionRef=payload['record_data']['data']['paymentDetails'][0]['transactionRef'],
+                        remita_transactions=remita_dd_history
+                    )
+            return JsonResponse({'message': 'Transaction Has Been Updated!', 'statuscode':'051'}, status=201)
+        return JsonResponse({'message': 'Method Not Allowed'}, status=501)
+
+
+class RemitaDDStatusReport(View):
+    def post(self, *args, **kwargs):
+        if self.request.is_ajax():
+            data = self.request.body.decode("utf-8")
+            payload = json.loads(data)
+            print(payload)
+            loanInstance = Loan.objects.get(loan_key=payload['loan_key'])
+            try:
+                dd_status = RemitaMandateStatusReport.objects.get(loan=loanInstance)
+                dd_status.loan = loanInstance
+                dd_status.start_date = payload['startDate']
+                dd_status.end_date = payload['endDate']
+                dd_status.request_id = payload['requestId']
+                dd_status.mandate_id = payload['mandateId']
+                dd_status.registration_date = payload['registrationDate']
+                dd_status.mandate_status = payload['isActive']
+                dd_status.report_status = payload['status']
+                dd_status.save()
+            except RemitaMandateStatusReport.DoesNotExist:
+                RemitaMandateStatusReport.objects.create(
+                    loan=loanInstance,
+                    start_date=payload['startDate'],
+                    end_date=payload['endDate'],
+                    request_id=payload['requestId'],
+                    mandate_id=payload['mandateId'],
+                    registration_date=payload['registrationDate'],
+                    mandate_status=payload['isActive'],
+                    report_status=payload['status']
+                )
+            return JsonResponse({'message': 'Transaction Has Been Updated!'}, status=201)
+        return JsonResponse({'message': 'Method Not Allowed'}, status=501)

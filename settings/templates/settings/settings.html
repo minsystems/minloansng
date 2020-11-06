@@ -1,0 +1,791 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% load l10n %}
+
+{% localize on %}
+    {{ value }}
+{% endlocalize %}
+
+{% block title %} {{ object }} {% endblock title %}
+
+
+{% block css_links %}
+
+  <!-- DataTables -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/datatables-bs4/css/dataTables.bootstrap4.css">
+  <!-- summernote -->
+  <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+  <!-- iCheck for checkboxes and radio inputs -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- Tempusdominus Bbootstrap 4 -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/select2/css/select2.min.css">
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+
+{% endblock css_links %}
+
+
+{% block content_header %}
+
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">
+                {{ object }} - System Settings
+            </h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{{ object.get_absolute_url }}">Home</a></li>
+              <li class="breadcrumb-item active"><i class="fa fa-cog"></i> Config / Settings</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+{% endblock content_header %}
+
+
+{% block content %}
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12 col-sm-12 col-lg-12">
+            <div class="card card-primary card-tabs">
+              <div class="card-header p-0 pt-1">
+                <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+                  <li class="nav-item">
+                    <a class="nav-link active" id="custom-tabs-one-home-tab" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home" aria-selected="true">
+                        General
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" id="custom-tabs-one-profile-tab" data-toggle="pill" href="#custom-tabs-one-profile" role="tab" aria-controls="custom-tabs-one-profile" aria-selected="false">
+                        Staff &amp; Company Management
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" id="custom-tabs-one-messages-tab" data-toggle="pill" href="#custom-tabs-one-messages" role="tab" aria-controls="custom-tabs-one-messages" aria-selected="false">
+                        Companies &amp; Branches
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" id="custom-tabs-one-settings-tab" data-toggle="pill" href="#custom-tabs-one-settings" role="tab" aria-controls="custom-tabs-one-settings" aria-selected="false">
+                        Apps Owned
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" id="custom-tabs-one-minone-tab" data-toggle="pill" href="#custom-tabs-one-minone" role="tab" aria-controls="custom-tabs-one-minone" aria-selected="false">
+                        MinOne
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" id="custom-tabs-one-thirdparty-tab" data-toggle="pill" href="#custom-tabs-one-thirdparty" role="tab" aria-controls="custom-tabs-one-thirdparty" aria-selected="false">
+                        Third Party Keys
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" id="custom-tabs-one-page-tab" data-toggle="pill" href="#custom-tabs-one-page" role="tab" aria-controls="custom-tabs-one-page" aria-selected="false">
+                        Design My Page
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="card-body">
+                <div class="tab-content" id="custom-tabs-one-tabContent">
+                  <div class="tab-pane fade show active" id="custom-tabs-one-home" role="tabpanel" aria-labelledby="custom-tabs-one-home-tab">
+                     <!-- SELECT2 EXAMPLE -->
+                     <div class="card card-default">
+                          <div class="card-header">
+                            <h3 class="card-title">Configure - {{ object }}</h3>
+
+                            <div class="card-tools">
+                              <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                              <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-remove"></i></button>
+                            </div>
+                          </div>
+                          <!-- /.card-header -->
+                          <div class="card-body">
+                            <div class="row">
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label>Company Name</label>
+                                  <input class="form-control" type="text" id="company-name" style="width: 100%;" value="{{ object }}" placeholder="Previous: {{ object }}" />
+                                </div>
+                                <!-- /.form-group -->
+                                <div class="form-group">
+                                  <label>Slug</label>
+                                  <input class="form-control" type="text" id="company-slug" style="width: 100%;" value="/{{ object.slug }}/" disabled="disabled" />
+                                </div>
+                                <!-- /.form-group -->
+                              </div>
+                              <!-- /.col -->
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label>Company Mail</label>
+                                  <input class="form-control" type="text" id="company-email" style="width: 100%;" value="{{ object.get_email }}" />
+                                </div>
+                                <!-- /.form-group -->
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <label>Logo</label>
+                                            <img src="{{ object.get_logo }}" class="img-responsive img-circle" width="100px" height="100px" />
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <p class="active">Change Logo <i class="fa fa-edit"></i> </p>
+                                            <input class="form-control" type="file" class="custom-file-input" id="exampleInputFile" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.form-group -->
+                              </div>
+                              <!-- /.col -->
+                            </div>
+                            <!-- /.row -->
+                          </div>
+                          <!-- /.card-body -->
+                          <div class="card-footer">
+                              <div class="row">
+                                  <div class="col-sm-6">
+                                      Modify Company information
+                                  </div>
+                                  <div class="col-sm-6" >
+                                      <button type="submit" class="btn btn-info" id="submitCompanyData">
+                                          <i class="fa fa-arrow-right"></i> Submit Data
+                                      </button>
+                                  </div>
+                              </div>
+                          </div>
+                        </div>
+                     <!-- /.card -->
+                  </div>
+                  <div class="tab-pane fade" id="custom-tabs-one-profile" role="tabpanel" aria-labelledby="custom-tabs-one-profile-tab">
+
+                      <div class="row">
+                          <div class="col-12">
+                            <div class="card">
+                              <div class="card-header">
+                                <h3 class="card-title">Access Token - <strong>{{ accessToken }}</strong></h3>
+
+                                <div class="card-tools">
+                                  <div class="input-group input-group-sm" style="width: 150px;">
+                                    <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+
+                                    <div class="input-group-append">
+                                      <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <!-- /.card-header -->
+                              <div class="card-body table-responsive p-0" style="height: 300px;">
+                                <table class="table table-head-fixed">
+                                  <thead>
+                                    <tr>
+                                      <th>Image</th>
+                                      <th>Name</th>
+                                      <th>Role <i class="fa fa-edit" id="role-tooltip" style="color: #eea236" data-toggle="tooltip" data-placement="top" title="Click On The Role To Edit User Roles"></i> </th>
+                                      <th>Phone</th>
+                                      <th>User Code</th>
+                                      <th>Actions</th>
+                                      {% if request.user.profile.keycode == object.user.keycode %}
+                                          <th>
+                                              <a href="{% url 'account:profile-detail' object.user.slug %}" class="btn btn-info btn-outline btn-sm">
+                                                  <i class="fa fa-user"></i> Add New Staff
+                                              </a>
+                                          </th>
+                                      {% endif %}
+                                    </tr>
+                                  </thead>
+                                  <tbody id="staff-roles">
+
+                                  </tbody>
+
+                                </table>
+                              </div>
+                              <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
+                          </div>
+                        </div>
+                        <!-- /.row -->
+
+                  </div>
+                  <div class="tab-pane fade" id="custom-tabs-one-messages" role="tabpanel" aria-labelledby="custom-tabs-one-messages-tab">
+
+                      <h3 class="mt-4 mb-4">My Companies and Branches</h3>
+
+                      <div class="row">
+                          {% for obj in userCompany_qs %}
+                              <div class="col-md-4">
+                                <!-- Widget: user widget style 1 -->
+                                <div class="card card-widget widget-user">
+                                  <!-- Add the bg color to the header using any of the bg-* classes -->
+                                  <div class="widget-user-header text-white"
+                                       style="background: url('https://cdn.minloans.com.ng/min-dash/dist/img/photo1.png') center center;">
+                                    <h3 class="widget-user-username text-right">{{ obj.user.get_name }}</h3>
+                                    <h5 class="widget-user-desc text-right">{{ obj.user.role }} - {{ obj }}</h5>
+                                  </div>
+                                  <div class="widget-user-image">
+                                    <img class="img-circle" src="{{ obj.get_logo }}" alt="User Avatar">
+                                  </div>
+                                  <div class="card-footer">
+                                    <div class="row">
+                                      <div class="col-sm-4 border-right">
+                                        <div class="description-block">
+                                          <h5 class="description-header">{{ loanCount }}</h5>
+                                          <span class="description-text">Loans Conducted</span>
+                                        </div>
+                                        <!-- /.description-block -->
+                                      </div>
+                                      <!-- /.col -->
+                                      <div class="col-sm-4 border-right">
+                                        <div class="description-block">
+                                          <h5 class="description-header">{{ borrowerCount }}</h5>
+                                          <span class="description-text">Borrowers</span>
+                                        </div>
+                                        <!-- /.description-block -->
+                                      </div>
+                                      <!-- /.col -->
+                                      <div class="col-sm-4">
+                                        <div class="description-block">
+                                          <h5 class="description-header"> {{ obj.branch.address }}</h5>
+                                          <span class="description-text">Branch</span>
+                                        </div>
+                                        <!-- /.description-block -->
+                                      </div>
+                                      <!-- /.col -->
+                                    </div>
+                                    <!-- /.row -->
+                                  </div><hr/>
+                                  <a href="#" class="btn btn-warning">Close Company Temporary</a><hr/>
+                                  <a href="#" class="btn btn-danger">Close Company Permanently</a>
+                                </div>
+                                <!-- /.widget-user -->
+                              </div>
+                              <!-- /.col -->
+                          {% endfor %}
+
+                        </div>
+                        <!-- /.row -->
+
+                  </div>
+                  <div class="tab-pane fade" id="custom-tabs-one-settings" role="tabpanel" aria-labelledby="custom-tabs-one-settings-tab">
+
+                      <h3 class="mt-4 mb-4">Loan Type Packages</h3>
+                      <div class="card-body">
+                        <div class="row">
+                          {% for pkg in company_loanType_packages %}
+                              <div class="col-sm-4">
+                                <div class="position-relative p-3 bg-gray" style="height: 180px">
+                                  <div class="ribbon-wrapper">
+                                    <div class="ribbon bg-success">
+                                      {% if pkg.package.premium_package %}
+                                          Premium
+                                      {% else %}
+                                          Free
+                                      {% endif %}
+                                    </div>
+                                  </div>
+                                  <div class="row">
+                                      <div class="col-sm-4">
+                                          <img src="{{ pkg.package.image.url }}" width="100px" height="100px" class="img-bordered-sm img-responsive img-thumbnail" />
+                                      </div>
+                                      <div class="col-sm-8">
+                                          {{ pkg.package.name }} <i class="fa fa-spinner fa-spin"></i><br />
+                                          <small>{{ pkg.package.description|safe|truncatechars:60 }}</small><hr/>
+                                          <a href="#" class="btn btn-info btn-outline">
+                                              Renewal In {{ object.user.get_expiry|timeuntil }}
+                                          </a>
+                                      </div>
+                                  </div>
+                                </div>
+                              </div>
+                          {% empty %}
+                              <strong class="text-info text-capitalize text-center">
+                                  Oops!, you don't have any package here!, Get More Loan Packages From The
+                                  <a href="#" class="btn btn-outline">MINSTORE</a>
+                              </strong>
+                          {% endfor %}
+                        </div>
+                      </div>
+                      <!-- /.card-body -->
+
+                      <h3 class="mt-4 mb-4">Repayment Packages</h3>
+                      <div class="card-body">
+                        <div class="row">
+                          {% for pkg in company_collection_packages %}
+                              <div class="col-sm-4">
+                                <div class="position-relative p-3 bg-gray" style="height: 180px">
+                                  <div class="ribbon-wrapper">
+                                    <div class="ribbon bg-success">
+                                      {% if pkg.package.premium_package %}
+                                          Premium
+                                      {% else %}
+                                          Free
+                                      {% endif %}
+                                    </div>
+                                  </div>
+                                  <div class="row">
+                                      <div class="col-sm-4">
+                                          <img src="{{ pkg.package.image.url }}" width="100px" height="100px" class="img-bordered-sm img-responsive img-thumbnail" />
+                                      </div>
+                                      <div class="col-sm-8">
+                                          {{ pkg.package.name }} <i class="fa fa-spinner fa-spin"></i> <br />
+                                          <small>{{ pkg.package.description|safe|truncatechars:60 }}</small><hr/>
+                                          <a href="#" class="btn btn-info btn-outline">
+                                              Renewal In {{ object.user.get_expiry|timeuntil }}
+                                          </a>
+                                      </div>
+                                  </div>
+                                </div>
+                              </div>
+                          {% empty %}
+                              <strong class="text-info text-capitalize text-center">
+                                  Oops!, you don't have any package here!, Get More Loan Packages From The
+                                  <a href="#" class="btn btn-outline">MINSTORE</a>
+                              </strong>
+                          {% endfor %}
+                        </div>
+                      </div>
+                      <!-- /.card-body -->
+
+                  </div>
+                  <div class="tab-pane fade" id="custom-tabs-one-minone" role="tabpanel" aria-labelledby="custom-tabs-one-minone-tab">
+                     <div class="row">
+                      <div class="col-md-4">
+                        <div class="card card-default">
+                          <div class="card-header">
+                            <h3 class="card-title">
+                              <i class="fas fa-phone"></i>
+                              MinOne
+                            </h3>
+                          </div>
+                          <!-- /.card-header -->
+                          <div class="card-body">
+                            <div class="alert alert-default">
+                              <img class="img-responsive" src="https://cdn.minloans.com.ng/images/minone-single.jpg" height="400px" width="550px"/>
+                            </div>
+                          </div>
+                          <!-- /.card-body -->
+                          <div class="card-footer">
+                              <div class="form-group">
+                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                  <input type="checkbox" class="custom-control-input" id="customSwitch3">
+                                  <label class="custom-control-label" for="customSwitch3">
+                                      I want to use Minone
+                                  </label>
+                                </div>
+                              </div>
+                          </div>
+                        </div>
+                        <!-- /.card -->
+                      </div>
+                      <!-- /.col -->
+
+                      <div class="col-md-8">
+                        <div class="card card-default">
+                          <div class="card-header">
+                            <h3 class="card-title">
+                              <i class="fas fa-bullhorn"></i>
+                              About MINONE
+                            </h3>
+                          </div>
+                          <!-- /.card-header -->
+                          <div class="card-body">
+                            <div class="callout callout-danger">
+                              <h5>What Is Minone ?</h5>
+                              <p>{{ minone_obj.description|safe }}</p>
+                            </div>
+                            <div class="callout callout-info">
+                              <h5>Who Uses Minone ?</h5>
+                              <p>{{ minone_obj.who_uses_minone|safe }}</p>
+                            </div>
+                            <div class="callout callout-warning">
+                              <h5>Benefit Of Minone To The Lenders</h5>
+                              <p>{{ minone_obj.benefit_of_minone_to_lenders|safe }}</p>
+                            </div>
+                            <div class="callout callout-success">
+                              <h5>Benefit Of Minone To The Borrowers</h5>
+                              <p>{{ minone_obj.benefit_of_minone_to_borrowers|safe }}</p>
+                            </div>
+                          </div>
+                          <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                      </div>
+                      <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                  </div>
+                  <div class="tab-pane fade" id="custom-tabs-one-page" role="tabpanel" aria-labelledby="custom-tabs-one-page-tab">
+                      <div class="row">
+                          <div class="col-sm-6 col-sm-offset-3 text-center">
+                              <strong class="text-center">Page Designer Is Coming Soon</strong>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="tab-pane fade" id="custom-tabs-one-thirdparty" role="tabpanel" aria-labelledby="custom-tabs-one-thirdparty-tab">
+                      <div class="row">
+
+                             <!-- SELECT2 EXAMPLE -->
+                             <div class="card card-default col-sm-6">
+                                  <div class="card-header">
+                                    <h3 class="card-title">Credentials For - Direct Debit</h3>
+
+                                    <div class="card-tools">
+                                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-remove"></i></button>
+                                    </div>
+                                  </div>
+                                  <!-- /.card-header -->
+                                  <div class="card-body">
+                                    <div class="row">
+                                      <div class="col-md-6">
+                                        <div class="form-group">
+                                          <label>Direct Debit Merchant Key</label>
+                                          <input class="form-control" type="text" id="remita_dd_merchant_key" style="width: 100%;" value="{{ user_thirdparty_cred.remita_dd_merchant }}" placeholder="Previous: {{ user_thirdparty_cred.remita_dd_merchant }}" />
+                                        </div>
+                                        <!-- /.form-group -->
+                                        <div class="form-group">
+                                          <label>Direct Debit Service Type ID</label>
+                                          <input class="form-control" type="text" id="remita_dd_service_type_id" style="width: 100%;" value="{{ user_thirdparty_cred.remita_dd_serviceType_id }}" placeholder="Previous: {{ user_thirdparty_cred.remita_dd_serviceType_id }}"/>
+                                        </div>
+                                        <!-- /.form-group -->
+                                      </div>
+                                      <!-- /.col -->
+                                      <div class="col-md-6">
+                                        <div class="form-group">
+                                          <label>Direct Debit API Key</label>
+                                          <input class="form-control" type="text" id="remita_dd_api_key" style="width: 100%;" value="{{ user_thirdparty_cred.remita_dd_api_key }}" placeholder="Previous: {{ user_thirdparty_cred.remita_dd_api_key }}" />
+                                        </div>
+                                        <!-- /.form-group -->
+                                        <div class="form-group">
+                                          <label>Direct Debit API Token</label>
+                                          <input class="form-control" type="text" id="remita_dd_api_token" style="width: 100%;" value="{{ user_thirdparty_cred.remita_dd_api_token }}" placeholder="Previous: {{ user_thirdparty_cred.remita_dd_api_token }}" />
+                                        </div>
+                                      </div>
+                                      <!-- /.col -->
+                                    </div>
+                                    <!-- /.row -->
+                                  </div>
+                                  <!-- /.card-body -->
+                                  <div class="card-footer">
+                                      <div class="row">
+                                          <div class="col-sm-6">
+                                              Modify Company information
+                                          </div>
+                                          <div class="col-sm-6" >
+                                              <button type="submit" class="btn btn-info" id="submitCompanyData">
+                                                  <i class="fa fa-arrow-right"></i> Submit Data
+                                              </button>
+                                          </div>
+                                      </div>
+                                  </div>
+                                </div>
+                             <!-- /.card -->
+
+                             <!-- SELECT2 EXAMPLE -->
+                             <div class="card card-default col-sm-6">
+                                  <div class="card-header">
+                                    <h3 class="card-title">Credentials For - Data Referencing</h3>
+
+                                    <div class="card-tools">
+                                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-remove"></i></button>
+                                    </div>
+                                  </div>
+                                  <!-- /.card-header -->
+                                  <div class="card-body">
+                                    <div class="row">
+                                      <div class="col-md-6">
+                                        <div class="form-group">
+                                          <label>Data Referencing Merchant</label>
+                                          <input class="form-control" type="text" id="remita_drf_merchant_key" style="width: 100%;" value="{{ user_thirdparty_cred.remita_drf_merchant }}" placeholder="Previous: {{ user_thirdparty_cred.remita_drf_merchant }}" />
+                                        </div>
+                                        <!-- /.form-group -->
+                                        <div class="form-group">
+                                          <label>Data Referencing APIKey</label>
+                                          <input class="form-control" type="text" id="remita_drf_api_key" style="width: 100%;" value="{{ user_thirdparty_cred.remita_drf_api_key }}" placeholder="Previous: {{ user_thirdparty_cred.remita_drf_api_key }}"/>
+                                        </div>
+                                        <!-- /.form-group -->
+                                      </div>
+                                      <!-- /.col -->
+                                      <div class="col-md-6">
+                                        <div class="form-group">
+                                          <label>Data Referencing API Token</label>
+                                          <input class="form-control" type="text" id="remita_drf_api_token" style="width: 100%;" value="{{ user_thirdparty_cred.remita_drf_api_token }}" placeholder="Previous: {{ user_thirdparty_cred.remita_drf_api_token }}" />
+                                        </div>
+                                        <!-- /.form-group -->
+                                      </div>
+                                      <!-- /.col -->
+                                    </div>
+                                    <!-- /.row -->
+                                  </div>
+                                  <!-- /.card-body -->
+                                  <div class="card-footer">
+                                      <div class="row">
+                                          <div class="col-sm-6">
+                                              Modify Company information
+                                          </div>
+                                          <div class="col-sm-6" >
+                                              <button type="submit" class="btn btn-info" id="submitCompanyData">
+                                                  <i class="fa fa-arrow-right"></i> Submit Data
+                                              </button>
+                                          </div>
+                                      </div>
+                                  </div>
+                                </div>
+                             <!-- /.card -->
+
+                      </div>
+                  </div>
+
+                </div>
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+      </div>
+      <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+
+{% endblock content %}
+
+
+{% block js_links %}
+
+    <!-- jQuery -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/datatables/jquery.dataTables.js"></script>
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+    <!-- AdminLTE App -->
+    <script src="https://cdn.minloans.com.ng/min-dash/dist/js/adminlte.min.js"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="https://cdn.minloans.com.ng/min-dash/dist/js/demo.js"></script>
+    <!-- Summernote -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/summernote/summernote-bs4.min.js"></script>
+    <!-- Bootstrap Switch -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/moment/moment.min.js"></script>
+
+    <!-- jsGrid -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/jsgrid/jsgrid.min.js"></script>
+
+    <!-- Select2 -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/select2/js/select2.full.min.js"></script>
+    <!-- Bootstrap4 Duallistbox -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+
+            let staffs = [];
+            let dataUrl = '{% url "settings-api-url:company-staff-api" object.slug %}';
+            $.ajax({
+                method: 'GET',
+                url: dataUrl,
+                
+                success: function (response) {
+                    staffs = response;
+                    for (let staff in staffs) {
+                        addNewRow(staffs[staff])
+                    }
+                }
+            });
+            
+            function updateStaffRole(data) {
+                let uri = '{% url "settings-url:company-settings" object.slug %}';
+                {% include 'csrf_ajax/csrf_ajax_token.js' %}
+                $.ajax({
+                    method: 'POST',
+                    url: uri,
+                    data:data,
+
+                    success: function (response) {
+                        $(document).Toasts('create', {
+                            class: 'bg-success',
+                            autohide: true,
+                            delay: 750,
+                            title: 'Staff Role Changed!',
+                            subtitle: 'Staff Role Updated',
+                            body: 'Staff Updated Successfully'
+                        });
+                    }, error: function (error) {
+                        $(document).Toasts('create', {
+                            class: 'bg-danger',
+                            autohide: true,
+                            delay: 750,
+                            title: 'Error!',
+                            subtitle: 'Server Error',
+                            body: 'An Error Has Occurred, Try Later'
+                        });
+                    }
+                });
+            }
+            
+            function removeStaff(data) {
+                let uri = '{% url "settings-url:company-settings" object.slug %}';
+                {% include 'csrf_ajax/csrf_ajax_token.js' %}
+                $.ajax({
+                    method: 'POST',
+                    url: uri,
+                    data:data,
+
+                    success: function (response) {
+                        $(document).Toasts('create', {
+                            class: 'bg-success',
+                            autohide: true,
+                            delay: 750,
+                            title: 'Staff Removed From Company!',
+                            subtitle: 'Staff Removed!',
+                            body: 'This Staff Cannot Be Added Until After 24hours Of Removal'
+                        });
+                    }, error: function (error) {
+                        $(document).Toasts('create', {
+                            class: 'bg-danger',
+                            autohide: true,
+                            delay: 750,
+                            title: 'Error!',
+                            subtitle: 'Server Error',
+                            body: 'An Error Has Occurred, Try Later'
+                        });
+                    }
+                });
+            }
+
+            function addNewRow(obj) {
+                let ownerKey = "{{ object.user.keycode|safe }}";
+                let row = `
+                            <tr scope="row" class="staff-row-${obj.id}">
+                              <td data-key="${obj.keycode}">
+                                  <img src="${obj.get_image}" class="img-circle img-bordered-sm" width="50px" height="50px"/>
+                              </td>
+                              <td data-key="${obj.keycode}">${obj.get_name}</td>
+                              <td id="role-${obj.id}" data-staffid="${obj.id}" data-key="${obj.keycode}">${obj.role}</td>
+                              <td data-key="${obj.keycode}}">${obj.get_phone}</td>
+                              <td data-key="${obj.keycode}"><strong>${obj.keycode}</strong></td>
+                              <td>
+                                <button class="btn btn-danger btn-sm" data-staffid="${obj.id}" id="delete-${obj.id}">Remove</button>
+                                <button class="btn btn-info btn-sm" data-staffid="${obj.id}" id="save-${obj.id}" disabled="true">Save</button>
+
+                                <button class="btn btn-warning btn-sm" hidden data-staffid="${obj.id}" id="cancel-${obj.id}">Cancel</button>
+                                <button class="btn btn-primary btn-sm" hidden data-staffid="${obj.id}" id="confirm-${obj.id}">Confirm</button>
+                              </td>
+                            </tr>
+                           `;
+                $('#staff-roles').append(row);
+
+                $(`#delete-${obj.id}`).on('click', deleteStaff);
+                $(`#cancel-${obj.id}`).on('click', cancelDelete);
+                $(`#confirm-${obj.id}`).on('click', confirmDelete);
+                $(`#role-${obj.id}`).on('click', editResult);
+                $(`#save-${obj.id}`).on('click', saveUpdate);
+            }
+
+            
+            function editResult() {
+                let staffid = $(this).data('staffid');
+                let value = $(this).html();
+                $(this).unbind();
+
+                $(this).html(`
+                        <select class="role form-control select2" style="width: 100%;" id="staff-${staffid}" data-staffid="${staffid}" required>
+                            <option value="Admin">Admin</option>
+                            <option value="Staff">Staff</option>
+                            <option value="Customer">Customer</option>
+                        </select>
+                    `);
+
+                $(`.role`).on('change', function (event) {
+                    let staffid = $(this).data('staffid');
+                    let saveBtn = $(`#save-${staffid}`);
+                    saveBtn.prop('disabled', false)
+                });
+            }
+            
+            function saveUpdate() {
+                let staffid = $(this).data('staffid');
+                let saveBtn = $(`#save-${staffid}`);
+                let row = $(`staff-row-${staffid}`);
+
+                saveBtn.prop('disabled', true);
+                saveBtn.html("<i class='fa fa-spin fa-spinner'></i> Updating Record!..");
+
+                row.css('opacity', '0.5');
+
+                let role = $(`#staff-${staffid}`).val();
+                let keycode = $(`#role-${staffid}`).data('key');
+                let data = {'id': staffid, 'role':role, 'company':'{{ object|safe }}', 'keycode':keycode, 'actionType':'update'};
+                updateStaffRole(data);
+
+                setTimeout(function () {
+                    row.css('opacity', '1');
+                    saveBtn.html("Save")
+                }, 2000)
+            }
+
+            function deleteStaff() {
+                let staffid = $(this).data('staffid');
+
+                let deleteBtn = $(`#delete-${staffid}`);
+                let saveBtn = $(`#save-${staffid}`);
+                let cancelBtn = $(`#cancel-${staffid}`);
+                let confirmBtn = $(`#confirm-${staffid}`);
+
+                deleteBtn.prop('hidden', true);
+                saveBtn.prop('hidden', true);
+
+                cancelBtn.prop('hidden', false);
+                confirmBtn.prop('hidden', false);
+
+            }
+
+            function cancelDelete() {
+                let staffid = $(this).data('staffid');
+
+                let deleteBtn = $(`#delete-${staffid}`);
+                let saveBtn = $(`#save-${staffid}`);
+                let cancelBtn = $(`#cancel-${staffid}`);
+                let confirmBtn = $(`#confirm-${staffid}`);
+
+                deleteBtn.prop('hidden', false);
+                saveBtn.prop('hidden', false);
+
+                cancelBtn.prop('hidden', true);
+                confirmBtn.prop('hidden', true);
+            }
+
+            function confirmDelete() {
+                let staffid = $(this).data('staffid');
+                let row = $(`.staff-row-${staffid}`);
+                let keycode = $(`#role-${staffid}`).data('key');
+                let data = {'id': staffid, 'company':'{{ object|safe }}', 'keycode':keycode, 'actionType':'delete'};
+                removeStaff(data);
+                row.remove();
+            }
+            
+            
+        }());
+    </script>
+
+{% endblock js_links %}

@@ -2,7 +2,16 @@ from django.contrib import admin
 
 # Register your models here.
 from loans.models import LoanType, Collateral, LoanTerms, Loan, ModeOfRepayments, Penalty, CollateralFiles, \
-    CollateralType
+    CollateralType, LoanActivityComments
+
+
+@admin.register(LoanActivityComments)
+class LoanActivityCommentsAdmin(admin.ModelAdmin):
+    list_display = ("assigned_to", "done_by", "loan", "comment", "active", "timestamp")
+    list_display_links = ("assigned_to", "loan")
+    list_editable = ("active",)
+    list_filter = ("assigned_to", "done_by", "loan", "timestamp", "active")
+    search_fields = ("assigned_to", "done_by", "comment")
 
 
 @admin.register(Collateral)
@@ -12,9 +21,6 @@ class CollateralAdmin(admin.ModelAdmin):
     list_editable = ('status',)
     list_filter = ('collateral_type', 'name', 'registered_date', 'status', 'condition')
     search_fields = ('name',)
-
-    class Meta:
-        model = Collateral
 
 
 @admin.register(LoanType)

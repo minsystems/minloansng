@@ -10,9 +10,11 @@
       <li class="nav-item d-none d-sm-inline-block">
         <a href="{{ company.get_absolute_url }}" class="nav-link">Home</a>
       </li>
-      <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Settings</a>
-      </li>
+      {% if request.user.profile.role == 'Admin' %}
+          <li class="nav-item d-none d-sm-inline-block">
+            <a href="{% url 'settings-url:company-settings' object.slug %}" class="nav-link">Settings</a>
+          </li>
+      {% endif %}
     </ul>
 
     <!-- SEARCH FORM -->
@@ -58,6 +60,7 @@
           <a href="/system/handler/{{ company.slug }}/messages/" class="dropdown-item dropdown-footer">See All Messages</a>
         </div>
       </li>
+
       <!-- Notifications Dropdown Menu -->
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
@@ -85,11 +88,40 @@
           <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
         </div>
       </li>
+
+      <!-- user account profile -->
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="far fa-user"></i>
+          <span class="badge badge-primary navbar-badge"> <i class="fa fa-tasks"></i> </span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <span class="dropdown-item dropdown-header">{{ request.user.profile.get_name }} - {{ request.user.profile.role }}</span>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-user mr-2"></i> Manage My Profile
+            <span class="float-right text-muted text-sm"><i class="fas fa-cog"></i> </span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-signal mr-2"></i> Log Out
+            <span class="float-right text-muted text-sm"> <i class="fas fa-arrow-right"></i> </span>
+          </a>
+          {% if request.user.profile.role == 'Admin' %}
+              <div class="dropdown-divider"></div>
+              <a href="{% url 'settings-url:company-settings' object.slug %}" class="dropdown-item dropdown-footer">
+                  Review Company Settings and Policy Controls
+              </a>
+          {% endif %}
+        </div>
+      </li>
+
       <li class="nav-item">
         <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#">
           <i class="fas fa-th-large"></i>
         </a>
       </li>
+
     </ul>
   </nav>
 <!-- /.navbar -->

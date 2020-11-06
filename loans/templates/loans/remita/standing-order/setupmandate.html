@@ -360,102 +360,117 @@
                     contentType: 'application/x-www-form-urlencoded',
 
                     success: function (data) {
+                        console.log(data);
                         mandateActivationForm[0].reset();
-                        $(document).Toasts('create', {
-                            class: 'bg-success',
-                            autohide: true,
-                            delay: 750,
-                            title: 'Mandate Data Processing!',
-                            subtitle: 'Mandate Data Activation In Progress',
-                            body: '' + data.message
-                        });
+                        if (data.status === 401){
+                            $(document).Toasts('create', {
+                                class: 'bg-error',
+                                autohide: true,
+                                delay: 750,
+                                title: 'Failed Transaction!',
+                                subtitle: 'Could Not Locate Borrower Instance',
+                                body: '' + data.message
+                            });
+                        } else {
+                            $(document).Toasts('create', {
+                                class: 'bg-success',
+                                autohide: true,
+                                delay: 750,
+                                title: 'Mandate Data Processing!',
+                                subtitle: 'Mandate Data Activation In Progress',
+                                body: '' + data.message
+                            });
 
-                        // Send data to remita server
-                        $.ajax({
-                            method: mandateActivationFormMethod,
-                            url: '{{ dd_url|safe }}',
-                            data: finalData,
-                            contentType: 'application/json',
+                            // Send data to remita server
+                            $.ajax({
+                                method: mandateActivationFormMethod,
+                                url: '{{ dd_url|safe }}',
+                                data: finalData,
+                                contentType: 'application/json',
 
-                            success: function (data) {
-                                mandateActivationForm[0].reset();
-                                const payload_data = jsonExtract(data);
-                                $(document).Toasts('create', {
-                                    class: 'bg-success',
-                                    autohide: true,
-                                    delay: 3500,
-                                    title: 'Mandate Activated!',
-                                    subtitle: 'Activated Successfully!',
-                                    body: '' + payload_data.status + ', ' + 'Mandate Activation Key: ' + payload_data.mandateId
-                                });
+                                success: function (data) {
+                                    mandateActivationForm[0].reset();
+                                    const payload_data = jsonExtract(data);
+                                    $(document).Toasts('create', {
+                                        class: 'bg-success',
+                                        autohide: true,
+                                        delay: 3500,
+                                        title: 'Mandate Activated!',
+                                        subtitle: 'Activated Successfully!',
+                                        body: '' + payload_data.status + ', ' + 'Mandate Activation Key: ' + payload_data.mandateId
+                                    });
 
-                                // update mandate_dd data
-                                $.ajax({
-                                    method: "post",
-                                    url: "{% url 'loans-url:loan-mandate-update' object.slug loan_obj.slug loan_obj.loan_key %}",
-                                    data: payload_data,
-                                    contentType: 'application/x-www-form-urlencoded',
+                                    // update mandate_dd data
+                                    $.ajax({
+                                        method: "post",
+                                        url: "{% url 'loans-url:loan-mandate-update' object.slug loan_obj.slug loan_obj.loan_key %}",
+                                        data: payload_data,
+                                        contentType: 'application/x-www-form-urlencoded',
 
-                                    success: function (data) {
-                                        console.log(data.message);
-                                        if (data.status === '007') {
+                                        success: function (data) {
+                                            console.log(data.message);
+                                            if (data.status === '007') {
+                                                $(document).Toasts('create', {
+                                                    class: 'bg-success',
+                                                    autohide: true,
+                                                    delay: 3500,
+                                                    title: 'Mandate Updated!',
+                                                    subtitle: 'Updated Successfully!',
+                                                    body: '' + data.message
+                                                });
+
+                                                // redirect to loan details
+                                                setTimeout(function () {
+                                                    window.location.replace("{% url 'loans-url:loan-detail' object.slug loan_obj.slug %}");
+                                                }, 3000);
+                                            } else {
+                                                 $(document).Toasts('create', {
+                                                    class: 'bg-danger',
+                                                    autohide: true,
+                                                    delay: 3500,
+                                                    title: 'Mandate Failed!',
+                                                    subtitle: 'Failed To Update!',
+                                                    body: '' + data.message
+                                                });
+
+                                                // redirect to loan recreate the standing order
+                                                setTimeout(function () {
+                                                    window.location.replace("{% url 'loans-url:loan-standing-order-create' object.slug loan_obj.slug loan_obj.loan_key %}");
+                                                }, 3000);
+                                            }
+
+                                        }, error: function (error) {
                                             $(document).Toasts('create', {
-                                                class: 'bg-success',
-                                                autohide: true,
-                                                delay: 3500,
-                                                title: 'Mandate Updated!',
-                                                subtitle: 'Updated Successfully!',
-                                                body: '' + data.message
-                                            });
-
-                                            // redirect to loan details
-                                            setTimeout(function () {
-                                                window.location.replace("{% url 'loans-url:loan-detail' object.slug loan_obj.slug %}");
-                                            }, 3000);
-                                        } else {
-                                             $(document).Toasts('create', {
                                                 class: 'bg-danger',
                                                 autohide: true,
-                                                delay: 3500,
-                                                title: 'Mandate Failed!',
-                                                subtitle: 'Failed To Update!',
-                                                body: '' + data.message
+                                                delay: 2500,
+                                                title: 'An Error!',
+                                                subtitle: 'Error! Updating..',
+                                                body: 'An Error Occurred During Mandate Activation Update!'
                                             });
-
-                                            // redirect to loan recreate the standing order
-                                            setTimeout(function () {
-                                                window.location.replace("{% url 'loans-url:loan-standing-order-create' object.slug loan_obj.slug loan_obj.loan_key %}");
-                                            }, 3000);
                                         }
+                                    });
 
-                                    }, error: function (error) {
-                                        $(document).Toasts('create', {
-                                            class: 'bg-danger',
-                                            autohide: true,
-                                            delay: 2500,
-                                            title: 'An Error!',
-                                            subtitle: 'Error! Updating..',
-                                            body: 'An Error Occurred During Mandate Activation Update!'
-                                        });
-                                    }
-                                });
+                                }, error: function (error) {
+                                    console.log(error);
+                                    mandateActivationForm[0].reset();
+                                    displaySubmitting(mandateActivationFormSubmitBtn, mandateActivationFormSubmitBtnText, false);
+                                    $(document).Toasts('create', {
+                                        class: 'bg-danger',
+                                        autohide: true,
+                                        delay: 2500,
+                                        title: 'An Error Connect..!',
+                                        subtitle: 'Error! To External Server',
+                                        body: 'An Error Occurred During Server Communication!'
+                                    });
+                                }
+                            });
+                        }
 
-                            }, error: function (error) {
-                                console.log(error);
-                                mandateActivationForm[0].reset();
-                                $(document).Toasts('create', {
-                                    class: 'bg-danger',
-                                    autohide: true,
-                                    delay: 2500,
-                                    title: 'An Error Connect..!',
-                                    subtitle: 'Error! To External Server',
-                                    body: 'An Error Occurred During Server Communication!'
-                                });
-                                displaySubmitting(mandateActivationFormSubmitBtn, mandateActivationFormSubmitBtnText, false);
-                            }
-                        });
                     }, error: function (error) {
+                        console.log(error);
                         mandateActivationForm[0].reset();
+                        displaySubmitting(mandateActivationFormSubmitBtn, mandateActivationFormSubmitBtnText, false);
                         $(document).Toasts('create', {
                             class: 'bg-danger',
                             autohide: true,
@@ -464,7 +479,6 @@
                             subtitle: 'An Error Occurred',
                             body: 'An Error Occurred During Mandate Processing!'
                         });
-                        displaySubmitting(mandateActivationFormSubmitBtn, mandateActivationFormSubmitBtnText, false);
                     }
                 })
 

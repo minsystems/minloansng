@@ -52,7 +52,7 @@ class UserAdminCreationForm(forms.ModelForm):
 
 class UserDetailChangeForm(forms.ModelForm):
     full_name = forms.CharField(label='Name', required=False, widget=forms.TextInput(attrs={"class": 'form-control'}))
-    phone = PhoneNumberField(label='Phone', required=True, widget=forms.TextInput(attrs={"class": 'form-control'}))
+    phone = PhoneNumberField(label='Phone', required=True, widget=forms.TextInput(attrs={"class": 'form-control', 'placeholder': '+234XXXXXXXXXX'}))
 
     class Meta:
         model = User

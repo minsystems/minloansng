@@ -187,9 +187,29 @@ def digitExtract(char):
     # return re.findall(r'\d+', char) - would return data as a list encapsulated data
 
 
+def removeNCharFromString(num_of_char, string_data):
+    size = len(string_data)
+    # Slice string to remove last N characters from string
+    return string_data[:size - num_of_char]
+
+
 def secondWordExtract(char):
     """
     extract the second word from a string sequence
     :type char: str
     """
     return char.split(' ', 2)[1]
+
+
+def armotizationLoanCalculator(pAmount, interest, nRepayment):
+    """
+    system generated armotized loan estimate
+    """
+    pAmount = int(pAmount)
+    interest_ = int(interest)
+    nRepayment = int(nRepayment)
+
+    sInterest = pAmount * (interest_ / 100)
+    sRepayment = pAmount / nRepayment
+
+    return int(sRepayment + sInterest)

@@ -16,6 +16,13 @@
   <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/datatables-bs4/css/dataTables.bootstrap4.css">
   <!-- summernote -->
   <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+  <!-- iCheck for checkboxes and radio inputs -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- Tempusdominus Bbootstrap 4 -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/select2/css/select2.min.css">
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 
 {% endblock css_links %}
 
@@ -29,6 +36,9 @@
           <div class="col-sm-6">
             <h1 class="m-0 text-dark">
                 {{ loan_obj.borrower }} - Loan Status: {{ loan_obj.loan_status }}
+                {% if overdue == "active" %}
+                    <i class="fas fa-exclamation-circle" style="color: #eea236"></i>
+                {% endif %}
             </h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
@@ -98,7 +108,7 @@
               </div>
               <div class="row">
                 <div class="col-12">
-                  <h4>Loan / Branch Information</h4>
+                    <h4>Loan / Branch Information</h4>
                     <div class="post clearfix">
                       <div class="user-block">
                         <img class="img-circle img-bordered-sm" src="{{ loan_obj.borrower.get_image }}" alt="user image">
@@ -130,9 +140,9 @@
                                   </a> <hr/>
                                 <strong>Repayment: </strong>
                                     {% if loan_obj.balance_due == 'Modify/Change Loan' %}
-                                        <a href="#" class="btn btn-xs btn-outline-warning">Update Repayment Balance</a>
+                                        <a href="#" class="btn btn-xs btn-outline-warning" data-toggle="modal" data-target="#modal-sm-repayment">Update Repayment Balance</a>
                                     {% else %}
-                                        {{ loan_obj.balance_due }}
+                                        ₦ {{ loan_obj.balance_due|localize|intcomma }} <a href="#" class="btn btn-xs btn-outline-warning" data-toggle="modal" data-target="#modal-sm-repayment">Modify</a>
                                     {% endif %}
                           </div>
                       </div>
@@ -147,24 +157,318 @@
                       </p>
                     </div>
 
+                    <h4>Pipeline &amp; Actions</h4>
+                    <div class="row">
+                      <div class="col-5 col-sm-3">
+                        <div class="nav flex-column nav-tabs h-100" id="vert-tabs-tab" role="tablist" aria-orientation="vertical">
+                          <a class="nav-link active" id="vert-tabs-home-tab" data-toggle="pill" href="#vert-tabs-home" role="tab" aria-controls="vert-tabs-home" aria-selected="true">
+                              Loan Actions
+                          </a>
+                          <a class="nav-link" id="vert-tabs-profile-tab" data-toggle="pill" href="#vert-tabs-profile" role="tab" aria-controls="vert-tabs-profile" aria-selected="false">
+                              Visuals
+                          </a>
+                          <a class="nav-link" id="vert-tabs-messages-tab" data-toggle="pill" href="#vert-tabs-messages" role="tab" aria-controls="vert-tabs-messages" aria-selected="false">
+                              Mandate Payment Transaction History For {{ loan_obj.borrower }}
+                          </a>
+                          <a class="nav-link" id="vert-tabs-settings-tab" data-toggle="pill" href="#vert-tabs-settings" role="tab" aria-controls="vert-tabs-settings" aria-selected="false">
+                              Mandate Status Report
+                          </a>
+                        </div>
+                      </div>
+                      <div class="col-7 col-sm-9">
+                        <div class="tab-content" id="vert-tabs-tabContent">
+                          <div class="tab-pane text-left fade show active" id="vert-tabs-home" role="tabpanel" aria-labelledby="vert-tabs-home-tab">
+                              {% if loanActions == 'DD' %}
+                                 <!-- Loan Action Buttons buttons -->
+                                    <div class="card">
+                                      <div class="card-header">
+                                        <h3 class="card-title">Remita Direct Debit Loan Actions </h3>
+                                      </div>
+                                      <div class="card-body">
+                                        <p>
+                                            <code>Please make sure you fully understand the DD loan enough to use it</code>
+                                        </p>
+                                        <button class="btn btn-app" id="mandate-activation-request">
+                                          <i class="fas fa-edit"></i> Mandate Activation Request
+                                        </button>
+                                        {% if otpCheck == 1 %}
+                                        <button class="btn btn-app" data-toggle="modal" data-target="#modal-sm-mandate-validate-otp">
+                                          <i class="fas fa-play"></i> Mandate Validate OTP
+                                        </button>
+                                        {% endif %}
+                                        <button class="btn btn-app" data-toggle="modal" data-target="#modal-sm-mandate-sendDebit">
+                                          <i class="fas fa-forward"></i> Send Debit Instructions
+                                        </button>
+                                        <button class="btn btn-app" id="check-debit-status">
+                                          <i class="fas fa-signal"></i> Check Debit Status
+                                        </button>
+                                        <button class="btn btn-app" id="cancel-debit">
+                                          <span class="badge bg-warning">#</span>
+                                          <i class="fas fa-trash"></i> Cancel Debit Instruction
+                                        </button>
+                                        <button class="btn btn-app" id="mandate-payment-history">
+                                          <span class="badge bg-success">#</span>
+                                          <i class="fas fa-barcode"></i> Mandate Payment History
+                                        </button>
+                                        <button class="btn btn-app" id="stop-mandate">
+                                          <span class="badge bg-purple">#</span>
+                                          <i class="fas fa-tasks"></i> Stop Mandate
+                                        </button>
+                                        <button class="btn btn-app" id="mandate-report-status">
+                                          <span class="badge bg-teal">#</span>
+                                          <i class="fas fa-inbox"></i> Mandate Status
+                                        </button>
+                                      </div>
+                                      <!-- /.card-body -->
+                                    </div>
+                                 <!-- /.card -->
+                              {% endif %}
+                          </div>
+                          <div class="tab-pane fade" id="vert-tabs-profile" role="tabpanel" aria-labelledby="vert-tabs-profile-tab">
+
+                              <canvas id="myChart" width="400" height="400"></canvas>
+
+                          </div>
+                          <div class="tab-pane fade" id="vert-tabs-messages" role="tabpanel" aria-labelledby="vert-tabs-messages-tab">
+
+                              <div class="row">
+                                  <div class="col-12">
+                                    <div class="card">
+                                      <div class="card-header">
+                                        <h3 class="card-title">
+                                            Transaction Count: {{ mandateTransactionRecord.total_transaction_count }} | Total Amount: NGN {{ mandateTransactionRecord.total_amount|localize|intcomma }}
+                                        </h3>
+
+                                        <div class="card-tools">
+                                          <div class="input-group input-group-sm" style="width: 150px;">
+                                            <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+
+                                            <div class="input-group-append">
+                                              <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <!-- /.card-header -->
+                                      <div class="card-body table-responsive p-0">
+                                        <table class="table table-hover">
+                                          <thead>
+                                            <tr>
+                                              <th>Amount</th>
+                                              <th>Timestamp</th>
+                                              <th>RRR</th>
+                                              <th>Trx-Ref</th>
+                                              <th>Status</th>
+                                              <th>Code</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody>
+                                            {% for pDetails in paymentDetails %}
+                                                <tr>
+                                                  <td>₦ {{ pDetails.amount|localize|intcomma }}</td>
+                                                  <td>{{ pDetails.lastStatusUpdateTime }}</td>
+                                                  <td>{{ pDetails.RRR }}</td>
+                                                  <td>{{ pDetails.transactionRef }}</td>
+                                                  <td><span class="tag tag-success">{{ pDetails.status }}</span></td>
+                                                  <td>{{ pDetails.statuscode }}</td>
+                                                </tr>
+                                            {% empty %}
+                                                <tr>
+                                                <td>No Transaction Status Generated Yet</td>
+                                                </tr>
+                                            {% endfor %}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                      <!-- /.card-body -->
+                                    </div>
+                                    <!-- /.card -->
+                                  </div>
+                                </div>
+                                <!-- /.row -->
+
+                          </div>
+                          <div class="tab-pane fade" id="vert-tabs-settings" role="tabpanel" aria-labelledby="vert-tabs-settings-tab">
+
+                              <div class="container-fluid">
+                                <div class="row">
+                                  <div class="col-12">
+                                    <div class="callout callout-info">
+                                      <h5><i class="fas fa-info"></i> Note:</h5>
+                                      This data is gotten from remita's server and is subject to change or been updated
+                                    </div>
+
+
+                                    <!-- Main content -->
+                                    <div class="invoice p-3 mb-3">
+                                      <!-- title row -->
+                                      <div class="row">
+                                        <div class="col-12">
+                                          <h4>
+                                            <i class="fas fa-globe"></i> Remita Mandate Status Report.
+                                            <small class="float-right">Activated Date: {{ dd_status_report.registered_date|timesince }}</small>
+                                          </h4>
+                                        </div>
+                                        <!-- /.col -->
+                                      </div>
+                                      <!-- info row -->
+                                      <div class="row invoice-info">
+                                        <div class="col-sm-4 invoice-col">
+                                          From
+                                          <address>
+                                            <strong>Remita DD</strong><br>
+                                          </address>
+                                        </div>
+                                        <!-- /.col -->
+                                        <div class="col-sm-4 invoice-col">
+                                          On
+                                          <address>
+                                            <strong>{{ loan_obj.borrower }}</strong><br>
+                                          </address>
+                                        </div>
+                                        <!-- /.col -->
+                                        <div class="col-sm-4 invoice-col">
+                                          <b>Mandate ID #{{ dd_status_report.mandate_id }}</b><br>
+                                          <br>
+                                          <b>Request ID</b> {{ dd_status_report.request_id }}<br>
+                                        </div>
+                                        <!-- /.col -->
+                                      </div>
+                                      <!-- /.row -->
+
+                                      <!-- Table row -->
+                                      <div class="row">
+                                        <div class="col-12 table-responsive">
+                                          <table class="table table-striped">
+                                            <thead>
+                                            <tr>
+                                              <th>Loan</th>
+                                              <th>Start Date</th>
+                                              <th>End Date</th>
+                                              <th>Registration Date</th>
+                                              <th>Status</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                              <td>{{ dd_status_report.loan }}</td>
+                                              <td>{{ dd_status_report.start_date }}</td>
+                                              <td>{{ dd_status_report.end_date }}</td>
+                                              <td>{{ dd_status_report.registration_date }}</td>
+                                              <td>
+                                                  {% if dd_status_report.mandate_status %}
+                                                      <i class="fas fa-check" style="color: #5cb85c"></i>
+                                                  {% else %}
+                                                      <i class="fas fa-exclamation" style="color: #ba2121"></i>
+                                                  {% endif %}
+                                              </td>
+                                            </tr>
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                        <!-- /.col -->
+                                      </div>
+                                      <!-- /.row -->
+
+                                      <div class="row">
+                                        <!-- accepted payments column -->
+                                        <div class="col-6">
+                                          <p class="lead">Direct Debit Loan</p>
+
+                                          <p class="text-muted well well-sm shadow-none" style="margin-top: 10px;">
+                                            Remita Direct Debit Mandate Status on {{ loan_obj }}
+                                          </p>
+                                        </div>
+                                        <!-- /.col -->
+                                        <div class="col-6">
+                                          <p class="lead">Mandate End On {{ dd_status_report.end_date }}</p>
+
+                                          <div class="table-responsive">
+                                            <table class="table">
+                                              <tr>
+                                                <th style="width:50%">Amount:</th>
+                                                <td>₦ {{ loan_obj.principal_amount|localize|intcomma }}</td>
+                                              </tr>
+                                              <tr>
+                                                <th>Interest (Armotization Calculation)</th>
+                                                <td>{{ loan_obj.interest }}%</td>
+                                              </tr>
+                                              <tr>
+                                                <th>Repayment Amount:</th>
+                                                <td>₦ {{ loan_obj.balance_due|localize|intcomma }}</td>
+                                              </tr>
+                                              <tr>
+                                                <th>Number Installments:</th>
+                                                <td>{{ loan_obj.number_repayments }} Installments</td>
+                                              </tr>
+                                            </table>
+                                          </div>
+                                        </div>
+                                        <!-- /.col -->
+                                      </div>
+                                      <!-- /.row -->
+
+                                      <!-- this row will not appear when printing -->
+                                      <div class="row no-print">
+                                        <div class="col-12">
+                                          <a href="#" target="_blank" class="btn btn-default"><i class="fas fa-print"></i> Print</a>
+                                          <button type="button" class="btn btn-primary float-right" style="margin-right: 5px;">
+                                            <i class="fas fa-download"></i> Generate PDF
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <!-- /.invoice -->
+                                  </div><!-- /.col -->
+                                </div><!-- /.row -->
+                              </div><!-- /.container-fluid -->
+
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <br/>
+
                     <h4>Loan / Customer Activity</h4>
-                    <div class="post clearfix">
+                    {% for loan_comments in loan_comment_qs %}
+                      <div class="post clearfix">
                       <div class="user-block">
                         <img class="img-circle img-bordered-sm" src="{{ loan_obj.account_officer.get_image }}" alt="{{ loan_obj.account_officer.get_name }} Image">
                         <span class="username">
                           <a href="#">{{ loan_obj.account_officer.get_name }}</a>
                         </span>
-                        <span class="description">Made First Payment - 3 days ago</span>
+                        <span class="description">Activity Changes Done On {{ loan_obj.borrower }}'s {{ loan_comments.timestamp|timesince }}</span>
                       </div>
                       <!-- /.user-block -->
                       <p>
-                        Lorem ipsum represents a long-held tradition for designers,
-                        typographers and the like. Some people hate it and argue for
-                        its demise, but others ignore.
+                        {{ loan_comments.comment|safe }}
                       </p>
-                      <p>
-                        <a href="#" class="link-black text-sm"><i class="fas fa-link mr-1"></i> Modify Content</a>
+                      <p class="row">
+                        <a href="#" class="link-black text-sm col-sm-4">
+                            <i class="fas fa-link mr-1"></i> Task Assigned To: {{ loan_obj.account_officer.get_name }}
+                        </a>
+
+                        <a href="#" class="link-black text-sm col-sm-4">
+                            <i class="fas fa-tasks mr-1"></i> Task Done By: {{ loan_comments.done_by.get_name }}
+                        </a>
+
+                        <a href="#" class="link-black text-sm col-sm-4">
+                            <i class="fas fa-clock mr-1"></i> Date/Time: {{ loan_comments.timestamp }}
+                        </a>
                       </p>
+                    </div>
+                    {% endfor %}
+
+                    <div class="post clearfix">
+                        <form class="taskComment" method="post" action="{% url 'loans-url:comment-processor' %}">{% csrf_token %}
+                            <div class="form-group">
+                                <label for="inputDescription">Write Down Descriptive Changes Made On {{ loan_obj.borrower }}'s Loan</label>
+                                <textarea id="inputDescription" class="form-control" rows="4"></textarea>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary" type="submit">
+                                <i class="fa fa-arrow-circle-right"></i> Log This Activity
+                            </button>
+                        </form>
                     </div>
 
                 </div>
@@ -172,6 +476,16 @@
             </div>
             <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2">
               <h3 class="text-primary"><i class="fas fa-credit-card"></i> {{ loan_obj.loan_type.package.name }} </h3>
+              <!-- Bootstrap Switch -->
+              <div class="card card-secondary">
+                  <div class="card-header">
+                    <h3 class="card-title">Set Loan Status - {{ loan_obj.loan_status }} </h3>
+                  </div>
+                  <div class="card-body">
+                    <input type="checkbox" name="my-checkbox" checked data-bootstrap-switch data-off-color="danger" data-on-color="success">
+                  </div>
+              </div>
+              <!-- /.card -->
               <p>
                   <small>
                       <i class="fas fa-warning" style="color: #eea236"></i>
@@ -197,7 +511,7 @@
                 <p class="text-sm">Loan / Mandate Information
                   <b class="d-block">Mandate Hash: <pre>{{ dd_obj.hash_key }}</pre></b>
                   <b class="d-block">Mandate Type: {{ loan_obj.mode_of_repayments }}</b>
-                  <b class="d-block">Merchant ID: {{ company_creds.merchantId }}</b>
+                  <b class="d-block">Merchant ID: {{ company_dd_creds.remita_dd_merchant }}</b>
                   <b class="d-block">Request ID: {{ dd_obj.requestId }}</b>
                   <b class="d-block">Service Type ID: {{ dd_obj.serviceTypeId }}</b>
                   <b class="d-block">Mandate Start Date: {{ dd_obj.start_date }}</b>
@@ -205,8 +519,8 @@
                   <b class="d-block">Status Code: {{ dd_obj.statuscode }}</b>
                   <b class="d-block">Mandate ID: {{ dd_obj.mandateId }}</b>
                   <b class="d-block">Status: {{ dd_obj.status }}</b>
-                  <b class="d-block">Processing Fee:{% if dd_obj.processing_fee %} {{ dd_obj.processing_fee }} <i class="fa fa-check" style="color: #5cb85c"></i> {% else %} Not Charged! <i class="fa fa-bell" style="color: #ba2121"></i> {% endif %}</b>
-                  <b class="d-block">Insurance Fee: {% if dd_obj.insurance %} {{ dd_obj.insurance }} <i class="fa fa-check" style="color: #5cb85c"></i> {% else %} Not Charged! <i class="fa fa-bell" style="color: #ba2121"></i> {% endif %}</b>
+                  <b class="d-block">Processing Fee:{% if loan_obj.processing_fee %} NGN {{ loan_obj.processing_fee|localize|intcomma }} <i class="fa fa-check" style="color: #5cb85c"></i> {% else %} Not Charged! <i class="fa fa-bell" style="color: #ba2121"></i> {% endif %}</b>
+                  <b class="d-block">Insurance Fee: {% if loan_obj.insurance %} NGN {{ loan_obj.insurance|localize|intcomma }} <i class="fa fa-check" style="color: #5cb85c"></i> {% else %} Not Charged! <i class="fa fa-bell" style="color: #ba2121"></i> {% endif %}</b>
                 </p>
 
                 <p class="text-sm">Loan Terms / Loan Collateral
@@ -297,9 +611,11 @@
                 </li>
               </ul>
                 <div class="text-center mt-5 mb-3">
-                    <div class="mb-3">
+                    <div class="mb-3" id="description-content-toke">
                         <textarea class="textarea" id="description-content" placeholder="Place some text here"
-                                  style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                                  style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;">
+                            {{ loan_obj.description }}
+                        </textarea>
                     </div>
                     <div class="col-md-12">
                       <div class="card card-outline card-info">
@@ -322,8 +638,8 @@
                         <!-- /.card-header -->
                         <div class="card-body pad">
                           <div class="text-center mt-5 mb-3">
-                            <a href="#" class="btn btn-sm btn-primary">Get Started Using Minone</a>
-                            <a href="#" class="btn btn-sm btn-warning">Loan Mandate Actions</a>
+                            <a href="{% url 'settings-url:company-settings' company.slug %}" class="btn btn-sm btn-primary">Get Started Using Minone</a>
+                            <a href="#" class="btn btn-sm btn-warning">Get More Plugins</a>
                           </div>
                           <p class="text-sm mb-0">
                             Oops! Need Records Of Your Financial Informations? Check
@@ -354,6 +670,10 @@
             </div>
             <div class="modal-body">
               <p>{{ loan_obj.penalty.describe | safe }}</p>
+              <hr/>
+
+              <strong><i class="fas fa-credit-card"></i> Current Base Fee: </strong> ₦ {{ penalty.punishment_fee|localize|intcomma }}<br/>
+              <strong><i class="fas fa-outdent"></i> Fee Added {{ penalty.period }}: </strong> ₦ {{ penalty.value_on_period|localize|intcomma }}<br/>
 
               <hr/>
               <strong><i class="fas fa-building"></i> Company: </strong> {{ loan_obj.company }}<br/>
@@ -370,8 +690,6 @@
     </div>
     <!-- /.modal -->
 
-
-
     <div class="modal fade" id="modal-sm-penalty-knowledge">
         <div class="modal-dialog">
           <div class="modal-content bg-info">
@@ -384,10 +702,44 @@
               <small style="color: #fffee8">
                   Learning about loan penalties on <strong>MINLOANSNG</strong>, We would give you a quick guide reference.
                   The software system auto-calculates standard loan penalty for the lenders using international lending rules, as
-                  attached to the STANDARD LENDING GUIDANCE SYSTEM (SLGS), for loans that are part maturity date.
-                  However lenders can re-attach or modify current legal punishment to fit their own mode of business depending on the
-                  borrower. The SLGS standard is automatically created for each borrower once a loan instance is created.
+                  attached to the STANDARD LENDING GUIDANCE SYSTEM (SLGS), for loans that are past maturity date.
+                  However lenders can re-attach or modify current legal punishment to fit their own mode of business, depending on the
+                  borrower and however they choose. The SLGS standard is automatically created for each borrower once a loan instance is created.
               </small>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <small class="well well-sm" style="color: #fffee8"><i class="fas fa-warning"></i> For Lenders View Only* </small>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
+    <div class="modal fade" id="modal-sm-repayment">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title"><small>Update Repayment</small></h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                  <!-- form start -->
+                  <form role="form" class="repayment-update" action="{% url 'loans-url:repayment-processor' %}" method="post">
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label for="exampleInputEmail1">Repayment/Balance Due</label>
+                        <input type="text" name="currency-field" class="form-control" id="currency-field" pattern="^\NGN \d{1,3}(,\d{3})*(\.\d+)?$" value="" data-type="currency" placeholder="NGN 1,000,000.00">
+                      </div>
+                    </div>
+                    <!-- /.card-body -->
+
+                    <div class="card-footer">
+                      <button type="submit" class="btn btn-primary btn-block">Update Repayment Bill</button>
+                    </div>
+                  </form>
             </div>
             <div class="modal-footer justify-content-between">
               <small class="well well-sm" style="color: #fffee8"><i class="fas fa-warning"></i> For Lenders View Only* </small>
@@ -404,16 +756,41 @@
         <div class="modal-dialog modal-sm">
           <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title"><small>Change Loan Penalty</small></h4>
+                <h4 class="modal-title"><small>Set Loan Penalty</small></h4>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div class="modal-body">
-              <p></p>
-            </div>
-            <div class="modal-footer justify-content-between">
-              <button type="submit" class="btn btn-outline-success btn-block">Submit</button>
+              <form role="form" class="loan-penalty" action="{% url 'loans-url:loan-penalty-processor' %}" method="post">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="firstFee">First Fee</label>
+                        <input type="number" name="first-fee" class="form-control" id="first-fee" value=" ₦ {{ penalty.punishment_fee|localize|intcomma }}" required="required">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="continuosFee">Continuous Fee</label>
+                        <input type="number" name="continuous-fee" class="form-control" id="continuous-fee" value="₦ {{ penalty.value_on_period|localize|intcomma }}" required="required">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reoccurring-period">Reoccurring Period</label>
+                        <select class="form-control select2" style="width: 100%;" id="reoccurring-period" required>
+                            <option value="Per Year">Yearly</option>
+                            <option value="Per Month">Monthly</option>
+                            <option value="Per Week">Weekly</option>
+                            <option value="Per Day">Daily</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer justify-content-between">
+                          <button type="submit" class="btn btn-outline-success btn-block" id="loan-penalty-activation">
+                              Submit
+                          </button>
+                    </div>
+              </form>
             </div>
           </div>
           <!-- /.modal-content -->
@@ -422,9 +799,77 @@
     </div>
     <!-- /.modal -->
 
-    </section>
-    <!-- /.content -->
+    <div class="modal fade" id="modal-sm-mandate-validate-otp">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><small>Validate OTP</small></h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <form role="form" class="otp-validate" action="#" method="post">
+                    {% csrf_token %}
 
+                    <div class="form-group">
+                        <label for="userCard">Card Details</label>
+                        <input type="text" name="card-number" class="form-control" id="card-number" value="" placeholder="4225 XXXX XXXX XXXX" required="required">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="userOtp">OTP Token</label>
+                        <input type="text" name="otp-number" class="form-control" id="otp-number" value="" placeholder="OTP Token" required="required">
+                    </div>
+
+                    <div class="modal-footer justify-content-between">
+                          <button type="submit" class="btn btn-outline-success btn-block" id="mandate-validate-otp">
+                              Submit
+                          </button>
+                    </div>
+
+                </form>
+            </div>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+
+    <div class="modal fade" id="modal-sm-mandate-sendDebit">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><small>Enter Amount To Be Debited At Intervals</small></h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <em>system automatically calculates estimated value, using amortization method..</em>
+                </div>
+                <form role="form" class="otp-validate" action="#" method="post">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="userCard">Amount To Debit: At Intervals</label>
+                        <input type="text" name="amount-debit" class="form-control" id="amount-debit" value="{{ installment_repayment }}" placeholder="System Calculated: {{ installment_repayment }}" required="required">
+                    </div>
+
+                    <div class="modal-footer justify-content-between">
+                          <button type="submit" class="btn btn-outline-success btn-block" id="mandate-sendDebit">
+                              Submit
+                          </button>
+                    </div>
+
+                </form>
+            </div>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
 
 
     <div class="modal fade" id="modal-sm-collateral-change">
@@ -470,33 +915,17 @@
     <script src="https://cdn.minloans.com.ng/min-dash/dist/js/demo.js"></script>
     <!-- Summernote -->
     <script src="https://cdn.minloans.com.ng/min-dash/plugins/summernote/summernote-bs4.min.js"></script>
-    <script>
-      $(function () {
-        // Summernote
-        $('.textarea').summernote();
-        console.log("page ready!");
-
-
-
-        //setup before functions
-        let typingTimer;                //timer identifier
-        const doneTypingInterval = 5000;  //time in ms, 5 second for example
-        let $input = $('#description-content');
-
-        //on keyup, start the countdown
-        $input.on('keyup', function () {
-          console.log("clicked!");
-          clearTimeout(typingTimer);
-          typingTimer = setTimeout(doneTyping, doneTypingInterval);
-        });
-
-        console.log("worked! till here again");
-
-        //active-user is "finished typing," do something(Save content to server via ajax & load a saved alert message!)
-        function doneTyping (event) {
-          console.log("finished typing!")
-        }
-      })
-    </script>
+    <!-- Bootstrap Switch -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/moment/moment.min.js"></script>
+    <!-- Select2 -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/select2/js/select2.full.min.js"></script>
+    <!-- Bootstrap4 Duallistbox -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    {% include 'js/loan-detail-js.html' %}
 
 {% endblock js_links %}

@@ -15,10 +15,9 @@ from django.template.loader import get_template
 from django.urls import reverse
 from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
-from sendgrid import Mail, SendGridAPIClient
 
 from minloansng.utils import unique_key_generator, get_trial_days, unique_slug_generator_by_email, \
-    random_string_generator
+    random_string_generator, addDays
 from minloansng import email_settings
 
 DEFAULT_ACTIVATION_DAYS = getattr(settings, 'DEFAULT_ACTIVATION_DAYS', 7)
@@ -187,16 +186,15 @@ class EmailActivation(models.Model):
                 txt_ = get_template("registration/emails/verify.txt").render(context)
                 html_ = get_template("registration/emails/verify.html").render(context)
                 subject = 'Minloansng 1-Click Email Verification'
-                from_email = email_settings.DEFAULT_FROM_EMAIL
+                from_email = email_settings.EMAIL_HOST_USER
                 recipient_list = [self.email]
-                sg = SendGridAPIClient(email_settings.SENDGRID_API_KEY)
-                message = Mail(
-                    from_email=from_email,
-                    to_emails=recipient_list,
-                    subject=subject,
-                    html_content=html_
+
+                from django.core.mail import EmailMessage
+                message = EmailMessage(
+                    subject, html_, from_email, recipient_list
                 )
-                return sg.send(message)
+                message.fail_silently = False
+                message.send()
         return False
 
 
@@ -232,6 +230,12 @@ PAYMENT_PLAN = (
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    duration_package = models.PositiveIntegerField(blank=True, null=True, help_text="Duration is recorded in months: "
+                                                                                    "30days")
+    pkg_duration_date = models.DateTimeField(blank=True, null=True)
+    duration_collection_package = models.PositiveIntegerField(blank=True, null=True,
+                                                              help_text="Duration is recorded in months: 30days")
+    pkg_collection_duration_date = models.DateTimeField(blank=True, null=True)
     phone = PhoneNumberField(blank=True, null=True)
     image = CloudinaryField(upload_image_path, null=True, blank=True)
     keycode = models.CharField(max_length=10, blank=True, null=True, unique=True)
@@ -254,6 +258,12 @@ class Profile(models.Model):
     def __str__(self):
         return str(self.user.email)
 
+    def get_expiry(self):
+        return addDays(self.pkg_duration_date, self.duration_package * 30)
+
+    def get_expiry_collection_pkgs(self):
+        return addDays(self.pkg_collection_duration_date, self.duration_package * 30)
+
     def get_absolute_url(self):
         return reverse('account:profile-detail', kwargs={'slug': self.slug})
 
@@ -270,6 +280,11 @@ class Profile(models.Model):
             caps_initials = caps_initials.title()
             return caps_initials
         return self.user.email
+
+    def get_phone(self):
+        if self.phone:
+            return str(self.phone)
+        return "No Phone"
 
     @property
     def get_image(self):
@@ -296,6 +311,30 @@ def post_save_user_create_reciever(sender, instance, created, *args, **kwargs):
 
 
 post_save.connect(post_save_user_create_reciever, sender=User)
+
+
+class ThirdPartyCreds(models.Model):
+    user = models.OneToOneField(Profile, on_delete=models.CASCADE)
+    remita_dd_merchant = models.CharField(max_length=300, blank=True, null=True)
+    remita_dd_api_key = models.CharField(max_length=300, blank=True, null=True)
+    remita_dd_serviceType_id = models.CharField(max_length=300, blank=True, null=True)
+    remita_dd_api_token = models.CharField(max_length=300, blank=True, null=True)
+
+    remita_drf_merchant = models.CharField(max_length=300, blank=True, null=True)
+    remita_drf_api_key = models.CharField(max_length=300, blank=True, null=True)
+    remita_drf_api_token = models.CharField(max_length=300, blank=True, null=True)
+
+    active = models.BooleanField(default=True)
+
+    timestamp = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Third Party Credentials"
+        verbose_name_plural = "Third Party Credentials"
+
+    def __str__(self):
+        return str(self.user.get_name())
 
 
 class GuestEmail(models.Model):

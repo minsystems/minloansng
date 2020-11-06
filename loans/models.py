@@ -1,17 +1,14 @@
 from cloudinary.models import CloudinaryField
-from dateutil.relativedelta import relativedelta
 from django.db import models
 
 # Create your models here.
 from django.db.models.signals import post_save
 from django.urls import reverse
-from django.utils import timezone
-from django.utils.datetime_safe import datetime
 
 from accounts.models import Profile, upload_image_path
 from borrowers.models import Borrower
 from company.models import Company
-from minloansng.utils import unique_slug_by_name, digitExtract, secondWordExtract
+from minloansng.utils import digitExtract, addDays
 from minmarkets.models import LoanPackage, LoanCollectionPackage
 
 INTEREST_PLAN = (
@@ -70,7 +67,7 @@ class LoanTerms(models.Model):
 
 class ModeOfRepayments(models.Model):
     package = models.OneToOneField(LoanCollectionPackage, on_delete=models.CASCADE, blank=True, null=True)
-    bought_by = models.ManyToManyField(Profile,)
+    bought_by = models.ManyToManyField(Profile, )
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
 
@@ -94,8 +91,9 @@ class Penalty(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
     describe = models.TextField()
     punishment_fee = models.CharField(max_length=300, blank=True, null=True)
-    re_occuring = models.BooleanField(default=False)
+    re_occuring = models.BooleanField(default=True)
     value_on_period = models.IntegerField(default=7, blank=True, null=True)
+    linked_loan = models.ForeignKey(to='loans.Loan', on_delete=models.CASCADE, blank=True, null=True, related_name='linked_loan')
     period = models.CharField(max_length=20, choices=INTEREST_PLAN, default="Per Month", blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
 
@@ -124,6 +122,7 @@ class CollateralFiles(models.Model):
 class CollateralType(models.Model):
     name = models.CharField(max_length=300, blank=True, null=True)
     description = models.TextField()
+    owned = models.ForeignKey(to='loans.Loan', on_delete=models.CASCADE, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
 
@@ -132,7 +131,7 @@ class CollateralType(models.Model):
         verbose_name_plural = 'Collateral Type'
 
     def __str__(self):
-        return self.name
+        return self.owned.loan_key
 
 
 class LoanType(models.Model):
@@ -224,7 +223,7 @@ class Loan(models.Model):
     loan_status = models.CharField(max_length=20, choices=LOAN_STATUS, default="OPEN", blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
     mode_of_repayments = models.ForeignKey(ModeOfRepayments, on_delete=models.CASCADE, blank=True, null=True)
-    penalty = models.ForeignKey(Penalty, on_delete=models.CASCADE, blank=True, null=True)
+    penalty = models.ForeignKey(Penalty, on_delete=models.CASCADE, blank=True, null=True, related_name='loan_penalty')
     loan_terms = models.OneToOneField(LoanTerms, on_delete=models.CASCADE, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -253,17 +252,6 @@ class Loan(models.Model):
     def get_interest_rate(self):
         return "{rate}% {period}".format(rate=self.interest, period=self.interest_period)
 
-    # def get_loan_status(self):
-    #     if self.get_end_date() < datetime.now():
-    #         return "EXPIRED/OVERDUE"
-    #     return self.loan_status
-    #
-    # # override the save method! each time a save method is called!
-    # def save(self, *args, **kwargs):
-    #     if self.get_end_date() < datetime.now():
-    #         self.loan_status = "EXPIRED/OVERDUE"
-    #     super(Loan, self).save(*args, **kwargs)
-
 
 def post_save_user_create_reciever(sender, instance, created, *args, **kwargs):
     print(instance.borrower)
@@ -274,3 +262,37 @@ def post_save_user_create_reciever(sender, instance, created, *args, **kwargs):
 
 
 post_save.connect(post_save_user_create_reciever, sender=Loan)
+
+
+class LoanActivityCommentsQuerySet(models.query.QuerySet):
+    def active(self):
+        return self.filter(active=True)
+
+
+class LoanActivityCommentsManager(models.Manager):
+    def get_queryset(self):
+        return LoanActivityCommentsQuerySet(self.model, using=self._db)
+
+    def all(self):
+        return self.get_queryset().active()
+
+
+class LoanActivityComments(models.Model):
+    assigned_to = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True,
+                                    related_name="task_assigned_to")
+    done_by = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True, related_name="task_done_by")
+    loan = models.ForeignKey(Loan, on_delete=models.CASCADE, blank=True, null=True)
+    comment = models.TextField()
+    active = models.BooleanField(default=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    objects = LoanActivityCommentsManager()
+
+    class Meta:
+        db_table = "loan activity comments"
+        verbose_name = "loan activity comments"
+        verbose_name_plural = "loan activity comments"
+        ordering = ("-timestamp",)
+
+    def __str__(self):
+        return str(self.loan)
