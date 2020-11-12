@@ -1,8 +1,12 @@
+from decimal import Decimal
+
 from cloudinary.models import CloudinaryField
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 # Create your models here.
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
 from django.urls import reverse
 
 from accounts.models import Profile, upload_image_path
@@ -57,9 +61,6 @@ class Company(models.Model):
 
     objects = CompanyManager()
 
-    # reverse relationship
-    # company_set = Bus.trips_set.all().count()
-
     class Meta:
         db_table = "company"
         verbose_name = "company"
@@ -81,6 +82,51 @@ class Company(models.Model):
         if self.email is not None:
             return self.email
         return self.user.user.email
+
+
+class BankAccountType(models.Model):
+    name = models.CharField(max_length=128, blank=True, null=True)
+    company = models.ForeignKey(to='company.Company', on_delete=models.CASCADE, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    maximum_withdrawal_amount = models.DecimalField(decimal_places=2,max_digits=12, blank=True, null=True)
+    active = models.BooleanField(default=True)
+    slug = models.SlugField(blank=True, null=True)
+    annual_interest_rate = models.DecimalField(
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        decimal_places=2,
+        max_digits=5,
+        help_text='Interest rate from 0 - 100'
+    )
+    interest_calculation_per_year = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(12)],
+        help_text='The number of times interest will be calculated per year'
+    )
+
+    def __str__(self):
+        return self.name
+
+    def calculate_interest(self, principal):
+        """
+        Calculate interest for each account type.
+        This uses a basic interest calculation formula
+        """
+        p = principal
+        r = self.annual_interest_rate
+        n = Decimal(self.interest_calculation_per_year)
+
+        # Basic Future Value formula to calculate interest
+        interest = (p * (1 + ((r/100) / n))) - p
+
+        return round(interest, 2)
+
+    def get_absolute_url(self):
+        return reverse("company-url:bank-account-type-details", kwargs={"company_slug":self.company.slug, "slug": self.slug})
+
+
+@receiver(pre_save, sender=BankAccountType)
+def my_callback(sender, instance, *args, **kwargs):
+    if instance.slug is None:
+        instance.slug = unique_slug_generator(instance)
 
 
 def post_save_user_create_reciever(sender, instance, created, *args, **kwargs):

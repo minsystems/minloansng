@@ -1,13 +1,13 @@
 from django.db import models
 
+from borrowers.models import BorrowerBankAccount
 from .constants import TRANSACTION_TYPE_CHOICES
-from accounts.models import UserBankAccount
 
 
 class Transaction(models.Model):
     company = models.ForeignKey(to='company.Company', on_delete=models.CASCADE, blank=True, null=True)
     account = models.ForeignKey(
-        UserBankAccount,
+        BorrowerBankAccount,
         related_name='transactions',
         on_delete=models.CASCADE,
     )

@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 from company.models import Company, Branch, RemitaCredentials, RemitaMandateActivationData, \
-    RemitaMandateTransactionRecord, RemitaPaymentDetails, RemitaMandateStatusReport
+    RemitaMandateTransactionRecord, RemitaPaymentDetails, RemitaMandateStatusReport, BankAccountType
 
 admin.site.register(Branch)
 admin.site.register(RemitaMandateActivationData)
@@ -47,3 +47,12 @@ class RemitaMandateStatusReportAdmin(admin.ModelAdmin):
     list_editable = ('mandate_status',)
     list_filter = ('mandate_id', 'request_id')
     search_fields = ('loan', 'mandate_id', 'request_id')
+
+
+@admin.register(BankAccountType)
+class BankAccountTypeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'company', 'active', 'maximum_withdrawal_amount', 'annual_interest_rate', 'interest_calculation_per_year')
+    list_display_links = ('name', 'company')
+    list_filter = ('company',)
+    search_fields = ('company', 'name')
+    prepopulated_fields = {'slug':('name', 'company')}

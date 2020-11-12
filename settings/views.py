@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView
 
-from accounts.models import Profile
+from accounts.models import Profile, ThirdPartyCreds
 from company.models import Company
 from loans.models import LoanType
 from minloansng.mixins import GetObjectMixin
@@ -35,12 +35,11 @@ class CompanySettings(LoginRequiredMixin, GetObjectMixin, DetailView):
         context['company_collection_packages'] = owner.user.profile.modeofrepayments_set.all()
         context['minone_obj'] = MinOneDescription.objects.first()
         context['user_thirdparty_cred'] = owner.thirdpartycreds
-
         return context
 
     def render_to_response(self, context, **response_kwargs):
         if context:
-            user_profile_obj = Profile.objects.get(user=self.request.user)
+            user_profile_obj = Profile.objects.get(user=self.get_object().user.user)
             if timezone.now() > user_profile_obj.trial_days:
                 # return redirect to payment page
                 messages.error(self.request,
@@ -67,8 +66,9 @@ class CompanySettings(LoginRequiredMixin, GetObjectMixin, DetailView):
             company = Company.objects.get(name__iexact=self.request.POST.get('company'))
             staff = company.staffs.get(keycode__exact=self.request.POST.get('keycode'))
             if self.request.POST.get('keycode') == str(self.get_object().user.keycode):
-                return messages.warning(self.request, "Fraudulent Act!, Cannot change or remove company owner, If you are the company "
-                                 "owner, contact minloans support")
+                return messages.warning(self.request,
+                                        "Fraudulent Act!, Cannot change or remove company owner, If you are the company "
+                                        "owner, contact minloans support")
             else:
                 staff.role = self.request.POST.get('role')
                 staff.save()
@@ -78,8 +78,8 @@ class CompanySettings(LoginRequiredMixin, GetObjectMixin, DetailView):
             staff = company.staffs.get(keycode__exact=self.request.POST.get('keycode'))
             if self.request.POST.get('keycode') == str(self.get_object().user.keycode):
                 return messages.warning(self.request,
-                    "Fraudulent Act!, Cannot change or remove company owner, If you are the company "
-                    "owner, contact minloans support")
+                                        "Fraudulent Act!, Cannot change or remove company owner, If you are the company "
+                                        "owner, contact minloans support")
             else:
                 # remove firm from user
                 staff.working_for.remove(company)

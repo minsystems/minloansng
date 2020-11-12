@@ -1,13 +1,13 @@
 from __future__ import print_function
 
-from django.contrib.auth import logout
+from django.contrib.auth import logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.http import JsonResponse, HttpResponseRedirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import CreateView, FormView, DetailView, View, UpdateView
+from django.views.generic import CreateView, FormView, DetailView, View, UpdateView, TemplateView
 from django.views.generic.edit import FormMixin
 from django.shortcuts import render, redirect
 from django.utils.safestring import mark_safe
@@ -17,7 +17,7 @@ from company.models import Company
 from mincore.models import PlanDetails, SupportTickets
 from minloansng.mixins import NextUrlMixin, RequestFormAttachMixin
 from .forms import LoginForm, RegisterForm, GuestForm, ReactivateEmailForm, UserDetailChangeForm
-from .models import EmailActivation, Profile
+from .models import EmailActivation, Profile, User
 
 
 class AccountHomeView(LoginRequiredMixin, DetailView):
@@ -148,8 +148,11 @@ class UserDetailUpdateView(LoginRequiredMixin, UpdateView):
             user_profile_obj.save()
             self.get_object().full_name = full_name
             form.save()
-            return JsonResponse({'message': 'Success!'}, status=status.HTTP_200_OK)
-        return JsonResponse({'message': 'An error has occurred!'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            messages.success(self.request, "Successfully Completed Account Activation")
+            return redirect(reverse('success'))
+        else:
+            messages.error(self.request, "Please Validate Fields, Check If Phone is In +234XXXXXXXX format")
+        return render(self.request, 'accounts/detail-update-view.html', {'form': form})
 
     def get_success_url(self):
         return reverse("account:profile-detail", kwargs={'slug': self.get_object().profile.slug})
@@ -184,7 +187,5 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
             user_code.append(code_obj.keycode)
 
         context["userKeyCode"] = user_code
-
         context['userTickets_qs'] = SupportTickets.objects.filter(user__exact=self.object)[:10]
-
         return context

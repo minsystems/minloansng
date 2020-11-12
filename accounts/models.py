@@ -1,13 +1,12 @@
 import random
 import os
+import smtplib
 
 from datetime import timedelta
-from decimal import Decimal
 
 from cloudinary.models import CloudinaryField
 from django.conf import settings
 from django.contrib import auth
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Q
 from django.db.models.signals import pre_save, post_save
@@ -20,6 +19,7 @@ from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 
 from accounts.constants import GENDER_CHOICE
+from minloansng.email_settings import EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_PASSWORD
 from minloansng.utils import unique_key_generator, get_trial_days, unique_slug_generator_by_email, \
     random_string_generator, addDays
 from minloansng import email_settings
@@ -132,102 +132,6 @@ class User(AbstractBaseUser):
     @property
     def is_admin(self):
         return self.admin
-
-    @property
-    def balance(self):
-        if hasattr(self, 'account'):
-            return self.account.balance
-        return 0
-
-
-class BankAccountType(models.Model):
-    name = models.CharField(max_length=128, blank=True, null=True)
-    maximum_withdrawal_amount = models.DecimalField(decimal_places=2,max_digits=12, blank=True, null=True)
-    annual_interest_rate = models.DecimalField(
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
-        decimal_places=2,
-        max_digits=5,
-        help_text='Interest rate from 0 - 100'
-    )
-    interest_calculation_per_year = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(12)],
-        help_text='The number of times interest will be calculated per year'
-    )
-
-    def __str__(self):
-        return self.name
-
-    def calculate_interest(self, principal):
-        """
-        Calculate interest for each account type.
-        This uses a basic interest calculation formula
-        """
-        p = principal
-        r = self.annual_interest_rate
-        n = Decimal(self.interest_calculation_per_year)
-
-        # Basic Future Value formula to calculate interest
-        interest = (p * (1 + ((r/100) / n))) - p
-
-        return round(interest, 2)
-
-
-class UserBankAccount(models.Model):
-    company = models.ForeignKey(to='company.Company', on_delete=models.CASCADE, blank=True, null=True)
-    user = models.OneToOneField(
-        User,
-        related_name='account',
-        on_delete=models.CASCADE,
-    )
-    account_type = models.ForeignKey(
-        BankAccountType,
-        related_name='accounts',
-        on_delete=models.CASCADE
-    )
-    account_no = models.PositiveIntegerField(unique=True)
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICE)
-    birth_date = models.DateField(null=True, blank=True)
-    balance = models.DecimalField(
-        default=0,
-        max_digits=12,
-        decimal_places=2
-    )
-    interest_start_date = models.DateField(
-        null=True, blank=True,
-        help_text=(
-            'The month number that interest calculation will start from'
-        )
-    )
-    initial_deposit_date = models.DateField(null=True, blank=True)
-
-    def __str__(self):
-        return str(self.account_no)
-
-    def get_interest_calculation_months(self):
-        """
-        List of month numbers for which the interest will be calculated
-        returns [2, 4, 6, 8, 10, 12] for every 2 months interval
-        """
-        interval = int(
-            12 / self.account_type.interest_calculation_per_year
-        )
-        start = self.interest_start_date.month
-        return [i for i in range(start, 13, interval)]
-
-
-class UserAddress(models.Model):
-    user = models.OneToOneField(
-        User,
-        related_name='address',
-        on_delete=models.CASCADE,
-    )
-    street_address = models.CharField(max_length=512)
-    city = models.CharField(max_length=256)
-    postal_code = models.PositiveIntegerField()
-    country = models.CharField(max_length=256)
-
-    def __str__(self):
-        return self.user.email
 
 
 class EmailActivationQuerySet(models.query.QuerySet):

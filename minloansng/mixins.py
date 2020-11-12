@@ -1,3 +1,5 @@
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -48,3 +50,11 @@ class GetObjectMixin(object):
         else:
             obj = super(GetObjectMixin, self).get_object(*args, **kwargs)
         return obj
+
+
+class IsUserOwnerMixin(object):
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user != self.get_object().company.user.user:
+            return HttpResponseRedirect(reverse('404_'))
+        return super(IsUserOwnerMixin, self).dispatch(request, *args, **kwargs)

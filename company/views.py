@@ -1,19 +1,21 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.text import slugify
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView, UpdateView, DeleteView, CreateView
 from django.views.generic.base import View
 
-from accounts.models import Profile
-from company.models import Company, Branch
+from accounts.models import Profile, ThirdPartyCreds
+from company.forms import BankAccountTypeUpdateForm
+from company.models import Company, Branch, BankAccountType
 from mincore.models import Messages
-from minloansng.mixins import GetObjectMixin
+from minloansng.mixins import GetObjectMixin, IsUserOwnerMixin
 from minloansng.utils import random_string_generator
 
 TRIAL_WARNING_DAYS = 5
@@ -24,12 +26,13 @@ class Dashboard(View):
         if request.user.is_authenticated:
             if request.user.full_name and request.user.profile.phone:
                 try:
-                    company_obj = Company.objects.get(user=request.user.profile, slug=kwargs.get('slug'))
+                    company_obj = Company.objects.get(slug=kwargs.get('slug'))
                     if company_obj.name:
-                        user_profile_obj = Profile.objects.get(user=request.user)
+                        ThirdPartyCreds.objects.get_or_create(user=company_obj.user)
+                        user_profile_obj = Profile.objects.get(user=company_obj.user.user)
                         user_plan = str(user_profile_obj.plan)
                         print(user_plan)
-                        if request.user.profile.is_premium:
+                        if company_obj.user.is_premium:
                             if user_plan == "STARTUP":
                                 if timezone.now() > user_profile_obj.trial_days:
                                     # return redirect to payment page
@@ -366,4 +369,130 @@ class UpdateCompanyProfileView(GetObjectMixin, DetailView):
 
         payload = {"success": True}
         return JsonResponse(payload)
+
+
+class CompanyAccountTypesList(LoginRequiredMixin, ListView):
+    template_name = 'company/account_type.html'
+    model = BankAccountType
+
+    def get_queryset(self):
+        company = Company.objects.get(slug=self.kwargs.get('slug'))
+        account_types_qs = self.model.objects.filter(company=company)
+        return account_types_qs
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(CompanyAccountTypesList, self).get_context_data(**kwargs)
+        company = Company.objects.get(slug=self.kwargs.get('slug'))
+        company_qs = company.user.user.profile.company_set.all()
+        context.update({
+            "object": company,
+            "company": company,
+            "account_type_list": self.get_queryset(),
+            "company_owner": company.user.user,
+            "userCompany_qs": company_qs
+        })
+        return context
+
+
+class CompanyAccountTypeDetails(LoginRequiredMixin, DetailView):
+    template_name = 'company/account_type_detail.html'
+    model = BankAccountType
+
+    def get_context_data(self, **kwargs):
+        context = super(CompanyAccountTypeDetails, self).get_context_data(**kwargs)
+        print(self.kwargs)
+        company = Company.objects.get(slug=self.kwargs.get('company_slug'))
+        company_qs = company.user.user.profile.company_set.all()
+        context.update({
+            "object": company,
+            "object_detail": self.object,
+            "company": company,
+            "company_owner": company.user.user,
+            "userCompany_qs": company_qs
+        })
+        return context
+
+
+class CompanyAccountTypeUpdate(IsUserOwnerMixin, SuccessMessageMixin, UpdateView):
+    template_name = 'company/account_type_update.html'
+    model = BankAccountType
+    form_class = BankAccountTypeUpdateForm
+    success_message = "Account Type Was Updated Successfully!"
+
+    def get_context_data(self, **kwargs):
+        context = super(CompanyAccountTypeUpdate, self).get_context_data(**kwargs)
+        company = Company.objects.get(slug=self.kwargs.get('company_slug'))
+        company_qs = company.user.user.profile.company_set.all()
+        account_type_obj = BankAccountType.objects.get(company=company, slug=self.kwargs.get('slug'))
+        context.update({
+            "form": self.form_class(instance=account_type_obj),
+            "object": company,
+            "object_detail": self.object,
+            "company": company,
+            "company_owner": company.user.user,
+            "userCompany_qs": company_qs
+        })
+        return context
+
+
+class CompanyAccountTypeDelete(IsUserOwnerMixin, SuccessMessageMixin, DeleteView):
+    model = BankAccountType
+    template_name = 'company/account_type_delete.html'
+    success_message = "Account Type Deleted Successfully!"
+
+    def get_success_url(self):
+        return reverse("company-url:bank-account-type", kwargs={"slug": self.kwargs.get('company_slug')})
+
+    def get_context_data(self, **kwargs):
+        context = super(CompanyAccountTypeDelete, self).get_context_data(**kwargs)
+        company = Company.objects.get(slug=self.kwargs.get('company_slug'))
+        company_qs = company.user.user.profile.company_set.all()
+        context.update({
+            "object": company,
+            "object_detail": self.object,
+            "company": company,
+            "company_owner": company.user.user,
+            "userCompany_qs": company_qs
+        })
+        return context
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(CompanyAccountTypeDelete, self).delete(request, *args, **kwargs)
+
+
+class CompanyAccountCreateForm(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    template_name = "company/account_create.html"
+    model = BankAccountType
+    success_message = "Bank Account For MFB Organization Was Created Successfully"
+    form_class = BankAccountTypeUpdateForm
+
+    def get_success_url(self):
+        return reverse("company-url:bank-account-type", kwargs={"slug": self.kwargs.get('company_slug')})
+
+    def get_context_data(self, **kwargs):
+        context = super(CompanyAccountCreateForm, self).get_context_data(**kwargs)
+        company = Company.objects.get(slug=self.kwargs.get('company_slug'))
+        company_qs = company.user.user.profile.company_set.all()
+        context.update({
+            "form": self.form_class(self.request.POST),
+            "object": company,
+            "object_detail": self.object,
+            "company": company,
+            "company_owner": company.user.user,
+            "userCompany_qs": company_qs
+        })
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super(CompanyAccountCreateForm, self).get_form_kwargs()
+        print(kwargs)
+        return kwargs
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        company = Company.objects.get(slug=self.kwargs.get('company_slug'))
+        self.object.company = company
+        self.object.save()
+        return super(CompanyAccountCreateForm, self).form_valid(form)
 

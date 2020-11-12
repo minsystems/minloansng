@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.http import JsonResponse, HttpResponseRedirect
 
 # Create your views here.
@@ -8,16 +10,15 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.datetime_safe import date
 from django.utils.text import slugify
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, CreateView
 from django_countries import countries
 from django_countries.fields import Country
 
 from accounts.models import Profile
 from banks.models import BankCode
-from borrowers.forms import BorrowerUpdateForm
-from borrowers.models import Borrower, BorrowerGroup
-from company.models import Company
-from loans.models import Loan
+from borrowers.forms import BorrowerUpdateForm, BorrowerBankAccountForm
+from borrowers.models import Borrower, BorrowerGroup, BorrowerBankAccount
+from company.models import Company, BankAccountType
 from minloansng.mixins import GetObjectMixin
 from minloansng.utils import random_string_generator
 
@@ -168,16 +169,22 @@ class BorrowerGroupCreateView(GetObjectMixin, LoginRequiredMixin, DetailView):
 
 
 class BorrowerListView(LoginRequiredMixin, ListView):
-    queryset = Borrower.objects.all()
     template_name = 'borrowers/borrower-list.html'
+
+    def get_queryset(self):
+        company = Company.objects.get(slug=self.kwargs.get('slug'))
+        return company.borrower_set.all()
 
     def get_context_data(self, *args, **kwargs):
         context = super(BorrowerListView, self).get_context_data(*args, **kwargs)
-        owner_company_qs = self.request.user.profile.company_set.all()
-        owner_company_obj = owner_company_qs.first()
-        context['company_borrowers'] = self.queryset.filter(registered_to=owner_company_obj)
-        context['userCompany_qs'] = owner_company_qs
-        context['object'] = owner_company_obj
+        company = Company.objects.get(slug=self.kwargs.get('slug'))
+        company_qs = company.user.user.profile.company_set.all()
+        context.update({
+            "object": company,
+            "company": company,
+            "company_owner": company.user.user,
+            "userCompany_qs": company_qs
+        })
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -192,27 +199,126 @@ class BorrowerListView(LoginRequiredMixin, ListView):
         return super(BorrowerListView, self).render_to_response(context, **response_kwargs)
 
 
+class BorrowerDetailView(LoginRequiredMixin, DetailView):
+    template_name = 'borrowers/borrower-detail.html'
+    model = Company
+
+    def get_context_data(self, **kwargs):
+        context = super(BorrowerDetailView, self).get_context_data(**kwargs)
+        borrower_obj = Borrower.objects.get(slug=self.kwargs.get('slug_borrower'))
+        try:
+            borrower_account = borrower_obj.registered_to.borrowerbankaccount_set.all().first()
+        except Exception as e:
+            borrower_account = 0.00
+        company = Company.objects.get(slug=self.kwargs.get('slug'))
+        company_qs = company.user.user.profile.company_set.all()
+        context.update({
+            "object": company,
+            "company": company,
+            "company_owner": company.user.user,
+            "userCompany_qs": company_qs,
+            "borrowers_qs": self.get_object().borrower_set.all(),
+            "borrower_obj": borrower_obj,
+            "borrower_acc": borrower_account
+        })
+
+        context['borrower_loan_qs'] = self.get_object().loan_set.all().filter(borrower=borrower_obj)
+        context['age'] = calculate_age(borrower_obj.date_of_birth)
+
+        return context
+
+    def get_object(self, *args, **kwargs):
+        slug = self.kwargs.get('slug')
+        try:
+            company_obj = Company.objects.get(slug=slug)
+        except Company.DoesNotExist:
+            return redirect(reverse("404_"))
+        except Company.MultipleObjectsReturned:
+            company_qs = Company.objects.filter(slug=slug)
+            company_obj = company_qs.first()
+        except:
+            return redirect(reverse('404_'))
+        return company_obj
+
+
 class BorrowerGroupsListView(LoginRequiredMixin, ListView):
-    template_name = 'borrowers/borrower-group_list.html'
+    template_name = 'borrowers/borrower-group-list.html'
 
     def get_context_data(self, *args, **kwargs):
         context = super(BorrowerGroupsListView, self).get_context_data(*args, **kwargs)
-        context['userCompany_qs'] = self.request.user.profile.company_set.all()
-        context['object'] = self.request.user.profile.company_set.all().first()
+        company = Company.objects.get(slug=self.kwargs.get('slug'))
+        context['userCompany_qs'] = company.user.user.profile.company_set.all()
+        context['object'] = context['company'] = company
+        context['borrower_group_qs'] = self.get_queryset()
+        for bg in self.get_queryset():
+            # print(bg.borrowers.all(), bg.borrowers.get_queryset())
+            for member in bg.borrowers.all():
+                print(member.get_image)
         return context
 
     def render_to_response(self, context, **response_kwargs):
         if context:
-            user_profile_obj = Profile.objects.get(user=self.request.user)
-            if timezone.now() > user_profile_obj.trial_days:
+            comp_owner_profile_expiry = context['object'].user.trial_days
+            if timezone.now() > comp_owner_profile_expiry:
                 # return redirect to payment page
                 messages.error(self.request,
-                               "Account Expired!, Your Account Has Been Expired You Would Be "
+                               "Account Expired!, Organization Account Has Been Expired You Would Be "
                                "Redirected To The Payment Portal Upgrade Your Payment")
                 return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
         return super(BorrowerGroupsListView, self).render_to_response(context, **response_kwargs)
 
     def get_queryset(self):
-        owner_company_qs = self.request.user.profile.company_set.all()
-        bg_qs = BorrowerGroup.objects.filter(registered_to=owner_company_qs)
+        company = Company.objects.get(slug=self.kwargs.get('slug'))
+        bg_qs = company.borrowergroup_set.all()
         return bg_qs
+
+
+class AssignBankAccountToBorrower(LoginRequiredMixin, DetailView):
+    template_name = "borrowers/bank-account-create.html"
+    model = Company
+
+    def get_context_data(self, **kwargs):
+        context = super(AssignBankAccountToBorrower, self).get_context_data(**kwargs)
+        mfb_account_type_qs = BankAccountType.objects.filter(company=self.object)
+        context.update({
+            'userCompany_qs':self.object.user.company_set.all(),
+            'borrowers_qs':self.object.borrower_set.all(),
+            'account_type_qs':mfb_account_type_qs
+        })
+        return context
+
+    def post(self, request, *args, **kwargs):
+        borrower_obj = Borrower.objects.get(slug=self.request.POST.get('borrower'))
+        bank_account_type = BankAccountType.objects.get(slug=self.request.POST.get('account_type'))
+        BorrowerBankAccount.objects.create(
+            company=self.get_object(),
+            borrower=borrower_obj,
+            account_type=bank_account_type,
+            account_no = (
+                borrower_obj.id + settings.ACCOUNT_NUMBER_START_FROM
+            ),
+            balance=self.request.POST.get('balance'),
+            interest_start_date=self.request.POST.get('interest_start_date'),
+            initial_deposit_date=self.request.POST.get('initial_deposit_date')
+        )
+        return JsonResponse({'message': 'Activated Successfully!'})
+
+
+class CustomerAccountList(LoginRequiredMixin, ListView):
+    template_name = 'borrowers/borrower-account-list.html'
+
+    def get_queryset(self):
+        company = Company.objects.get(slug=self.kwargs.get('slug'))
+        return company.borrowerbankaccount_set.all()
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(CustomerAccountList, self).get_context_data(*args, **kwargs)
+        company = Company.objects.get(slug=self.kwargs.get('slug'))
+        company_qs = company.user.user.profile.company_set.all()
+        context.update({
+            "object": company,
+            "company": company,
+            "company_owner": company.user.user,
+            "userCompany_qs": company_qs
+        })
+        return context

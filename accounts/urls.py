@@ -4,7 +4,7 @@ from .views import (
     AccountHomeView,
     AccountEmailActivateView,
     UserDetailUpdateView,
-    ProfileDetailView
+    ProfileDetailView,
 )
 
 urlpatterns = [

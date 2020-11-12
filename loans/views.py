@@ -48,9 +48,9 @@ class LoanCreateView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(LoanCreateView, self).get_context_data(**kwargs)
-        context['userCompany_qs'] = self.request.user.profile.company_set.all()
-        context['user_pkgs'] = self.request.user.profile.loantype_set.all()
-        context['user_collection_pkgs'] = self.request.user.profile.modeofrepayments_set.all()
+        context['userCompany_qs'] = self.get_object().user.company_set.all()
+        context['user_pkgs'] = self.get_object().user.loantype_set.all()
+        context['user_collection_pkgs'] = self.get_object().user.modeofrepayments_set.all()
         context['borrowers_qs'] = self.get_object().borrower_set.all()
         context['borrower_group_qs'] = self.get_object().borrowergroup_set.all()
         return context

@@ -4,10 +4,9 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from phonenumber_field.formfields import PhoneNumberField
+from .models import EmailActivation, GuestEmail
 
 User = get_user_model()
-
-from .models import EmailActivation, GuestEmail
 
 
 class ReactivateEmailForm(forms.Form):
@@ -52,7 +51,8 @@ class UserAdminCreationForm(forms.ModelForm):
 
 class UserDetailChangeForm(forms.ModelForm):
     full_name = forms.CharField(label='Name', required=False, widget=forms.TextInput(attrs={"class": 'form-control'}))
-    phone = PhoneNumberField(label='Phone', required=True, widget=forms.TextInput(attrs={"class": 'form-control', 'placeholder': '+234XXXXXXXXXX'}))
+    phone = PhoneNumberField(label='Phone', required=True,
+                             widget=forms.TextInput(attrs={"class": 'form-control', 'placeholder': '+234XXXXXXXXXX'}))
 
     class Meta:
         model = User

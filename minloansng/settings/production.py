@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django_jenkins',
 
     # third party apps
+    'django_celery_beat',
     'phonenumber_field',
     'crispy_forms',
     'rest_framework',
@@ -71,6 +72,7 @@ INSTALLED_APPS = [
     'minmarkets',
     'minone',
     'settings',
+    'transactions',
 ]
 
 X_FRAME_OPTIONS='SAMEORIGIN'
@@ -180,6 +182,12 @@ PROTECTED_ROOT = os.path.join(BASE_DIR, "static", "protected_media")
 
 from minloansng.ssl_config import *
 CORS_ORIGIN_ALLOW_ALL = True
+
+ACCOUNT_NUMBER_START_FROM = 1000000000
+MINIMUM_DEPOSIT_AMOUNT = 500
+MINIMUM_WITHDRAWAL_AMOUNT = 500
+
+from minloansng import celery_config
 
 DEFAULT_RENDERER_CLASSES = [
     'rest_framework.renderers.JSONRenderer',

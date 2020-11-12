@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from borrowers.models import Borrower, BorrowerGroup
+from borrowers.models import Borrower, BorrowerGroup, BorrowerBankAccount
 
 
 @admin.register(Borrower)
@@ -21,12 +21,26 @@ class BorrowersAdmin(admin.ModelAdmin):
 
 @admin.register(BorrowerGroup)
 class BorrowersGroupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'group_leader', 'collector', 'meeting_schedule', 'timestamp', 'updated')
+    list_display = ('name', 'group_leader', 'collector', 'timestamp', 'updated')
     list_display_links = ('name',)
-    list_editable = ('group_leader', 'collector', 'meeting_schedule')
+    list_editable = ('group_leader', 'collector')
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ('name',)
     list_filter = ('name', 'slug')
 
     class Meta:
         model = BorrowerGroup
+
+
+@admin.register(BorrowerBankAccount)
+class BorrowerBankAccountAdmin(admin.ModelAdmin):
+    list_display = (
+        'company', 'borrower', 'account_type', 'account_no', 'active', 'balance', 'interest_start_date',
+        'initial_deposit_date')
+    list_display_links = ('company', 'account_type')
+    list_editable = ('balance', 'interest_start_date', 'initial_deposit_date')
+    search_fields = ('account_type', 'account_no')
+    list_filter = ('account_type', 'account_no')
+
+    class Meta:
+        model = BorrowerBankAccount
