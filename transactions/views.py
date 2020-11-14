@@ -2,10 +2,12 @@ from dateutil.relativedelta import relativedelta
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, ListView, DetailView
 
+from borrowers.models import Borrower, BorrowerBankAccount
 from company.models import Company
 from transactions.constants import DEPOSIT, WITHDRAWAL
 from transactions.forms import (
@@ -27,8 +29,14 @@ class TransactionForMFB(LoginRequiredMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(TransactionForMFB, self).get_context_data(**kwargs)
+        company = Company.objects.get(slug=self.kwargs.get('slug'))
+        userCompany_qs = company.user.user.profile.company_set.all()
+        context['company'] = company
         context.update({
+            'object': company,
+            'company': company,
             'bank_transactions': self.get_queryset(),
+            'userCompany_qs': userCompany_qs,
         })
         return context
 
@@ -76,9 +84,6 @@ class TransactionCreateMixin(LoginRequiredMixin, CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs.update({
-            'account': self.request.user.account
-        })
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -90,45 +95,59 @@ class TransactionCreateMixin(LoginRequiredMixin, CreateView):
         return context
 
 
-class DepositMoneyView(TransactionCreateMixin):
-    form_class = DepositForm
-    title = 'Deposit Money to Your Account'
+class DepositMoneyView(LoginRequiredMixin, DetailView):
+    template_name = 'transactions/transaction-deposit.html'
+    model = Company
+    title = 'Deposit Money To Account'
 
-    def get_initial(self):
-        initial = {'transaction_type': DEPOSIT}
-        return initial
+    def get_context_data(self, **kwargs):
+        context = super(DepositMoneyView, self).get_context_data(**kwargs)
+        context.update({
+            'title': self.title,
+            'company': self.get_object(),
+            'userCompany_qs': self.get_object().user.company_set.all(),
+            'borrowers_qs': self.get_object().borrower_set.all()
+        })
+        return context
 
-    def form_valid(self, form):
-        amount = form.cleaned_data.get('amount')
-        account = self.request.user.account
-
-        if not account.initial_deposit_date:
-            now = timezone.now()
-            next_interest_month = int(
-                12 / account.account_type.interest_calculation_per_year
-            )
-            account.initial_deposit_date = now
-            account.interest_start_date = (
-                    now + relativedelta(
-                months=+next_interest_month
-            )
-            )
-
-        account.balance += amount
-        account.save(
-            update_fields=[
-                'initial_deposit_date',
-                'balance',
-                'interest_start_date'
-            ]
-        )
-
-        messages.success(
-            self.request,
-            f'₦{amount} was deposited to your account successfully'
-        )
-
-        return super().form_valid(form)
+    def post(self, *args, **kwargs):
+        print(self.request.POST)
+        if self.request.POST.get('transactionType') == 'Deposit':
+            amount = int(self.request.POST.get('amount'))
+            borrower = Borrower.objects.get(slug__iexact=self.request.POST.get('borrower'))
+            borrower_account = BorrowerBankAccount.objects.get(borrower=borrower)
+            if not borrower_account.initial_deposit_date:
+                print("here worked!")
+                now = timezone.now()
+                next_interest_month = int(12 / borrower_account.account_type.interest_calculation_per_year)
+                borrower_account.initial_deposit_date = now
+                borrower_account.interest_start_date = (
+                    now + relativedelta(months=+next_interest_month)
+                )
+                borrower_account.company = self.get_object()
+                borrower_account.borrower = borrower
+                borrower_account.balance += amount
+                borrower_account.save(
+                    update_fields=[
+                        'company',
+                        'borrower',
+                        'initial_deposit_date',
+                        'balance',
+                        'interest_start_date'
+                    ]
+                )
+                borrower_account_new = BorrowerBankAccount.objects.get(borrower=borrower)
+                Transaction.objects.create(
+                    company=self.get_object(),
+                    account=borrower_account,
+                    amount=amount,
+                    balance_after_transaction=borrower_account_new.balance,
+                    transaction_type=1
+                )
+            payload_message = f'₦{amount} was deposited to your account successfully'
+            return JsonResponse({'message': payload_message})
+        else:
+            pass
 
 
 class WithdrawMoneyView(TransactionCreateMixin):

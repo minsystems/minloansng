@@ -29,3 +29,13 @@ class Transaction(models.Model):
 
     class Meta:
         ordering = ['timestamp']
+
+    def get_display_name(self):
+        if self.transaction_type == 1:
+            return 'Deposit'
+        elif self.transaction_type == 2:
+            return 'Withdrawal'
+        elif self.transaction_type == 3:
+            return 'Interest'
+        else:
+            return None
