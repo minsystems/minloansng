@@ -2,17 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6b2ceb19-997d-44ab-af94-3b88c9a4fa83" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/templates/transactions/transaction-deposit.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db_minloansng_new.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db_minloansng_new.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/payment-upgrade/account-upgrade.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/payment-upgrade/account-upgrade.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/sidenav/sidebar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/sidenav/sidebar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/transactions/transaction_form.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/transactions/transaction_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/transactions/transaction_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/transactions/transaction_report.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/transactions/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/transactions/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transactions/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/transactions/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transactions/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/transactions/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/transactions/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/transactions/views.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -73,11 +62,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/transactions/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="208">
-              <caret line="141" column="40" lean-forward="true" selection-start-line="141" selection-start-column="40" selection-end-line="141" selection-end-column="40" />
+            <state relative-caret-position="288">
+              <caret line="181" column="25" lean-forward="true" selection-start-line="181" selection-start-column="25" selection-end-line="181" selection-end-column="25" />
               <folding>
                 <element signature="e#0#48#0" expanded="true" />
               </folding>
@@ -85,10 +74,10 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/payment-upgrade/account-upgrade.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="64">
+            <state relative-caret-position="240">
               <caret line="108" column="56" selection-start-line="108" selection-start-column="56" selection-end-line="108" selection-end-column="56" />
             </state>
           </provider>
@@ -232,8 +221,8 @@
         <option value="$PROJECT_DIR$/transactions/urls.py" />
         <option value="$PROJECT_DIR$/templates/transactions/transaction-deposit.html" />
         <option value="$PROJECT_DIR$/templates/sidenav/sidebar.html" />
-        <option value="$PROJECT_DIR$/transactions/views.py" />
         <option value="$PROJECT_DIR$/templates/payment-upgrade/account-upgrade.html" />
+        <option value="$PROJECT_DIR$/transactions/views.py" />
       </list>
     </option>
   </component>
@@ -512,7 +501,7 @@
       <workItem from="1604029445700" duration="27000" />
       <workItem from="1604029986413" duration="196174000" />
       <workItem from="1605039639130" duration="61429000" />
-      <workItem from="1605340415616" duration="4920000" />
+      <workItem from="1605340415616" duration="5411000" />
     </task>
     <task id="LOCAL-00001" summary="First Official Dashboard Build With Sub Companies">
       <created>1582131582380</created>
@@ -532,7 +521,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1569304000" />
+    <option name="totallyTimeSpent" value="1569795000" />
   </component>
   <component name="TodoView" selected-index="3">
     <todo-panel id="selected-file">
@@ -547,12 +536,12 @@
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.27836612" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.27836612" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3289689" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4977307" visible="true" weight="0.34042552" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4977307" visible="true" weight="0.34042552" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39934534" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -1034,20 +1023,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/transactions/views.py">
+    <entry file="file://$PROJECT_DIR$/templates/payment-upgrade/account-upgrade.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="141" column="40" lean-forward="true" selection-start-line="141" selection-start-column="40" selection-end-line="141" selection-end-column="40" />
-          <folding>
-            <element signature="e#0#48#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="240">
+          <caret line="108" column="56" selection-start-line="108" selection-start-column="56" selection-end-line="108" selection-end-column="56" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/payment-upgrade/account-upgrade.html">
+    <entry file="file://$PROJECT_DIR$/transactions/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="64">
-          <caret line="108" column="56" selection-start-line="108" selection-start-column="56" selection-end-line="108" selection-end-column="56" />
+        <state relative-caret-position="288">
+          <caret line="181" column="25" lean-forward="true" selection-start-line="181" selection-start-column="25" selection-end-line="181" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#48#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

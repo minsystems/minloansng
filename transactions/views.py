@@ -144,10 +144,48 @@ class DepositMoneyView(LoginRequiredMixin, DetailView):
                     balance_after_transaction=borrower_account_new.balance,
                     transaction_type=1
                 )
-            payload_message = f'₦{amount} was deposited to your account successfully'
-            return JsonResponse({'message': payload_message})
+                payload_message = f'₦{amount} was deposited to your account successfully'
+                return JsonResponse({'message': payload_message})
+            else:
+                borrower_account.company = self.get_object()
+                borrower_account.borrower = borrower
+                borrower_account.balance += amount
+                borrower_account.save(
+                    update_fields=[
+                        'company',
+                        'borrower',
+                        'balance',
+                    ]
+                )
+                borrower_account_new = BorrowerBankAccount.objects.get(borrower=borrower)
+                Transaction.objects.create(
+                    company=self.get_object(),
+                    account=borrower_account,
+                    amount=amount,
+                    balance_after_transaction=borrower_account_new.balance,
+                    transaction_type=1
+                )
+                payload_message = f'₦{amount} was deposited to your account successfully'
+                return JsonResponse({'message': payload_message})
         else:
-            pass
+            amount = int(self.request.POST.get('amount'))
+            borrower = Borrower.objects.get(slug__iexact=self.request.POST.get('borrower'))
+            borrower_account = BorrowerBankAccount.objects.get(borrower=borrower)
+
+            borrower_account.balance -= amount
+            borrower_account.save(update_fields=['balance'])
+
+            borrower_account_new = BorrowerBankAccount.objects.get(borrower=borrower)
+            Transaction.objects.create(
+                company=self.get_object(),
+                account=borrower_account,
+                amount=amount,
+                balance_after_transaction=borrower_account_new.balance,
+                transaction_type=2
+            )
+
+            payload_message = f'Successfully withdrawn ₦{amount} from your account'
+            return JsonResponse({'message': payload_message})
 
 
 class WithdrawMoneyView(TransactionCreateMixin):
