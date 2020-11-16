@@ -16,7 +16,7 @@ from company.forms import BankAccountTypeUpdateForm
 from company.models import Company, Branch, BankAccountType
 from mincore.models import Messages
 from minloansng.mixins import GetObjectMixin, IsUserOwnerMixin
-from minloansng.utils import random_string_generator
+from minloansng.utils import random_string_generator, switch_month
 
 TRIAL_WARNING_DAYS = 5
 
@@ -28,10 +28,12 @@ class Dashboard(View):
                 try:
                     company_obj = Company.objects.get(slug=kwargs.get('slug'))
                     if company_obj.name:
+                        company_obj.staffs.add(company_obj.user)
                         ThirdPartyCreds.objects.get_or_create(user=company_obj.user)
                         user_profile_obj = Profile.objects.get(user=company_obj.user.user)
                         user_plan = str(user_profile_obj.plan)
                         print(user_plan)
+
                         if company_obj.user.is_premium:
                             if user_plan == "STARTUP":
                                 if timezone.now() > user_profile_obj.trial_days:
@@ -40,7 +42,7 @@ class Dashboard(View):
                                                    "Account Expired!, Your Account Has Been Expired You Would Be "
                                                    "Redirected To The Payment Portal Upgrade Your Payment")
                                     # jQuery Handles Redirect
-                                    user_companies_qs = request.user.profile.company_set.all()
+                                    user_companies_qs = company_obj.user.user.profile.company_set.all()
                                     company_msg = Messages.objects.all().filter(to_obj=company_obj)
                                     context = {
                                         'company': company_obj,
@@ -50,17 +52,71 @@ class Dashboard(View):
                                     }
                                     return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
                                 else:
+                                    # check if requested user is a worker else don't allow them except owner
+                                    try:
+                                        company_obj.staffs.get(user=self.request.user)
+                                    except Profile.DoesNotExist:
+                                        return redirect(reverse('404_'))
                                     remaining_days = user_profile_obj.trial_days - timezone.now()
                                     messages.warning(request,
                                                      "You Have %s Days Left Before Account Suspension, Please Upgrade "
                                                      "Your Account" % (remaining_days.days))
-                                    user_companies_qs = request.user.profile.company_set.all()
+                                    user_companies_qs = company_obj.user.user.profile.company_set.all()
                                     company_msg = Messages.objects.all().filter(to_obj=company_obj)
+                                    dataset_loans = list()
+                                    dataset_savings = list()
+                                    for obj in range(12):
+                                        dataset_loans.append(
+                                            company_obj.loan_set.filter(timestamp__month=obj + 1).count())
+                                        dataset_savings.append(company_obj.borrowerbankaccount_set.filter(
+                                            timestamp__month=obj + 1).count())
+
+                                    bg_group_list_color = list()
+                                    loan_collected_for_bg_group_list = list()
+                                    for obj_color in company_obj.borrowergroup_set.all():
+                                        bg_group_list_color.append(obj_color.color_code)
+
+                                    for loan_collected in company_obj.loan_set.all():
+                                        active_data = loan_collected.borrower_group if None else 100
+                                        loan_collected_for_bg_group_list.append(active_data)
+
+                                    bg_group_list = list()
+                                    for bg in company_obj.borrowergroup_set.all():
+                                        bg_group_list.append(bg.name)
+
+                                    comp_account_type_list = list()
+                                    for account_type in company_obj.bankaccounttype_set.all():
+                                        comp_account_type_list.append(account_type)
+
+                                    comp_account_type_list_colorcode = list()
+                                    comp_bank_accounts = list()
+                                    borrower_array = list()
+                                    for bankAccountType in company_obj.bankaccounttype_set.all():
+                                        comp_account_type_list_colorcode.append(bankAccountType.color_code)
+                                        comp_bank_accounts.append(
+                                            company_obj.borrowerbankaccount_set.all().filter(
+                                                account_type=bankAccountType).count())
+                                        for b_obj in company_obj.borrowerbankaccount_set.all().filter(
+                                                account_type=bankAccountType):
+                                            borrower_array.append(b_obj.borrower.get_short_name())
+
                                     context = {
                                         'company': company_obj,
                                         'object': company_obj,
                                         'userCompany_qs': user_companies_qs,
                                         'msg': company_msg,
+                                        'borrowers': company_obj.borrower_set.all(),
+                                        'transactions': company_obj.transaction_set.all(),
+                                        'loans': company_obj.loan_set.all(),
+                                        'staffs': company_obj.staffs.get_queryset(),
+                                        'comp_loan_count_period': dataset_loans,
+                                        'comp_savings_count_period': dataset_savings,
+                                        'bg_group_list_color': bg_group_list_color,
+                                        'bg_group_list': bg_group_list,
+                                        'bg_loan_list': loan_collected_for_bg_group_list,
+                                        'comp_account_type_list_colorcode': comp_account_type_list_colorcode,
+                                        'comp_bank_accounts': comp_bank_accounts,
+                                        'borrower_array': borrower_array,
                                     }
                                     return render(request, "company/dashboard.html", context)
                             elif user_plan == "BUSINESS":
@@ -70,7 +126,7 @@ class Dashboard(View):
                                                    "Account Expired!, Your Account Has Been Expired You Would Be "
                                                    "Redirected To The Payment Portal Upgrade Your Payment")
                                     # jQuery Handles Redirect
-                                    user_companies_qs = request.user.profile.company_set.all()
+                                    user_companies_qs = company_obj.user.user.profile.company_set.all()
                                     company_msg = Messages.objects.all().filter(to_obj=company_obj)
                                     context = {
                                         'company': company_obj,
@@ -80,6 +136,11 @@ class Dashboard(View):
                                     }
                                     return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
                                 else:
+                                    # check if requested user is a worker else don't allow them except owner
+                                    try:
+                                        company_obj.staffs.get(user=self.request.user)
+                                    except Profile.DoesNotExist:
+                                        return redirect(reverse('404_'))
                                     remaining_days = user_profile_obj.trial_days - timezone.now()
                                     if remaining_days == 7:
                                         messages.warning(request,
@@ -87,13 +148,62 @@ class Dashboard(View):
                                                          "Your Account" % (remaining_days.days))
                                     else:
                                         messages.info(request, "Welcome, you are logged in as %s" % (request.user))
-                                    user_companies_qs = request.user.profile.company_set.all()
+                                    user_companies_qs = company_obj.user.user.profile.company_set.all()
                                     company_msg = Messages.objects.all().filter(to_obj=company_obj)
+                                    dataset_loans = list()
+                                    dataset_savings = list()
+                                    for obj in range(12):
+                                        dataset_loans.append(
+                                            company_obj.loan_set.filter(timestamp__month=obj + 1).count())
+                                        dataset_savings.append(company_obj.borrowerbankaccount_set.filter(
+                                            timestamp__month=obj + 1).count())
+
+                                    bg_group_list_color = list()
+                                    loan_collected_for_bg_group_list = list()
+                                    for obj_color in company_obj.borrowergroup_set.all():
+                                        bg_group_list_color.append(obj_color.color_code)
+
+                                    for loan_collected in company_obj.loan_set.all():
+                                        active_data = loan_collected.borrower_group if None else 100
+                                        loan_collected_for_bg_group_list.append(active_data)
+
+                                    bg_group_list = list()
+                                    for bg in company_obj.borrowergroup_set.all():
+                                        bg_group_list.append(bg.name)
+
+                                    comp_account_type_list = list()
+                                    for account_type in company_obj.bankaccounttype_set.all():
+                                        comp_account_type_list.append(account_type)
+
+                                    comp_account_type_list_colorcode = list()
+                                    comp_bank_accounts = list()
+                                    borrower_array = list()
+                                    for bankAccountType in company_obj.bankaccounttype_set.all():
+                                        comp_account_type_list_colorcode.append(bankAccountType.color_code)
+                                        comp_bank_accounts.append(
+                                            company_obj.borrowerbankaccount_set.all().filter(
+                                                account_type=bankAccountType).count())
+                                        for b_obj in company_obj.borrowerbankaccount_set.all().filter(
+                                                account_type=bankAccountType):
+                                            borrower_array.append(b_obj.borrower.get_short_name())
+
                                     context = {
                                         'company': company_obj,
                                         'object': company_obj,
                                         'userCompany_qs': user_companies_qs,
                                         'msg': company_msg,
+                                        'borrowers': company_obj.borrower_set.all(),
+                                        'transactions': company_obj.transaction_set.all(),
+                                        'loans': company_obj.loan_set.all(),
+                                        'staffs': company_obj.staffs.get_queryset(),
+                                        'comp_loan_count_period': dataset_loans,
+                                        'comp_savings_count_period': dataset_savings,
+                                        'bg_group_list_color': bg_group_list_color,
+                                        'bg_group_list': bg_group_list,
+                                        'bg_loan_list': loan_collected_for_bg_group_list,
+                                        'comp_account_type_list_colorcode': comp_account_type_list_colorcode,
+                                        'comp_bank_accounts': comp_bank_accounts,
+                                        'borrower_array': borrower_array,
                                     }
                                     return render(request, "company/dashboard.html", context)
                             elif user_plan == "ENTERPRISE":
@@ -103,7 +213,7 @@ class Dashboard(View):
                                                    "Account Expired!, Your Account Has Been Expired You Would Be "
                                                    "Redirected To The Payment Portal Upgrade Your Payment")
                                     # jQuery Handles Redirect
-                                    user_companies_qs = request.user.profile.company_set.all()
+                                    user_companies_qs = company_obj.user.user.profile.company_set.all()
                                     company_msg = Messages.objects.all().filter(to_obj=company_obj)
                                     context = {
                                         'company': company_obj,
@@ -113,17 +223,71 @@ class Dashboard(View):
                                     }
                                     return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
                                 else:
+                                    # check if requested user is a worker else don't allow them except owner
+                                    try:
+                                        company_obj.staffs.get(user=self.request.user)
+                                    except Profile.DoesNotExist:
+                                        return redirect(reverse('404_'))
                                     remaining_days = user_profile_obj.trial_days - timezone.now()
                                     messages.warning(request,
                                                      "You Have %s Days Left Before Account Suspension, Please Upgrade "
                                                      "Your Account" % (remaining_days.days))
-                                    user_companies_qs = request.user.profile.company_set.all()
+                                    user_companies_qs = company_obj.user.user.profile.company_set.all()
                                     company_msg = Messages.objects.all().filter(to_obj=company_obj)
+                                    dataset_loans = list()
+                                    dataset_savings = list()
+                                    for obj in range(12):
+                                        dataset_loans.append(
+                                            company_obj.loan_set.filter(timestamp__month=obj + 1).count())
+                                        dataset_savings.append(company_obj.borrowerbankaccount_set.filter(
+                                            timestamp__month=obj + 1).count())
+
+                                    bg_group_list_color = list()
+                                    loan_collected_for_bg_group_list = list()
+                                    for obj_color in company_obj.borrowergroup_set.all():
+                                        bg_group_list_color.append(obj_color.color_code)
+
+                                    for loan_collected in company_obj.loan_set.all():
+                                        active_data = loan_collected.borrower_group if None else 100
+                                        loan_collected_for_bg_group_list.append(active_data)
+
+                                    bg_group_list = list()
+                                    for bg in company_obj.borrowergroup_set.all():
+                                        bg_group_list.append(bg.name)
+
+                                    comp_account_type_list = list()
+                                    for account_type in company_obj.bankaccounttype_set.all():
+                                        comp_account_type_list.append(account_type)
+
+                                    comp_account_type_list_colorcode = list()
+                                    comp_bank_accounts = list()
+                                    borrower_array = list()
+                                    for bankAccountType in company_obj.bankaccounttype_set.all():
+                                        comp_account_type_list_colorcode.append(bankAccountType.color_code)
+                                        comp_bank_accounts.append(
+                                            company_obj.borrowerbankaccount_set.all().filter(
+                                                account_type=bankAccountType).count())
+                                        for b_obj in company_obj.borrowerbankaccount_set.all().filter(
+                                                account_type=bankAccountType):
+                                            borrower_array.append(b_obj.borrower.get_short_name())
+
                                     context = {
                                         'company': company_obj,
                                         'object': company_obj,
                                         'userCompany_qs': user_companies_qs,
                                         'msg': company_msg,
+                                        'borrowers': company_obj.borrower_set.all(),
+                                        'transactions': company_obj.transaction_set.all(),
+                                        'loans': company_obj.loan_set.all(),
+                                        'staffs': company_obj.staffs.get_queryset(),
+                                        'comp_loan_count_period': dataset_loans,
+                                        'comp_savings_count_period': dataset_savings,
+                                        'bg_group_list_color': bg_group_list_color,
+                                        'bg_group_list': bg_group_list,
+                                        'bg_loan_list': loan_collected_for_bg_group_list,
+                                        'comp_account_type_list_colorcode': comp_account_type_list_colorcode,
+                                        'comp_bank_accounts': comp_bank_accounts,
+                                        'borrower_array': borrower_array,
                                     }
                                     return render(request, "company/dashboard.html", context)
                             else:
@@ -144,144 +308,80 @@ class Dashboard(View):
                                 }
                                 return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
                             else:
+                                # check if requested user is a worker else don't allow them except owner
+                                try:
+                                    company_obj.staffs.get(user=self.request.user)
+                                except Profile.DoesNotExist:
+                                    return redirect(reverse('404_'))
+                                company_obj = Company.objects.get(slug=kwargs.get('slug'))
                                 remaining_days = user_profile_obj.trial_days - timezone.now()
                                 messages.warning(request,
                                                  "You Have %s Days Left Before Account Suspension, Please Upgrade "
                                                  "Your Account" % (remaining_days.days))
-                                user_companies_qs = request.user.profile.company_set.all()
+                                user_companies_qs = company_obj.user.user.profile.company_set.all()
                                 company_msg = Messages.objects.all().filter(to_obj=company_obj)
+                                dataset_loans = list()
+                                dataset_savings = list()
+                                for obj in range(12):
+                                    dataset_loans.append(company_obj.loan_set.filter(timestamp__month=obj + 1).count())
+                                    dataset_savings.append(
+                                        company_obj.borrowerbankaccount_set.filter(timestamp__month=obj + 1).count())
+
+                                bg_group_list_color = list()
+                                loan_collected_for_bg_group_list = list()
+                                for obj_color in company_obj.borrowergroup_set.all():
+                                    bg_group_list_color.append(obj_color.color_code)
+
+                                for loan_collected in company_obj.loan_set.all():
+                                    active_data = loan_collected.borrower_group if None else 100
+                                    loan_collected_for_bg_group_list.append(active_data)
+
+                                bg_group_list = list()
+                                for bg in company_obj.borrowergroup_set.all():
+                                    bg_group_list.append(bg.name)
+
+                                comp_account_type_list = list()
+                                for account_type in company_obj.bankaccounttype_set.all():
+                                    comp_account_type_list.append(account_type)
+
+                                comp_account_type_list_colorcode = list()
+                                comp_bank_accounts = list()
+                                borrower_array = list()
+                                for bankAccountType in company_obj.bankaccounttype_set.all():
+                                    comp_account_type_list_colorcode.append(bankAccountType.color_code)
+                                    comp_bank_accounts.append(
+                                        company_obj.borrowerbankaccount_set.all().filter(
+                                            account_type=bankAccountType).count())
+                                    for b_obj in company_obj.borrowerbankaccount_set.all().filter(
+                                            account_type=bankAccountType):
+                                        borrower_array.append(b_obj.borrower.get_short_name())
+
                                 context = {
                                     'company': company_obj,
                                     'object': company_obj,
                                     'userCompany_qs': user_companies_qs,
                                     'msg': company_msg,
+                                    'borrowers': company_obj.borrower_set.all(),
+                                    'transactions': company_obj.transaction_set.all(),
+                                    'loans': company_obj.loan_set.all(),
+                                    'staffs': company_obj.staffs.get_queryset(),
+                                    'comp_loan_count_period': dataset_loans,
+                                    'comp_savings_count_period': dataset_savings,
+                                    'bg_group_list_color': bg_group_list_color,
+                                    'bg_group_list': bg_group_list,
+                                    'bg_loan_list': loan_collected_for_bg_group_list,
+                                    'comp_account_type_list_colorcode': comp_account_type_list_colorcode,
+                                    'comp_bank_accounts': comp_bank_accounts,
+                                    'borrower_array': borrower_array,
                                 }
                                 return render(request, "company/dashboard.html", context)
                         else:
-                            return redirect(reverse('404_'))
+                            return redirect(reverse('mincore-url:account-upgrade'))
                     else:
                         return redirect(
                             reverse('company-url:update-company-profile', kwargs={'slug': company_obj.slug}))
                 except Company.DoesNotExist:
-                    print("You work here!")
-                    target_comp = Company.objects.get(slug=kwargs.get('slug'))
-                    company_array = list()
-                    user_profile_obj = Profile.objects.get(user=request.user)
-                    for company_inst in user_profile_obj.working_for.all():
-                        company_array.append(str(company_inst))
-
-                    for comp_ in company_array:
-                        if comp_ == str(target_comp):
-                            if target_comp.name:
-                                user_plan = str(target_comp.user.plan)
-                                print(user_plan)
-                                if target_comp.user.is_premium:
-                                    if user_plan == "STARTUP":
-                                        if timezone.now() > target_comp.user.trial_days:
-                                            # return redirect to payment page
-                                            messages.error(request,
-                                                           "Account Expired!, Your Account Has Been Expired You Would Be "
-                                                           "Redirected To The Payment Portal Upgrade Your Payment")
-                                            # jQuery Handles Redirect
-                                            user_companies_qs = target_comp.user.user.profile.company_set.all()
-                                            company_msg = Messages.objects.all().filter(to_obj=target_comp)
-                                            context = {
-                                                'company': target_comp,
-                                                'object': target_comp,
-                                                'userCompany_qs': user_companies_qs,
-                                                'msg': company_msg,
-                                            }
-                                            return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
-                                        else:
-                                            remaining_days = target_comp.user.trial_days - timezone.now()
-                                            messages.warning(request,
-                                                             "You Have %s Days Left Before Account Suspension, Please Upgrade "
-                                                             "Your Account" % (remaining_days.days))
-                                            user_companies_qs = target_comp.user.user.profile.company_set.all()
-                                            company_msg = Messages.objects.all().filter(to_obj=target_comp)
-                                            context = {
-                                                'company': target_comp,
-                                                'object': target_comp,
-                                                'userCompany_qs': user_companies_qs,
-                                                'msg': company_msg,
-                                            }
-                                            return render(request, "company/dashboard.html", context)
-                                    elif user_plan == "BUSINESS":
-                                        if timezone.now() > target_comp.user.trial_days:
-                                            # return redirect to payment page
-                                            messages.error(request,
-                                                           "Account Expired!, Your Account Has Been Expired You Would Be "
-                                                           "Redirected To The Payment Portal Upgrade Your Payment")
-                                            # jQuery Handles Redirect
-                                            user_companies_qs = target_comp.user.user.profile.company_set.all()
-                                            company_msg = Messages.objects.all().filter(to_obj=target_comp)
-                                            context = {
-                                                'company': target_comp,
-                                                'object': target_comp,
-                                                'userCompany_qs': user_companies_qs,
-                                                'msg': company_msg,
-                                            }
-                                            return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
-                                        else:
-                                            remaining_days = target_comp.user.trial_days - timezone.now()
-                                            if remaining_days == 5:
-                                                messages.warning(request,
-                                                                 "You Have %s Days Left Before Account Suspension, Please Upgrade "
-                                                                 "Your Account" % (remaining_days.days))
-                                            else:
-                                                messages.info(request,
-                                                              "Welcome, you are logged in as %s" % (request.user))
-                                            user_companies_qs = target_comp.user.user.profile.company_set.all()
-                                            company_msg = Messages.objects.all().filter(to_obj=target_comp)
-                                            context = {
-                                                'company': target_comp,
-                                                'object': target_comp,
-                                                'userCompany_qs': user_companies_qs,
-                                                'msg': company_msg,
-                                            }
-                                            return render(request, "company/dashboard.html", context)
-                                    elif user_plan == "ENTERPRISE":
-                                        print("ENTERPRISE")
-                                    else:
-                                        return redirect(reverse('404_'))
-                                elif user_plan == "FREEMIUM":
-                                    if timezone.now() > target_comp.user.trial_days:
-                                        # return redirect to payment page
-                                        messages.error(request,
-                                                       "Account Expired!, Your Account Has Been Expired You Would Be "
-                                                       "Redirected To The Payment Portal Upgrade Your Payment")
-                                        # jQuery Handles Redirect
-                                        user_companies_qs = target_comp.user.user.profile.company_set.all()
-                                        company_msg = Messages.objects.all().filter(to_obj=target_comp)
-                                        context = {
-                                            'company': target_comp,
-                                            'object': target_comp,
-                                            'userCompany_qs': user_companies_qs,
-                                            'msg': company_msg,
-                                        }
-                                        return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
-                                    else:
-                                        remaining_days = target_comp.user.trial_days - timezone.now()
-                                        messages.warning(request,
-                                                         "You Have %s Days Left Before Account Suspension, Please Upgrade "
-                                                         "Your Account" % (remaining_days.days))
-                                        user_companies_qs = target_comp.user.user.profile.company_set.all()
-                                        company_msg = Messages.objects.all().filter(to_obj=target_comp)
-                                        context = {
-                                            'company': target_comp,
-                                            'object': target_comp,
-                                            'userCompany_qs': user_companies_qs,
-                                            'msg': company_msg,
-                                        }
-                                        return render(request, "company/dashboard.html", context)
-                                else:
-                                    return redirect(reverse('404_'))
-                            else:
-                                return redirect(reverse('404_'))
-                            return render(request, "company/dashboard.html", context)
-                        else:
-                            redirect(reverse('404_'))
-                    return reverse('404_')
+                    return redirect(reverse('404_'))
             else:
                 return redirect(reverse('account:user-update'))
         else:
@@ -296,7 +396,8 @@ class Dashboard(View):
                     return render(request, "company/public-home.html", context={})
                 elif company_obj.user.plan == "FREEMIUM":
                     print("No Custom Homepage For Freemium Users")
-                    return redirect(reverse('404_'))
+                    return render(request, "company/public-home.html", context={})
+                    # return redirect(reverse('404_'))
             except Company.DoesNotExist:
                 return redirect(reverse('404_'))
             except Company.MultipleObjectsReturned:
@@ -495,4 +596,3 @@ class CompanyAccountCreateForm(LoginRequiredMixin, SuccessMessageMixin, CreateVi
         self.object.company = company
         self.object.save()
         return super(CompanyAccountCreateForm, self).form_valid(form)
-

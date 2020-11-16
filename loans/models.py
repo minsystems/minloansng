@@ -198,6 +198,7 @@ class Loan(models.Model):
     account_officer = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
     borrower = models.ForeignKey(Borrower, on_delete=models.CASCADE, blank=True, null=True)
+    borrower_group = models.ForeignKey(to='borrowers.BorrowerGroup', on_delete=models.CASCADE, blank=True, null=True)
     loan_type = models.ForeignKey(LoanType, on_delete=models.CASCADE, blank=True, null=True)
     loan_key = models.CharField(blank=True, null=True, max_length=300)
     principal_amount = models.CharField(blank=True, null=True, max_length=300)

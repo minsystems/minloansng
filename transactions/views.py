@@ -172,20 +172,25 @@ class DepositMoneyView(LoginRequiredMixin, DetailView):
             borrower = Borrower.objects.get(slug__iexact=self.request.POST.get('borrower'))
             borrower_account = BorrowerBankAccount.objects.get(borrower=borrower)
 
-            borrower_account.balance -= amount
-            borrower_account.save(update_fields=['balance'])
+            if borrower_account.balance >= amount:
+                borrower_account.balance -= amount
 
-            borrower_account_new = BorrowerBankAccount.objects.get(borrower=borrower)
-            Transaction.objects.create(
-                company=self.get_object(),
-                account=borrower_account,
-                amount=amount,
-                balance_after_transaction=borrower_account_new.balance,
-                transaction_type=2
-            )
+                borrower_account.save(update_fields=['balance'])
 
-            payload_message = f'Successfully withdrawn ₦{amount} from your account'
-            return JsonResponse({'message': payload_message})
+                borrower_account_new = BorrowerBankAccount.objects.get(borrower=borrower)
+                Transaction.objects.create(
+                    company=self.get_object(),
+                    account=borrower_account,
+                    amount=amount,
+                    balance_after_transaction=borrower_account_new.balance,
+                    transaction_type=2
+                )
+
+                payload_message = f'Successfully withdrawn ₦{amount} from your account'
+                return JsonResponse({'message': payload_message})
+            else:
+                payload_message = f'Request amount ₦{amount} cannot be withdrawn from your balance ₦{borrower_account.balance}'
+                return JsonResponse({'message': payload_message})
 
 
 class WithdrawMoneyView(TransactionCreateMixin):

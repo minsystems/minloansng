@@ -3,6 +3,7 @@ from __future__ import print_function
 from django.contrib.auth import logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
@@ -114,10 +115,11 @@ class LoginView(NextUrlMixin, RequestFormAttachMixin, FormView):
         return super(LoginView, self).render_to_response(context, **response_kwargs)
 
 
-class RegisterView(CreateView):
+class RegisterView(SuccessMessageMixin, CreateView):
     form_class = RegisterForm
     template_name = 'accounts/register.html'
     success_url = '/login/'
+    success_message = "An Email Has Been Sent To You For Confirmation, Please Activate Your Email"
 
 
 class LogoutView(View):
@@ -135,7 +137,7 @@ class UserDetailUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(UserDetailUpdateView, self).get_context_data(*args, **kwargs)
-        context['title'] = 'Change Your Account Details'
+        context['title'] = 'Update Your Account Details'
         return context
 
     def post(self, *args, **kwargs):

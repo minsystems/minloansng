@@ -21,11 +21,11 @@ class BorrowersAdmin(admin.ModelAdmin):
 
 @admin.register(BorrowerGroup)
 class BorrowersGroupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'group_leader', 'collector', 'timestamp', 'updated')
+    list_display = ('name', 'group_leader', 'collector', 'color_code', 'timestamp', 'updated')
     list_display_links = ('name',)
     list_editable = ('group_leader', 'collector')
     prepopulated_fields = {'slug': ('name',)}
-    search_fields = ('name',)
+    search_fields = ('name', 'color_code')
     list_filter = ('name', 'slug')
 
     class Meta:

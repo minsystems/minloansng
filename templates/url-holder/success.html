@@ -67,6 +67,11 @@
                             Successfully Done!
                             <img src="https://cdn.minloans.com.ng/svgs/tick.svg" class="img-responsive" width="40px" height="40px" />
                         </h4>
+                        <h4 class="wow fadeInUp" data-wow-duration="1s" data-wow-delay=".2s">
+                            <a href="{% url 'account:profile-detail' request.user.profile.slug %}" class="btn btn-info btn-block">
+                                <i class="fa fa-reply"></i> Go Back To Profile
+                            </a>
+                        </h4>
                     </div>
                 </div>
             </div>

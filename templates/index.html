@@ -51,9 +51,13 @@
                             </h3>
                             <div class="sldier_btn wow fadeInLeft" data-wow-duration="1s" data-wow-delay=".2s">
                                 {% if request.user.is_authenticated %}
-                                    <a href="https://feeds.minloans.com.ng" target="_blank" class="boxed-btn3">Check Out Minblog For Updates</a>
+                                    <a href="{% url 'account:profile-detail' request.user.profile.slug %}" target="_blank" class="boxed-btn3">
+                                        Access My Control Center
+                                    </a>
                                 {% else %}
-                                    <a href="#" class="boxed-btn3">Free 30 Day Trial</a>
+                                    <a href="{% url 'register' %}" class="boxed-btn3">
+                                        Free 30 Day Trial
+                                    </a>
                                 {% endif %}
                             </div>
                         </div>
@@ -72,7 +76,7 @@
                             <div class="submit_btn">
                                 <a class="boxed-btn3 btn-block" type="submit">
                                     {% if request.user.is_authenticated %}
-                                        Welcome Mr. {{ request.user.profile.get_name }}
+                                        Welcome {{ request.user.profile.get_name }}
                                     {% else %}
                                         Free For 30 days <i class="fa fa-arrow-right"></i>
                                     {% endif %}

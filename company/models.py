@@ -91,6 +91,7 @@ class BankAccountType(models.Model):
     maximum_withdrawal_amount = models.DecimalField(decimal_places=2,max_digits=12, blank=True, null=True)
     active = models.BooleanField(default=True)
     slug = models.SlugField(blank=True, null=True)
+    color_code = models.CharField(max_length=128, blank=True, null=True)
     annual_interest_rate = models.DecimalField(
         validators=[MinValueValidator(0), MaxValueValidator(100)],
         decimal_places=2,

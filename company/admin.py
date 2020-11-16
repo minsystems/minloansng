@@ -51,8 +51,8 @@ class RemitaMandateStatusReportAdmin(admin.ModelAdmin):
 
 @admin.register(BankAccountType)
 class BankAccountTypeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'company', 'active', 'maximum_withdrawal_amount', 'annual_interest_rate', 'interest_calculation_per_year')
+    list_display = ('name', 'company', 'active', 'color_code', 'maximum_withdrawal_amount', 'annual_interest_rate', 'interest_calculation_per_year')
     list_display_links = ('name', 'company')
     list_filter = ('company',)
-    search_fields = ('company', 'name')
+    search_fields = ('company', 'name', 'color_code')
     prepopulated_fields = {'slug':('name', 'company')}
