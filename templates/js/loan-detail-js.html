@@ -81,7 +81,7 @@
             let seconds = d.getUTCSeconds();
             let timeStamp = yyyy+'-'+mm+'-'+dd+'T'+hours+':'+minutes+':'+seconds+'+000000';
 
-            const endpoint = "https://remitademo.net/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/requestAuthorization";
+            const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/requestAuthorization";
             const method = "POST";
             let payload = {
                "mandateId":"{{ loanMandateId|safe }}",
@@ -157,7 +157,7 @@
                         let _merchantId = "{{ company_dd_creds.remita_dd_merchant|safe }}";
                         let dataHash = "{{ company_dd_creds.remita_dd_merchant|safe }}" + "{{ company_dd_creds.remita_dd_api_key|safe }}" + requestId;
                         let _hash = CryptoJS.SHA512(dataHash);
-                        let mandateUrl = `https://remitademo.net/remita/ecomm/mandate/form/${_merchantId}/${_hash}/${_mandateId}/${requestId}/rest.reg`;
+                        let mandateUrl = `{{ base_url }}/remita/ecomm/mandate/form/${_merchantId}/${_hash}/${_mandateId}/${requestId}/rest.reg`;
                         window.location.replace(mandateUrl);
                     }
 
@@ -210,7 +210,7 @@
             let seconds = d.getUTCSeconds();
             let timeStamp = yyyy+'-'+mm+'-'+dd+'T'+hours+':'+minutes+':'+seconds+'+000000';
 
-            const endpoint = "https://remitademo.net/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/validateAuthorization";
+            const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/validateAuthorization";
             const method = "POST";
             let payload = {
                  "remitaTransRef": "{{ requestId.remitaTransRef|safe }}",
@@ -292,7 +292,7 @@
             let concatenatedHash = "{{ company_dd_creds.remita_dd_merchant|safe }}" + "{{ company_dd_creds.remita_dd_serviceType_id|safe }}" + requestId + amount + "{{ company_dd_creds.remita_dd_api_key|safe }}";
             let apiHash = CryptoJS.SHA512(concatenatedHash).toString();
 
-            const endpoint = "https://remitademo.net/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/payment/send";
+            const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/payment/send";
             const method = "POST";
             let payload = {
                 "merchantId":"{{ company_dd_creds.remita_dd_merchant|safe }}",
@@ -382,7 +382,7 @@
             let concatenatedHash = mandateId + merchantId + requestId + apiKey;
             let hash = CryptoJS.SHA512(concatenatedHash).toString();
 
-            const endpoint = "https://remitademo.net/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/payment/status";
+            const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/payment/status";
             const method = "POST";
             let payload = {
                   "merchantId":""+merchantId,
@@ -515,7 +515,7 @@
             let concatenatedHash = transactionRef + merchantId + requestId + apiKey;
             let hash = CryptoJS.SHA512(concatenatedHash).toString();
 
-            const endpoint = "https://remitademo.net/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/payment/stop";
+            const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/payment/stop";
             const method = "POST";
             let payload = {
                   "merchantId":""+merchantId,
@@ -572,7 +572,7 @@
             let concatenatedHash = mandateId + merchantId + requestId + apiKey;
             let hash = CryptoJS.SHA512(concatenatedHash).toString();
 
-            const endpoint = "https://remitademo.net/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/payment/history";
+            const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/payment/history";
             const method = "POST";
             let payload = {
                   "merchantId":""+merchantId,
@@ -659,7 +659,7 @@
             let concatenatedHash = mandateId + merchantId + requestId + apiKey;
             let hash = CryptoJS.SHA512(concatenatedHash).toString();
 
-            const endpoint = "https://remitademo.net/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/stop";
+            const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/stop";
             const method = "POST";
             let payload = {
                   "merchantId":""+merchantId,
@@ -716,7 +716,7 @@
             let concatenatedHash = mandateId + merchantId + requestId + apiKey;
             let hash = CryptoJS.SHA512(concatenatedHash).toString();
 
-            const endpoint = "https://remitademo.net/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/status";
+            const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/status";
             const method = "POST";
             let payload = {
                   "merchantId":""+merchantId,

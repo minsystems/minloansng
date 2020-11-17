@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from mincore.models import Subscribers, Messages, SupportTickets, PlanDetails
+from mincore.models import Subscribers, Messages, SupportTickets, PlanDetails, BaseUrl
 
 
 class SubscribersAdmin(admin.ModelAdmin):
@@ -37,3 +37,10 @@ admin.site.register(SupportTickets, SupportTicketAdmin)
 class PlanDetailsModel(admin.ModelAdmin):
     list_display = ("name", "max_staff", "maintenance_fee", "price")
     list_display_links = ("name",)
+
+
+@admin.register(BaseUrl)
+class BaseUrlModelAdmin(admin.ModelAdmin):
+    list_display = ("belongs_to", "base_url", "timestamp", "updated")
+    list_filter = ("belongs_to",)
+    list_editable = ("base_url",)

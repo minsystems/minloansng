@@ -191,3 +191,6 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         context["userKeyCode"] = user_code
         context['userTickets_qs'] = SupportTickets.objects.filter(user__exact=self.object)[:10]
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        return super(ProfileDetailView, self).render_to_response(context, **response_kwargs)

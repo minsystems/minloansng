@@ -99,3 +99,18 @@ class PlanDetails(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class BaseUrl(models.Model):
+    belongs_to = models.CharField(max_length=300, blank=True, null=True)
+    base_url = models.CharField(max_length=300, blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
+    updated = models.DateTimeField(auto_now_add=False, auto_now=True)
+
+    class Meta:
+        verbose_name = 'Base URL'
+        verbose_name_plural = 'Base URLs'
+
+    def __str__(self):
+        return self.base_url
+

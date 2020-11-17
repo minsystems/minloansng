@@ -29,6 +29,7 @@ from company.models import Company, RemitaCredentials, RemitaMandateActivationDa
 from loans.forms import CollateralForm, LoanFileForm
 from loans.models import Loan, LoanType, ModeOfRepayments, Penalty, Collateral, LoanTerms, CollateralFiles, \
     CollateralType, LoanActivityComments
+from mincore.models import BaseUrl
 from minloansng.cloudinary_settings import cloudinary_upload_preset, cloudinary_url
 from minloansng.minmarket.packages.remita import remita_dd_url, statuscode_success
 from minloansng.mixins import GetObjectMixin
@@ -215,6 +216,11 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
             file_type = get_fileType(self.get_object().loan_file_upload.url)
             context['fileType'] = str(file_type)
         if str(self.get_object().mode_of_repayments) == "Remita Direct Debit":
+            try:
+                base_obj = BaseUrl.objects.get(belongs_to='remita')
+            except BaseUrl.DoesNotExist:
+                base_obj = "https://no-url-connected.com"
+            context['base_url'] = base_obj.base_url
             context['dd_obj'] = RemitaMandateActivationData.objects.get(loan_key=self.get_object())
             context['loanActions'] = 'DD'
             requestId_obj = company_inst.remitamandateactivationdata_set.all().get(loan_key=self.get_object())

@@ -62,13 +62,13 @@
                         <p>ROLE: <strong>{{ object.role }}</strong></p><hr/>
                          <p>Staff{% if staff_count > 1 %}s{% endif %}: <strong>
                             {% if object.plan == 'FREEMIUM' or object.plan == 'STARTUP' %}
-                                 <i class="fa fa-money"></i> Upgrade Account To Add Staff
+                                <i class="fa fa-money"></i> <div class="text-warning">Upgrade Account To Add Staff</div>
                             {% else %}
                                 <i class="fa fa-user"></i> {{ staff_count }}
                             {% endif %}
                          </strong></p> <hr/>
                         <p>
-                            You can add <strong>{{ plan_info_obj.max_staff }} staff{% if plan_info_obj.max_staff > 1 %}s{% endif %}</strong> only
+                            You can only add <strong>{{ plan_info_obj.max_staff }} staff{% if plan_info_obj.max_staff > 1 %}s{% endif %}</strong> only
                         </p><br/>
                         <button class="button button-contactForm btn_1 boxed-btn" data-toggle="modal" data-target="#modalLargeDefault"
                                 {% if object.plan == 'FREEMIUM' or object.plan == 'STARTUP' or staff_count == plan_info_obj.max_staff %}disabled{% endif %}>

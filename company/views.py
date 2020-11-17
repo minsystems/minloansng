@@ -481,6 +481,7 @@ class UpdateCompanyProfileView(GetObjectMixin, DetailView):
         company_instance.slug = "{name}-{randstr}".format(name=slugify(request.POST['companyName']),
                                                           randstr=random_string_generator(size=4))
         company_instance.save()
+        company_instance.user.working_for.add(company_instance)
 
         payload = {"success": True}
         return JsonResponse(payload)
