@@ -390,13 +390,27 @@ class Dashboard(View):
                 company_obj = Company.objects.get(slug=kwargs.get('slug'))
                 if company_obj.user.plan == "BUSINESS":
                     print("Have A Custom Homepage Without URL Masking")
-                    return render(request, "company/public-home.html", context={})
+                    context = {
+                        'title': "No Title"
+                    }
+                    return render(request, "company/public-home.html", context)
                 elif company_obj.user.plan == "ENTERPRISE":
                     print("Have A Custom Homepage With URL Masking")
                     return render(request, "company/public-home.html", context={})
                 elif company_obj.user.plan == "FREEMIUM":
                     print("No Custom Homepage For Freemium Users")
-                    return render(request, "company/public-home.html", context={})
+                    context = {
+                        'title': "No Title",
+                        'second_nav': "Second Nav",
+                        'third_nav': "Third Nav",
+                        "fourth_nav": "Fourth Nav",
+                        "fifth_nav": "Fifth Nav",
+                        "business_description": "Write a brief description of your business or"
+                                                " quick caption to get your users attention",
+                        "banner_image_url":"https://financial.ucsc.edu/SiteAssets/Dept_FAST.jpg",
+                        "second_nav_description": "Write a descriptive overview of this content"
+                    }
+                    return render(request, "company/public-home.html", context)
                     # return redirect(reverse('404_'))
             except Company.DoesNotExist:
                 return redirect(reverse('404_'))
