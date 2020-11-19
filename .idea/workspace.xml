@@ -3,10 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6b2ceb19-997d-44ab-af94-3b88c9a4fa83" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loans/templates/loans/remita/standing-order/setupmandate.html" beforeDir="false" afterPath="$PROJECT_DIR$/loans/templates/loans/remita/standing-order/setupmandate.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/loans/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/loans/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/js/loan-detail-js.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/js/loan-detail-js.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/nav/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/nav/navbar.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -51,23 +48,14 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/loans/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="192">
-              <caret line="640" column="12" selection-start-line="640" selection-start-column="12" selection-end-line="640" selection-end-column="12" />
+            <state relative-caret-position="226">
+              <caret line="791" column="36" lean-forward="true" selection-start-line="791" selection-start-column="36" selection-end-line="791" selection-end-column="36" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/templates/nav/navbar.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="400">
-              <caret line="76" column="4" selection-start-line="76" selection-start-column="4" selection-end-line="76" selection-end-column="4" />
             </state>
           </provider>
         </entry>
@@ -216,8 +204,8 @@
         <option value="$PROJECT_DIR$/templates/sidenav/sidebar.html" />
         <option value="$PROJECT_DIR$/loans/templates/loans/remita/standing-order/setupmandate.html" />
         <option value="$PROJECT_DIR$/templates/js/loan-detail-js.html" />
-        <option value="$PROJECT_DIR$/loans/views.py" />
         <option value="$PROJECT_DIR$/templates/nav/navbar.html" />
+        <option value="$PROJECT_DIR$/loans/views.py" />
       </list>
     </option>
   </component>
@@ -584,7 +572,7 @@
       <workItem from="1604029445700" duration="27000" />
       <workItem from="1604029986413" duration="196174000" />
       <workItem from="1605039639130" duration="61429000" />
-      <workItem from="1605340415616" duration="66328000" />
+      <workItem from="1605340415616" duration="67731000" />
     </task>
     <task id="LOCAL-00001" summary="First Official Dashboard Build With Sub Companies">
       <created>1582131582380</created>
@@ -604,7 +592,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1630712000" />
+    <option name="totallyTimeSpent" value="1632115000" />
   </component>
   <component name="TodoView" selected-index="3">
     <todo-panel id="selected-file">
@@ -691,13 +679,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="First Official Dashboard Build With Sub Companies" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/templates/transactions/transaction-deposit.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1776">
-          <caret line="10" column="33" lean-forward="true" selection-start-line="10" selection-start-column="33" selection-end-line="10" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/accounts/templates/accounts/user_registration.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2222">
@@ -1108,20 +1089,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/loans/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="640" column="12" selection-start-line="640" selection-start-column="12" selection-end-line="640" selection-end-column="12" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/Procfile">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/templates/nav/navbar.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="76" column="4" selection-start-line="76" selection-start-column="4" selection-end-line="76" selection-end-column="4" />
+        <state relative-caret-position="384">
+          <caret line="93" column="12" lean-forward="true" selection-start-line="93" selection-start-column="12" selection-end-line="93" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/loans/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="226">
+          <caret line="791" column="36" lean-forward="true" selection-start-line="791" selection-start-column="36" selection-end-line="791" selection-end-column="36" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

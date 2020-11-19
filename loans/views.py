@@ -162,8 +162,8 @@ class LoanListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(LoanListView, self).get_context_data(*args, **kwargs)
-        context['userCompany_qs'] = self.request.user.profile.company_set.all()
         company_inst = Company.objects.get(slug=self.kwargs.get('slug'))
+        context['userCompany_qs'] = company_inst.user.company_set.all()
         context['company'] = context['object'] = company_inst
         context['open_loan_count'] = self.get_queryset().filter(loan_status__iexact='OPEN').count()
         return context
@@ -202,7 +202,7 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
         company_inst = Company.objects.get(slug=self.kwargs.get('slug'))
         context['accessToken'] = company_inst.user.token
         context['company'] = context['object'] = company_inst
-        context['userCompany_qs'] = self.request.user.profile.company_set.all()
+        context['userCompany_qs'] = company_inst.user.company_set.all()
         context['loan_obj'] = self.get_object()
         context['penalty'] = self.get_object().penalty
         if timezone.now() >= self.get_object().end_date:
@@ -418,7 +418,7 @@ class LoanCollateralDetail(LoginRequiredMixin, DetailView):
         context = super(LoanCollateralDetail, self).get_context_data(*args, **kwargs)
         company_inst = Company.objects.get(slug=self.kwargs.get('slug'))
         context['company'] = context['object'] = company_inst
-        context['userCompany_qs'] = self.request.user.profile.company_set.all()
+        context['userCompany_qs'] = company_inst.user.company_set.all()
         context['loan_obj'] = self.get_object()
         context['cloudinary_upload_preset'] = cloudinary_upload_preset
         context['cloudinary_url'] = cloudinary_url
@@ -578,7 +578,7 @@ class RemitaStandingOrder(LoginRequiredMixin, DetailView):
         print(self.query_pk_and_slug, self.slug_url_kwarg)
         print(self.kwargs)
         context = super(RemitaStandingOrder, self).get_context_data(**kwargs)
-        context['userCompany_qs'] = self.request.user.profile.company_set.all()
+        context['userCompany_qs'] = self.get_object().user.company_set.all()
         context['user_pkgs'] = self.request.user.profile.loantype_set.all()
         context['user_collection_pkgs'] = self.request.user.profile.modeofrepayments_set.all()
         context['borrowers_qs'] = self.get_object().borrower_set.all()
