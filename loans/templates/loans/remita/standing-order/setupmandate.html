@@ -72,8 +72,8 @@
 
               <div class="card-body">
                 <div class="form-group">
-                <label for="inputName">Amount To Debit At Intervals</label>
-                <input type="number" id="inputAmount" class="form-control" value="" required>
+                <label for="inputName">Total Amount Remita Should Recover For You</label>
+                <input type="number" id="inputAmount" class="form-control" value="{{ estimatedReturn|localize|intcomma }}" required>
 
                 <br/>
 
@@ -148,10 +148,10 @@
                     <strong>Amount</strong>:
                 </p>
                 <p>
-                    Amount to be debited from user at interval when mandate is activated, also when multiplied with
-                    maximum number of debits, should add up to repayment fee.
+                    Total amount to be recovered from user when mandate is run is completed on user.
                     <p class="well well-sm mx-auto">
-                        <small>system estimated: </small><strong>NGN {{ loan_obj.principal_amount|localize|intcomma }}</strong>
+                        <small>system estimated: </small>
+                        <strong>NGN {{ estimatedReturn|localize|intcomma }}</strong>
                     </p>
                 </p>
 

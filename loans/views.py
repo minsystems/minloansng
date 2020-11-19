@@ -266,7 +266,8 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
             if timezone.now() >= self.get_object().end_date:
                 messages.warning(
                     self.request,
-                    "The loan %s has been overdue and system is scheduled to calculate penalty on current loan" % self.get_object().loan_key
+                    "The loan %s has been overdue and system is scheduled to calculate "
+                    "penalty on current loan" % self.get_object().loan_key
                 )
 
                 # get grace period
@@ -595,6 +596,7 @@ class RemitaStandingOrder(LoginRequiredMixin, DetailView):
 
         context['remitaCredential_obj'] = RemitaCredentials.objects.get(connected_firm=self.get_object())
         context['dd_url'] = remita_dd_url
+        context['estimatedReturn'] = armotizationLoanCalculator(loan_obj.principal_amount, loan_obj.interest, loan_obj.number_repayments)
 
         return context
 
@@ -635,6 +637,8 @@ class RemitaStandingOrder(LoginRequiredMixin, DetailView):
         return company_obj
 
     def post(self, *args, **kwargs):
+        if self.request.POST.get("startDate") == self.request.POST.get("endDate"):
+            return JsonResponse({'message': 'Mandate Start Date, Cannot Be The Same As EndDate'}, status=status.HTTP_200_OK)
         try:
             payer_obj = Borrower.objects.get(phone__exact=self.request.POST.get("payerPhone"))
         except Borrower.DoesNotExist:
@@ -649,34 +653,39 @@ class RemitaStandingOrder(LoginRequiredMixin, DetailView):
         loan_instance = Loan.objects.get(loan_key__iexact=self.request.POST.get("loanKey"))
         loanKey = loan_instance.loan_key
 
-        RemitaMandateActivationData.objects.create(
-            connected_firm=self.get_object(),
-            amount=self.request.POST.get("amount"),
-            start_date=self.request.POST.get("startDate"),
-            end_date=self.request.POST.get("endDate"),
-            max_number_of_debits=self.request.POST.get("maxNoOfDebits"),
-            mandate_type=self.request.POST.get("mandateType"),
-            payer_account=self.request.POST.get("payerAccount"),
-            payer_bank_code=payerBankCode,
-            payer_name=payerName,
-            payer_email=payerEmail,
-            payer_phone=self.request.POST.get("payerPhone"),
-            requestId=self.request.POST.get("requestId"),
-            merchantId=self.request.POST.get("merchantId"),
-            mandate_requestId=self.request.POST.get("requestId"),
-            hash_key=self.request.POST.get("hash"),
-            serviceTypeId=self.request.POST.get("serviceTypeId"),
-            loan_key=loan_instance,
-        )
+        try:
+            RemitaMandateActivationData.objects.get(loan_key=loanKey)
+            return JsonResponse({'message': 'This Mandate Activation Has Been Done Previously!'},
+                                status=status.HTTP_200_OK)
+        except RemitaMandateActivationData.DoesNotExist:
+            RemitaMandateActivationData.objects.create(
+                connected_firm=self.get_object(),
+                amount=self.request.POST.get("amount"),
+                start_date=self.request.POST.get("startDate"),
+                end_date=self.request.POST.get("endDate"),
+                max_number_of_debits=self.request.POST.get("maxNoOfDebits"),
+                mandate_type=self.request.POST.get("mandateType"),
+                payer_account=self.request.POST.get("payerAccount"),
+                payer_bank_code=payerBankCode,
+                payer_name=payerName,
+                payer_email=payerEmail,
+                payer_phone=self.request.POST.get("payerPhone"),
+                requestId=self.request.POST.get("requestId"),
+                merchantId=self.request.POST.get("merchantId"),
+                mandate_requestId=self.request.POST.get("requestId"),
+                hash_key=self.request.POST.get("hash"),
+                serviceTypeId=self.request.POST.get("serviceTypeId"),
+                loan_key=loan_instance,
+            )
 
-        # update the date of the loan date
-        loan_instance.number_repayments = self.request.POST.get("maxNoOfDebits")
-        loan_instance.release_date = datetime.strptime(self.request.POST.get('startDate'), "%d/%m/%Y")
-        loan_instance.end_date = datetime.strptime(self.request.POST.get("endDate"), "%d/%m/%Y")
-        loan_instance.save()
+            # update the date of the loan date
+            loan_instance.number_repayments = self.request.POST.get("maxNoOfDebits")
+            loan_instance.release_date = datetime.strptime(self.request.POST.get('startDate'), "%d/%m/%Y")
+            loan_instance.end_date = datetime.strptime(self.request.POST.get("endDate"), "%d/%m/%Y")
+            loan_instance.save()
 
-        return JsonResponse({'message': 'Submitted To DB, Processing to Remita Server..'},
-                            status=status.HTTP_200_OK)
+            return JsonResponse({'message': 'Submitted To DB, Processing to Remita Server..'},
+                                status=status.HTTP_200_OK)
 
 
 class RemitaMandateUpdate(View):

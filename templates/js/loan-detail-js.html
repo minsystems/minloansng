@@ -165,7 +165,16 @@
                     $(document).Toasts('create', {
                         class: 'bg-warning',
                         autohide: true,
-                        delay: 750,
+                        delay: 1000,
+                        title: 'An Error Occurred',
+                        subtitle: 'An error has made us reject this mandate ' + json_payload.mandateId,
+                        body: 'This Mandate ' + json_payload.mandateId + ' Activation Has ' + json_payload.status + ' with requestId ' + json_payload.requestId
+                    });
+                } else if (json_payload.statuscode === "02") {
+                    $(document).Toasts('create', {
+                        class: 'bg-danger',
+                        autohide: true,
+                        delay: 1000,
                         title: 'An Error Occurred',
                         subtitle: 'An error in your mandate data',
                         body: '' + json_payload.status
@@ -324,6 +333,15 @@
                         title: 'An error in previous transaction',
                         subtitle: 'Oops!',
                         body: 'Cannot perform debit, ' + json_payload.status
+                    });
+                } else if (json_payload.statuscode === "062") {
+                    $(document).Toasts('create', {
+                        class: 'bg-info',
+                        autohide: true,
+                        delay: 10000,
+                        title: 'Mandate Not Due',
+                        subtitle: 'Mandate Action Is Still In The Future',
+                        body: 'Cannot perform debit, because ' + json_payload.status
                     });
                 } else if (json_payload.statuscode === "069") {
                     $(document).Toasts('create', {
