@@ -58,7 +58,7 @@ class Messages(models.Model):
     def get_image(self):
         if self.image:
             return self.image.url
-        return 'https://cdn.minloans.com.ng/min-homepage/img/logo.png'
+        return 'https://cdn.minloans.com.ng/images/minloansng2.png'
 
     def get_absolute_url(self, company_inst):
         return reverse('mincore-url:message-detail', kwargs={'slug': company_inst, 'slug_message': self.slug})

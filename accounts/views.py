@@ -17,7 +17,7 @@ from rest_framework import status
 from company.models import Company
 from mincore.models import PlanDetails, SupportTickets
 from minloansng.mixins import NextUrlMixin, RequestFormAttachMixin
-from .forms import LoginForm, RegisterForm, GuestForm, ReactivateEmailForm, UserDetailChangeForm
+from .forms import LoginForm, RegisterForm, GuestForm, ReactivateEmailForm, UserDetailChangeForm, UserUpdateForm
 from .models import EmailActivation, Profile, User
 
 
@@ -192,5 +192,32 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         context['userTickets_qs'] = SupportTickets.objects.filter(user__exact=self.object)[:10]
         return context
 
-    def render_to_response(self, context, **response_kwargs):
-        return super(ProfileDetailView, self).render_to_response(context, **response_kwargs)
+
+class SystemUserProfile(LoginRequiredMixin, SuccessMessageMixin, DetailView):
+    model = Profile
+    template_name = 'accounts/system-user-profile.html'
+    success_message = "User profile has Been Updated Successfully!"
+
+    def get_context_data(self, **kwargs):
+        context = super(SystemUserProfile, self).get_context_data(**kwargs)
+        print(kwargs, self.kwargs)
+        company_obj = Company.objects.get(slug=self.kwargs.get('company_slug'))
+        loans_done_by_staff = company_obj.loan_set.filter(account_officer=kwargs.get('object'))
+        context['userCompany_qs'] = company_obj.user.company_set.all()
+        context['current_company_plan'] = company_obj.user.plan
+        context['works_for'] = self.object.working_for.all()
+        context.update({
+            'company': company_obj,
+            'object': company_obj,
+            'loans_conducted': loans_done_by_staff,
+            'form': UserUpdateForm(instance=self.get_object())
+        })
+        return context
+
+    def post(self, *args, **kwargs):
+        company_obj = Company.objects.get(slug=self.kwargs.get('company_slug'))
+        user_form = UserUpdateForm(self.request.POST or None, self.request.FILES or None, instance=self.get_object())
+        if user_form.is_valid():
+            user_form.save()
+            return redirect(reverse('account:company-user-detail', kwargs={'company_slug':company_obj.slug, 'slug': self.get_object().slug} ))
+        return JsonResponse({'message': 'An error during submission!'})

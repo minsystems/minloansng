@@ -50,142 +50,36 @@ class ContactProcessor(View):
 
 class MessageList(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        if request.user.full_name and request.user.profile.phone:
-            try:
-                company_obj = Company.objects.get(user=request.user.profile, slug=kwargs.get('slug'))
-                if company_obj.name:
-                    user_profile_obj = Profile.objects.get(user=request.user)
-                    user_plan = str(user_profile_obj.plan)
-                    if request.user.profile.is_premium:
-                        if user_plan == "STARTUP":
-                            if timezone.now() > user_profile_obj.trial_days:
-                                # return redirect to payment page
-                                messages.error(request,
-                                               "Account Expired!, Your Account Has Been Expired You Would Be "
-                                               "Redirected To The Payment Portal Upgrade Your Payment")
-                                # jQuery Handles Redirect
-                                user_companies_qs = request.user.profile.company_set.all()
-                                company_msg = Messages.objects.all().filter(to_obj=company_obj)
-                                context = {
-                                    'company': company_obj,
-                                    'object': company_obj,
-                                    'userCompany_qs': user_companies_qs,
-                                    'msg': company_msg,
-                                }
-                                return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
-                            else:
-                                remaining_days = user_profile_obj.trial_days - timezone.now()
-                                messages.warning(request,
-                                                 "You Have %s Days Left Before Account Suspension, Please Upgrade "
-                                                 "Your Account" % (remaining_days.days))
-                                user_companies_qs = request.user.profile.company_set.all()
-                                company_msg = Messages.objects.all().filter(to_obj=company_obj)
-                                context = {
-                                    'company': company_obj,
-                                    'object': company_obj,
-                                    'userCompany_qs': user_companies_qs,
-                                    'msg': company_msg,
-                                }
-                                return render(request, "company/dashboard.html", context)
-                        elif user_plan == "BUSINESS":
-                            print("BUSINESS")
-                        elif user_plan == "ENTERPRISE":
-                            print("ENTERPRISE")
-                        else:
-                            return redirect(reverse('404_'))
-                    elif user_plan == "FREEMIUM":
-                        if timezone.now() > user_profile_obj.trial_days:
-                            # return redirect to payment page
-                            messages.error(request, "Account Expired!")  # jQuery Handles Redirect
-                        else:
-                            user_companies_qs = request.user.profile.company_set.all()
-                            company_msg = Messages.objects.all().filter(to_obj=company_obj)
-                            context = {
-                                'company': company_obj,
-                                'object': company_obj,
-                                'userCompany_qs': user_companies_qs,
-                                'msg': company_msg,
-                            }
-                            return render(self.request, 'company/messages.html', context)
-                    else:
-                        return redirect(reverse('404_'))
-                else:
-                    return redirect(
-                        reverse('company-url:update-company-profile', kwargs={'slug': company_obj.slug}))
-            except Company.DoesNotExist:
-                return redirect('404_')
-        else:
-            return redirect(reverse('account:user-update'))
+        try:
+            company_obj = Company.objects.get(slug=kwargs.get('slug'))
+            user_companies_qs = company_obj.user.company_set.all()
+            company_msg = company_obj.messages_set.all()
+            context = {
+                'company': company_obj,
+                'object': company_obj,
+                'userCompany_qs': user_companies_qs,
+                'msg': company_msg,
+            }
+            return render(request, "company/messages.html", context)
+        except Company.DoesNotExist:
+            return redirect(reverse('404_'))
 
 
 class MessageDetail(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        if request.user.full_name and request.user.profile.phone:
-            try:
-                company_obj = Company.objects.get(user=request.user.profile, slug=kwargs.get('slug'))
-                if company_obj.name:
-                    user_profile_obj = Profile.objects.get(user=request.user)
-                    user_plan = str(user_profile_obj.plan)
-                    if request.user.profile.is_premium:
-                        if user_plan == "STARTUP":
-                            if timezone.now() > user_profile_obj.trial_days:
-                                # return redirect to payment page
-                                messages.error(request,
-                                               "Account Expired!, Your Account Has Been Expired You Would Be "
-                                               "Redirected To The Payment Portal Upgrade Your Payment")
-                                # jQuery Handles Redirect
-                                user_companies_qs = request.user.profile.company_set.all()
-                                company_msg = Messages.objects.all().filter(to_obj=company_obj)
-                                context = {
-                                    'company': company_obj,
-                                    'object': company_obj,
-                                    'userCompany_qs': user_companies_qs,
-                                    'msg': company_msg,
-                                }
-                                return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
-                            else:
-                                remaining_days = user_profile_obj.trial_days - timezone.now()
-                                messages.warning(request,
-                                                 "You Have %s Days Left Before Account Suspension, Please Upgrade "
-                                                 "Your Account" % (remaining_days.days))
-                                user_companies_qs = request.user.profile.company_set.all()
-                                company_msg = Messages.objects.all().filter(to_obj=company_obj)
-                                context = {
-                                    'company': company_obj,
-                                    'object': company_obj,
-                                    'userCompany_qs': user_companies_qs,
-                                    'msg': company_msg,
-                                }
-                                return render(request, "company/dashboard.html", context)
-                        elif user_plan == "BUSINESS":
-                            print("BUSINESS")
-                        elif user_plan == "ENTERPRISE":
-                            print("ENTERPRISE")
-                        else:
-                            return redirect(reverse('404_'))
-                    elif user_plan == "FREEMIUM":
-                        if timezone.now() > user_profile_obj.trial_days:
-                            # return redirect to payment page
-                            messages.error(request, "Account Expired!")  # jQuery Handles Redirect
-                        else:
-                            user_companies_qs = request.user.profile.company_set.all()
-                            company_msg_obj = Messages.objects.get(to_obj=company_obj, slug=kwargs.get('slug_message'))
-                            context = {
-                                'company': company_obj,
-                                'object': company_obj,
-                                'userCompany_qs': user_companies_qs,
-                                'msg_obj': company_msg_obj,
-                            }
-                            return render(self.request, 'company/messages-detail.html', context)
-                    else:
-                        return redirect(reverse('404_'))
-                else:
-                    return redirect(
-                        reverse('company-url:update-company-profile', kwargs={'slug': company_obj.slug}))
-            except Company.DoesNotExist:
-                return redirect('404_')
-        else:
-            return redirect(reverse('account:user-update'))
+        try:
+            company_obj = Company.objects.get(user=request.user.profile, slug=kwargs.get('slug'))
+            company_msg_obj = Messages.objects.get(to_obj=company_obj, slug=kwargs.get('slug_message'))
+            user_companies_qs = company_obj.user.company_set.all()
+            context = {
+                'company': company_obj,
+                'object': company_obj,
+                'userCompany_qs': user_companies_qs,
+                'msg_obj': company_msg_obj,
+            }
+            return render(request, "company/messages-detail.html", context)
+        except Company.DoesNotExist:
+            return redirect(reverse('404_'))
 
 
 class AccountUpgrade(View):

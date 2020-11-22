@@ -5,7 +5,7 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from phonenumber_field.formfields import PhoneNumberField
-from .models import EmailActivation, GuestEmail
+from .models import EmailActivation, GuestEmail, Profile
 
 User = get_user_model()
 
@@ -180,3 +180,21 @@ class RegisterForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = [
+            'phone',
+            'image'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(UserUpdateForm, self).__init__( *args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': (
+                    'form-control'
+                )
+            })

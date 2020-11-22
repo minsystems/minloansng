@@ -217,10 +217,10 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
             context['fileType'] = str(file_type)
         if str(self.get_object().mode_of_repayments) == "Remita Direct Debit":
             try:
-                base_obj = BaseUrl.objects.get(belongs_to='remita')
+                base_url = BaseUrl.objects.get(belongs_to='remita').base_url
             except BaseUrl.DoesNotExist:
-                base_obj = "https://no-url-connected.com"
-            context['base_url'] = base_obj.base_url
+                base_url = "https://no-url-connected.com"
+            context['base_url'] = base_url
             context['dd_obj'] = RemitaMandateActivationData.objects.get(loan_key=self.get_object())
             context['loanActions'] = 'DD'
             requestId_obj = company_inst.remitamandateactivationdata_set.all().get(loan_key=self.get_object())
@@ -433,7 +433,7 @@ class LoanCollateralDetail(LoginRequiredMixin, DetailView):
             # already existing and not created
             context['collateral_file_url'] = c_file_instance.file_url
         else:
-            context['collateral_file_url'] = c_file.file_url
+            context['collateral_file_url'] = "https://samplefiles.com/some-fake-docs.pdf"
         if self.get_object().mode_of_repayments == "Remita Direct Debit":
             context['dd_obj'] = RemitaMandateActivationData.objects.get(loan_key=self.get_object())
             context['company_creds'] = RemitaCredentials.objects.get(connected_firm=company_inst)

@@ -1,0 +1,386 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% load l10n %}
+
+{% block title %} {{ object }} {% endblock title %}
+
+
+{% block css_links %}
+    <!-- daterange picker -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/daterangepicker/daterangepicker.css">
+  <!-- iCheck for checkboxes and radio inputs -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- Bootstrap Color Picker -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
+  <!-- Tempusdominus Bbootstrap 4 -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/select2/css/select2.min.css">
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+  <!-- Bootstrap4 Duallistbox -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
+{% endblock css_links %}
+
+
+{% block content_header %}
+
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">{{ request.user.profile.get_name }} - Profile Detail</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{{ object.get_absolute_url }}">Home</a></li>
+              <li class="breadcrumb-item active">{{ object.name }}</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+{% endblock content_header %}
+
+
+{% block content %}
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-3">
+
+            <!-- Profile Image -->
+            <div class="card card-primary card-outline">
+              <div class="card-body box-profile">
+                <div class="text-center">
+                  <img class="profile-user-img img-fluid img-circle"
+                       src="{{ request.user.profile.get_image }}"
+                       alt="{{ request.user.profile.get_name }}">
+                </div>
+
+                <h3 class="profile-username text-center">{{ request.user.profile.get_name }}</h3>
+
+                <p class="text-muted text-center">
+                    <strong>Current Company: </strong> {{ object }}
+                </p>
+
+                <ul class="list-group list-group-unbordered mb-3">
+                  <li class="list-group-item">
+                    <b>Phone</b> <a class="float-right">{{ request.user.profile.phone }}</a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Email</b> <a class="float-right">{{ request.user.email }}</a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>keycode</b> <a class="float-right">{{ request.user.profile.keycode }} </a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Role</b> <a class="float-right"> {{ request.user.profile.role }}</a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Became A Member on:</b> <a class="float-right">{{ request.user.profile.timestamp }}</a>
+                  </li>
+                </ul>
+
+                <a href="#" class="btn btn-primary btn-block"><b>{{ request.user.profile.phone }}</b></a>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+          <div class="col-md-9">
+            <div class="card">
+              <div class="card-header p-2">
+                <ul class="nav nav-pills">
+                  <li class="nav-item"><a class="nav-link active" href="#activity" data-toggle="tab">Loans Conducted</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Update Profile</a></li>
+                </ul>
+              </div><!-- /.card-header -->
+              <div class="card-body">
+                <div class="tab-content">
+                  <div class="active tab-pane" id="activity">
+
+                  {% for obj in loans_conducted %}
+                    <!-- Post -->
+                    <div class="post">
+                      <div class="user-block">
+                        <img class="img-circle img-bordered-sm" src="{{ obj.loan_type.package.image.url }}" alt="">
+                        <span class="username">
+                          <a href="/loans/{{ object.slug }}/{{ obj.slug }}/detail/">{{ obj.loan_type.package.name }} - {{ borrower_obj }}</a>
+                          <a href="#" class="float-right btn-tool"><i class="fas fa-times"></i></a>
+                        </span>
+                        <span class="description">Loan Collected On - {{ obj.release_date|timesince }} ago</span>
+                      </div>
+                      <!-- /.user-block -->
+                      <p>{{ obj.description|safe }}</p>
+
+                      <br/>
+
+                      <p>
+                        <a href="/loans/{{ object.slug }}/{{ obj.slug }}/detail/" class="link-black text-sm mr-2"><i class="fas fa-edit mr-1"></i> Change/Modify</a>
+                        <a href="#" id="archiveLoan" class="link-black text-sm mr-2"><i class="fas fa-archive mr-1"></i> A/O: {{ obj.account_officer.get_name }}</a>
+                          <a href="#" class="link-black text-sm mr-2"><i class="fas fa-clock mr-1"></i> Loan Due: {{ obj.end_date }}</a>
+                        <span class="float-right">
+                          <a href="#" class="link-black text-sm">
+                              <i class="far fa-credit-card mr-2"></i> Installments: <strong>{{ obj.get_installments }} times</strong>
+                          </a>
+                          <a href="#" class="link-black text-sm">
+                              <i class="far fa-clipboard mr-1"></i> Status: <strong>{{ obj.loan_status }}</strong>
+                          </a>
+                        </span>
+                      </p>
+
+                    </div>
+                    <!-- /.post -->
+                  {% empty %}
+                      <h3 class="text-center">
+                          No Loan Record Found
+                      </h3>
+                  {% endfor %}
+
+                  </div>
+                  <!-- /.tab-pane -->
+                  <div class="tab-pane" id="timeline">
+                   <form method="POST" enctype="multipart/form-data" novalidate>
+                      {% csrf_token %}
+
+                      {% for hidden_field in form.hidden_fields %}
+                        {{ hidden_field }}
+                      {% endfor %}
+
+                      {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                          {% for error in form.non_field_errors %}
+                            {{ error }}
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+
+                      {% for field in form.visible_fields %}
+                        <div class="form-group">
+                          {{ field.label_tag }}
+
+                          {% if form.is_bound %}
+                            {% if field.errors %}
+                              {% render_field field class="form-control is-invalid" %}
+                              {% for error in field.errors %}
+                                <div class="invalid-feedback">
+                                  {{ error }}
+                                </div>
+                              {% endfor %}
+                            {% else %}
+                              {% render_field field class="form-control is-valid" %}
+                            {% endif %}
+                          {% else %}
+                            {% render_field field class="form-control" %}
+                          {% endif %}
+
+                          {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                          {% endif %}
+                        </div>
+                      {% endfor %}
+
+                      <button type="submit" class="btn btn-primary btn-block">Update</button>
+                  </form>
+                  </div>
+                  <!-- /.tab-pane -->
+                </div>
+                <!-- /.tab-content -->
+              </div><!-- /.card-body -->
+            </div>
+            <!-- /.nav-tabs-custom -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+
+{% endblock content %}
+
+
+{% block js_links %}
+<!-- jQuery -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Select2 -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/select2/js/select2.full.min.js"></script>
+<!-- Bootstrap4 Duallistbox -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
+<!-- InputMask -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/moment/moment.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/inputmask/min/jquery.inputmask.bundle.min.js"></script>
+<!-- date-range-picker -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/daterangepicker/daterangepicker.js"></script>
+<!-- bootstrap color picker -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+<!-- Bootstrap Switch -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+<!-- Page script -->
+<!-- jquery-validation -->
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/jquery-validation/jquery.validate.min.js"></script>
+<script src="https://cdn.minloans.com.ng/min-dash/plugins/jquery-validation/additional-methods.min.js"></script>
+<!-- AdminLTE App -->
+<script src="https://cdn.minloans.com.ng/min-dash/dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="https://cdn.minloans.com.ng/min-dash/dist/js/demo.js"></script>
+<script>
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2();
+
+    //Initialize Select2 Elements
+    $('.select2bs4').select2({
+      theme: 'bootstrap4'
+    });
+
+    //Datemask dd/mm/yyyy
+    $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' });
+    //Datemask2 mm/dd/yyyy
+    $('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' });
+    //Money Euro
+    $('[data-mask]').inputmask();
+
+    $('#id_date_of_birth').daterangepicker({
+        singleDatePicker: true,
+        showDropdowns: true,
+        minYear: 1910,
+        maxYear: parseInt(moment().format('YYYY'),10),
+        locale: {
+            format: 'YYYY-MM-DD'
+        }
+       }, function(start, end, label) {
+        var years = moment().diff(start, 'years');
+    });
+
+    //Date range picker
+    $('#reservation').daterangepicker();
+    //Date range picker with time picker
+    $('#reservationtime').daterangepicker({
+      timePicker: true,
+      timePickerIncrement: 30,
+      locale: {
+        format: 'MM/DD/YYYY hh:mm A'
+      }
+    });
+    //Date range as a button
+    $('#daterange-btn').daterangepicker(
+      {
+        ranges   : {
+          'Today'       : [moment(), moment()],
+          'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+          'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
+          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+          'This Month'  : [moment().startOf('month'), moment().endOf('month')],
+          'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        startDate: moment().subtract(29, 'days'),
+        endDate  : moment()
+      },
+      function (start, end) {
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
+      }
+    );
+
+    //Timepicker
+    $('#timepicker').datetimepicker({
+      format: 'LT'
+    });
+
+    //Bootstrap Duallistbox
+    $('.duallistbox').bootstrapDualListbox();
+
+    //Colorpicker
+    $('.my-colorpicker1').colorpicker();
+    //color picker with addon
+    $('.my-colorpicker2').colorpicker();
+
+    $('.my-colorpicker2').on('colorpickerChange', function(event) {
+      $('.my-colorpicker2 .fa-square').css('color', event.color.toString());
+    });
+
+    $("input[data-bootstrap-switch]").each(function(){
+      $(this).bootstrapSwitch('state', $(this).prop('checked'));
+    });
+
+    $("#country").change(function () {
+        const currentCountry = $(this).val();
+        $('#state').val("Enter A Corresponding State To The Country: " + currentCountry).change(function () {
+            $("#lga").val("Enter A Corresponding LGA To The Country: " + $(this).val())
+        })
+    });
+
+    Toast.fire({
+        type: 'Success',
+        title: 'Borrower Account!'
+    })
+
+  })
+</script>
+<script type="text/javascript">
+$(document).ready(function () {
+  $.validator.setDefaults({
+    submitHandler: function () {
+      console.log( "submitted clicked!" );
+    }
+  });
+  $('.addBorrowerForm').validate({
+    rules: {
+      email: {
+        required: true,
+        email: true,
+      },
+      password: {
+        required: true,
+        minlength: 5
+      },
+      terms: {
+        required: true
+      },
+    },
+    messages: {
+      email: {
+        required: "Please enter a email address",
+        email: "Please enter a vaild email address"
+      },
+      password: {
+        required: "Please provide a password",
+        minlength: "Your password must be at least 5 characters long"
+      },
+      terms: "Please accept our terms"
+    },
+    errorElement: 'span',
+    errorPlacement: function (error, element) {
+      error.addClass('invalid-feedback');
+      element.closest('.form-group').append(error);
+    },
+    highlight: function (element, errorClass, validClass) {
+      $(element).addClass('is-invalid');
+    },
+    unhighlight: function (element, errorClass, validClass) {
+      $(element).removeClass('is-invalid');
+    }
+  });
+
+  const archiveTrigger = $('#archiveLoan');
+  archiveTrigger.click(function (event) {
+      event.preventDefault();
+      console.log("clicked!");
+      const data = {
+          "company":object,
+      }
+  })
+});
+</script>
+{% endblock js_links %}

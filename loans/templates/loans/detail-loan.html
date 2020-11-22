@@ -113,7 +113,7 @@
                       <div class="user-block">
                         <img class="img-circle img-bordered-sm" src="{{ loan_obj.borrower.get_image }}" alt="user image">
                         <span class="username">
-                          <a href="#">{{ loan_obj.borrower }}</a>
+                          <a href="{{ loan_obj.borrower.get_absolute_url }}">{{ loan_obj.borrower }}</a>
                         </span>
                         <span class="description">Loan Type - {{ loan_obj.loan_type }}</span>
                       </div>
@@ -435,7 +435,7 @@
                       <div class="user-block">
                         <img class="img-circle img-bordered-sm" src="{{ loan_obj.account_officer.get_image }}" alt="{{ loan_obj.account_officer.get_name }} Image">
                         <span class="username">
-                          <a href="#">{{ loan_obj.account_officer.get_name }}</a>
+                          <a href="{{ loan_obj.account_officer.get_absolute_url }}">{{ loan_obj.account_officer.get_name }}</a>
                         </span>
                         <span class="description">Activity Changes Done On {{ loan_obj.borrower }}'s {{ loan_comments.timestamp|timesince }}</span>
                       </div>
