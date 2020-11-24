@@ -2,6 +2,7 @@ from cloudinary.models import CloudinaryField
 from django.db import models
 
 # Create your models here.
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.urls import reverse
 
@@ -182,6 +183,12 @@ class LoanQuerySet(models.query.QuerySet):
     def active(self):
         return self.filter(active=True)
 
+    def search(self, query):
+        lookups = (
+                Q(principal_amount__icontains=query) |Q(loan_key__icontains=query)
+            )
+        return self.filter(lookups).distinct()
+
 
 class LoanManager(models.Manager):
     def get_queryset(self):
@@ -192,6 +199,9 @@ class LoanManager(models.Manager):
 
     def opened_loans(self):
         return self.all().filter(loan_status__iexact='OPEN')
+
+    def search(self, query):
+        return self.get_queryset().active().search(query)
 
 
 class Loan(models.Model):
@@ -237,8 +247,8 @@ class Loan(models.Model):
         verbose_name_plural = "loans"
         ordering = ("-timestamp",)
 
-    def get_absolute_url(self, company_inst):
-        return reverse('loans-url:loan-detail', kwargs={'slug': company_inst.slug, 'loan_slug': self.slug})
+    def get_absolute_url(self):
+        return reverse('loans-url:loan-detail', kwargs={'slug': self.company.slug, 'loan_slug': self.slug})
 
     def __str__(self):
         return self.loan_key

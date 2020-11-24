@@ -596,7 +596,7 @@ class RemitaStandingOrder(LoginRequiredMixin, DetailView):
 
         context['remitaCredential_obj'] = RemitaCredentials.objects.get(connected_firm=self.get_object())
         context['dd_url'] = remita_dd_url
-        context['estimatedReturn'] = armotizationLoanCalculator(loan_obj.principal_amount, loan_obj.interest, loan_obj.number_repayments)
+        context['estimatedReturn'] = armotizationLoanCalculator(loan_obj.principal_amount, loan_obj.interest, digitExtract(loan_obj.number_repayments))
 
         return context
 

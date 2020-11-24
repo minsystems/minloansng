@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'minone',
     'settings',
     'transactions',
+    'search',
 ]
 
 X_FRAME_OPTIONS='SAMEORIGIN'
