@@ -388,9 +388,11 @@ $(document).ready(function () {
 
                 displaySubmitting(accountTypeFormSubmitBtn, "", true);
 
+                console.log(accountTypeFormData);
+
                 $.ajax({
                     method: accountTypeFormMethod,
-                    url: accountTypeFormEndpoint,
+                    url: "/borrowers/{{ object.slug }}/assign-account/",
                     data: accountTypeFormData,
                     contentType: 'application/x-www-form-urlencoded',
 
@@ -406,7 +408,7 @@ $(document).ready(function () {
                             body: '' + data.message
                         });
                         setTimeout(function () {
-                            window.location.replace({% url 'borrowers-url:borrower-account-list' object.slug %});
+                            window.location.replace("{% url 'borrowers-url:borrower-account-list' object.slug %}");
                         }, 3000);
                     }, error: function (error) {
                         accountTypeForm[0].reset();

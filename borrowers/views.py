@@ -288,6 +288,7 @@ class AssignBankAccountToBorrower(LoginRequiredMixin, DetailView):
         return context
 
     def post(self, request, *args, **kwargs):
+        print(self.request.POST)
         borrower_obj = Borrower.objects.get(slug=self.request.POST.get('borrower'))
         bank_account_type = BankAccountType.objects.get(slug=self.request.POST.get('account_type'))
         BorrowerBankAccount.objects.create(

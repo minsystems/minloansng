@@ -3,7 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="6b2ceb19-997d-44ab-af94-3b88c9a4fa83" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loans/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/loans/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/borrowers/templates/borrowers/bank-account-create.html" beforeDir="false" afterPath="$PROJECT_DIR$/borrowers/templates/borrowers/bank-account-create.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/borrowers/templates/borrowers/borrower-detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/borrowers/templates/borrowers/borrower-detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/borrowers/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/borrowers/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minmarkets/templates/minmarket/auth.html" beforeDir="false" afterPath="$PROJECT_DIR$/minmarkets/templates/minmarket/auth.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -78,23 +81,59 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/minmarkets/templates/minmarket/auth.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="122">
-              <caret line="31" column="19" lean-forward="true" selection-start-line="31" selection-start-column="19" selection-end-line="31" selection-end-column="19" />
+            <state relative-caret-position="400">
+              <caret line="50" column="86" selection-start-line="50" selection-start-column="86" selection-end-line="50" selection-end-column="86" />
               <folding>
                 <element signature="n#style#0;n#span#0;n#form#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#span#0;n#div#0;n#form#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#button#0;n#div#1;n#form#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#a#0;n#div#2;n#form#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/borrowers/views.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="286">
+              <caret line="300" column="26" selection-start-line="300" selection-start-column="26" selection-end-line="300" selection-end-column="26" />
+              <folding>
+                <element signature="e#0#32#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/borrowers/templates/borrowers/bank-account-create.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="314">
+              <caret line="410" column="113" lean-forward="true" selection-start-line="410" selection-start-column="113" selection-end-line="410" selection-end-column="113" />
+              <folding>
+                <element signature="e#2835#5644#0#HTML" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/borrowers/forms.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="336">
+              <caret line="58" column="17" lean-forward="true" selection-start-line="58" selection-start-column="17" selection-end-line="58" selection-end-column="17" />
+              <folding>
+                <element signature="e#0#48#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/loans/views.py">
+        <entry file="file://$PROJECT_DIR$/borrowers/templates/borrowers/borrower-detail.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="656" column="74" selection-start-line="656" selection-start-column="74" selection-end-line="656" selection-end-column="74" />
-              <folding>
-                <element signature="e#0#11#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="346">
+              <caret line="231" column="34" lean-forward="true" selection-start-line="231" selection-start-column="34" selection-end-line="231" selection-end-column="34" />
             </state>
           </provider>
         </entry>
@@ -140,8 +179,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/transactions/urls.py" />
-        <option value="$PROJECT_DIR$/templates/transactions/transaction-deposit.html" />
         <option value="$PROJECT_DIR$/accounts/templates/accounts/register.html" />
         <option value="$PROJECT_DIR$/minloansng/utils.py" />
         <option value="$PROJECT_DIR$/transactions/views.py" />
@@ -166,7 +203,6 @@
         <option value="$PROJECT_DIR$/templates/sidenav/sidebar.html" />
         <option value="$PROJECT_DIR$/loans/templates/loans/remita/standing-order/setupmandate.html" />
         <option value="$PROJECT_DIR$/templates/js/loan-detail-js.html" />
-        <option value="$PROJECT_DIR$/borrowers/views.py" />
         <option value="$PROJECT_DIR$/mincore/views.py" />
         <option value="$PROJECT_DIR$/mincore/models.py" />
         <option value="$PROJECT_DIR$/accounts/urls.py" />
@@ -189,8 +225,11 @@
         <option value="$PROJECT_DIR$/minmarkets/urls.py" />
         <option value="$PROJECT_DIR$/minloansng/urls.py" />
         <option value="$PROJECT_DIR$/minmarkets/templates/minmarket/cont.html" />
-        <option value="$PROJECT_DIR$/minmarkets/templates/minmarket/auth.html" />
         <option value="$PROJECT_DIR$/loans/views.py" />
+        <option value="$PROJECT_DIR$/minmarkets/templates/minmarket/auth.html" />
+        <option value="$PROJECT_DIR$/borrowers/views.py" />
+        <option value="$PROJECT_DIR$/borrowers/templates/borrowers/bank-account-create.html" />
+        <option value="$PROJECT_DIR$/borrowers/templates/borrowers/borrower-detail.html" />
       </list>
     </option>
   </component>
@@ -212,6 +251,24 @@
             <path>
               <item name="minloansng" type="b2602c69:ProjectViewProjectNode" />
               <item name="minloansng" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="minloansng" type="b2602c69:ProjectViewProjectNode" />
+              <item name="minloansng" type="462c0819:PsiDirectoryNode" />
+              <item name="borrowers" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="minloansng" type="b2602c69:ProjectViewProjectNode" />
+              <item name="minloansng" type="462c0819:PsiDirectoryNode" />
+              <item name="borrowers" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="minloansng" type="b2602c69:ProjectViewProjectNode" />
+              <item name="minloansng" type="462c0819:PsiDirectoryNode" />
+              <item name="borrowers" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+              <item name="borrowers" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="minloansng" type="b2602c69:ProjectViewProjectNode" />
@@ -439,7 +496,7 @@
       <workItem from="1604029445700" duration="27000" />
       <workItem from="1604029986413" duration="196174000" />
       <workItem from="1605039639130" duration="61429000" />
-      <workItem from="1605340415616" duration="94434000" />
+      <workItem from="1605340415616" duration="97661000" />
     </task>
     <task id="LOCAL-00001" summary="First Official Dashboard Build With Sub Companies">
       <created>1582131582380</created>
@@ -459,7 +516,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1658818000" />
+    <option name="totallyTimeSpent" value="1662045000" />
   </component>
   <component name="TodoView" selected-index="3">
     <todo-panel id="selected-file">
@@ -474,12 +531,12 @@
     <frame x="-8" y="-8" width="1382" height="744" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.27836612" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.27836612" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3289689" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4977307" visible="true" weight="0.29787233" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4977307" visible="true" weight="0.29787233" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39934534" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -546,13 +603,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="First Official Dashboard Build With Sub Companies" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/templates/privacy.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="14" column="108" selection-start-line="14" selection-start-column="108" selection-end-line="14" selection-end-column="108" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/features.html">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -682,13 +732,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/borrowers/templates/borrowers/borrower-detail.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="128">
-          <caret line="8" column="21" lean-forward="true" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/sidenav/sidebar.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1520">
@@ -721,26 +764,6 @@
           <caret line="39" column="52" selection-start-line="39" selection-start-column="51" selection-end-line="39" selection-end-column="52" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/borrowers/forms.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="55" column="46" selection-start-line="55" selection-start-column="46" selection-end-line="55" selection-end-column="46" />
-          <folding>
-            <element signature="e#0#48#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/borrowers/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="135" column="4" selection-start-line="135" selection-start-column="4" selection-end-line="141" selection-end-column="71" />
-          <folding>
-            <element signature="e#0#32#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -974,23 +997,63 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/minmarkets/templates/minmarket/auth.html">
+    <entry file="file://$PROJECT_DIR$/loans/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="122">
-          <caret line="31" column="19" lean-forward="true" selection-start-line="31" selection-start-column="19" selection-end-line="31" selection-end-column="19" />
+        <state relative-caret-position="234">
+          <caret line="685" lean-forward="true" selection-start-line="685" selection-end-line="685" />
           <folding>
-            <element signature="n#style#0;n#span#0;n#form#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/loans/views.py">
+    <entry file="file://$PROJECT_DIR$/minmarkets/templates/minmarket/auth.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="656" column="74" selection-start-line="656" selection-start-column="74" selection-end-line="656" selection-end-column="74" />
+        <state relative-caret-position="400">
+          <caret line="50" column="86" selection-start-line="50" selection-start-column="86" selection-end-line="50" selection-end-column="86" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#form#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#div#0;n#form#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#button#0;n#div#1;n#form#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#a#0;n#div#2;n#form#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/borrowers/forms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="58" column="17" lean-forward="true" selection-start-line="58" selection-start-column="17" selection-end-line="58" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#48#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/borrowers/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="286">
+          <caret line="300" column="26" selection-start-line="300" selection-start-column="26" selection-end-line="300" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/borrowers/templates/borrowers/bank-account-create.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="314">
+          <caret line="410" column="113" lean-forward="true" selection-start-line="410" selection-start-column="113" selection-end-line="410" selection-end-column="113" />
+          <folding>
+            <element signature="e#2835#5644#0#HTML" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/borrowers/templates/borrowers/borrower-detail.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="346">
+          <caret line="231" column="34" lean-forward="true" selection-start-line="231" selection-start-column="34" selection-end-line="231" selection-end-column="34" />
         </state>
       </provider>
     </entry>

@@ -172,7 +172,7 @@
                         <span class="description">Loan Collected On - {{ obj.release_date|timesince }} ago</span>
                       </div>
                       <!-- /.user-block -->
-                      <p>{{ obj.description }}</p>
+                      <p>{{ obj.description|safe }}</p>
 
                       <br/>
 
