@@ -654,7 +654,7 @@ class RemitaStandingOrder(LoginRequiredMixin, DetailView):
         loanKey = loan_instance.loan_key
 
         try:
-            RemitaMandateActivationData.objects.get(loan_key=loanKey)
+            RemitaMandateActivationData.objects.get(loan_key=loan_instance)
             return JsonResponse({'message': 'This Mandate Activation Has Been Done Previously!'},
                                 status=status.HTTP_200_OK)
         except RemitaMandateActivationData.DoesNotExist:

@@ -2,22 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6b2ceb19-997d-44ab-af94-3b88c9a4fa83" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/loans/templates/loans/snippets/card.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/minmarkets/templates/minmarket/auth.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/minmarkets/templates/minmarket/cont.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/minmarkets/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/search/templates/search/snippets/search-form.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/search/templates/search/view.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/search/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db_minloansng_new.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db_minloansng_new.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loans/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/loans/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/loans/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/loans/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minloansng/settings/production.py" beforeDir="false" afterPath="$PROJECT_DIR$/minloansng/settings/production.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minloansng/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/minloansng/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minmarkets/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/minmarkets/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/js/dashjs.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/js/dashjs.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/nav/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/nav/navbar.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -48,7 +34,7 @@
         <entry file="file://$PROJECT_DIR$/minmarkets/views.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="160">
-              <caret line="10" column="28" lean-forward="true" selection-start-line="10" selection-start-column="28" selection-end-line="10" selection-end-column="28" />
+              <caret line="10" column="28" selection-start-line="10" selection-start-column="28" selection-end-line="10" selection-end-column="28" />
               <folding>
                 <element signature="e#1#36#0" expanded="true" />
               </folding>
@@ -60,7 +46,7 @@
         <entry file="file://$PROJECT_DIR$/minmarkets/urls.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="112">
-              <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
+              <caret line="7" selection-start-line="7" selection-end-line="7" />
               <folding>
                 <element signature="e#0#28#0" expanded="true" />
               </folding>
@@ -72,7 +58,7 @@
         <entry file="file://$PROJECT_DIR$/minloansng/urls.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="263">
-              <caret line="33" column="56" lean-forward="true" selection-start-line="33" selection-start-column="56" selection-end-line="33" selection-end-column="56" />
+              <caret line="33" column="56" selection-start-line="33" selection-start-column="56" selection-end-line="33" selection-end-column="56" />
               <folding>
                 <element signature="e#634#666#0" expanded="true" />
               </folding>
@@ -84,16 +70,16 @@
         <entry file="file://$PROJECT_DIR$/minmarkets/templates/minmarket/cont.html">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="144">
-              <caret line="9" column="7" lean-forward="true" selection-start-line="9" selection-start-column="7" selection-end-line="9" selection-end-column="7" />
+              <caret line="9" column="7" selection-start-line="9" selection-start-column="7" selection-end-line="9" selection-end-column="7" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/minmarkets/templates/minmarket/auth.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="144">
-              <caret line="35" column="156" selection-start-line="35" selection-start-column="156" selection-end-line="35" selection-end-column="156" />
+            <state relative-caret-position="122">
+              <caret line="31" column="19" lean-forward="true" selection-start-line="31" selection-start-column="19" selection-end-line="31" selection-end-column="19" />
               <folding>
                 <element signature="n#style#0;n#span#0;n#form#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
               </folding>
@@ -101,11 +87,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/loans/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="266">
-              <caret line="597" column="41" lean-forward="true" selection-start-line="597" selection-start-column="41" selection-end-line="597" selection-end-column="41" />
+            <state relative-caret-position="90">
+              <caret line="656" column="74" selection-start-line="656" selection-start-column="74" selection-end-line="656" selection-end-column="74" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -203,8 +189,8 @@
         <option value="$PROJECT_DIR$/minmarkets/urls.py" />
         <option value="$PROJECT_DIR$/minloansng/urls.py" />
         <option value="$PROJECT_DIR$/minmarkets/templates/minmarket/cont.html" />
-        <option value="$PROJECT_DIR$/loans/views.py" />
         <option value="$PROJECT_DIR$/minmarkets/templates/minmarket/auth.html" />
+        <option value="$PROJECT_DIR$/loans/views.py" />
       </list>
     </option>
   </component>
@@ -453,7 +439,7 @@
       <workItem from="1604029445700" duration="27000" />
       <workItem from="1604029986413" duration="196174000" />
       <workItem from="1605039639130" duration="61429000" />
-      <workItem from="1605340415616" duration="92804000" />
+      <workItem from="1605340415616" duration="94434000" />
     </task>
     <task id="LOCAL-00001" summary="First Official Dashboard Build With Sub Companies">
       <created>1582131582380</created>
@@ -473,7 +459,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1657188000" />
+    <option name="totallyTimeSpent" value="1658818000" />
   </component>
   <component name="TodoView" selected-index="3">
     <todo-panel id="selected-file">
@@ -488,12 +474,12 @@
     <frame x="-8" y="-8" width="1382" height="744" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.27836612" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.27836612" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3289689" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4977307" visible="true" weight="0.29787233" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4977307" visible="true" weight="0.29787233" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39934534" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -920,7 +906,7 @@
     <entry file="file://$PROJECT_DIR$/minmarkets/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="112">
-          <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
+          <caret line="7" selection-start-line="7" selection-end-line="7" />
           <folding>
             <element signature="e#0#28#0" expanded="true" />
           </folding>
@@ -930,7 +916,7 @@
     <entry file="file://$PROJECT_DIR$/minmarkets/views.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="160">
-          <caret line="10" column="28" lean-forward="true" selection-start-line="10" selection-start-column="28" selection-end-line="10" selection-end-column="28" />
+          <caret line="10" column="28" selection-start-line="10" selection-start-column="28" selection-end-line="10" selection-end-column="28" />
           <folding>
             <element signature="e#1#36#0" expanded="true" />
           </folding>
@@ -957,7 +943,7 @@
     <entry file="file://$PROJECT_DIR$/minloansng/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="263">
-          <caret line="33" column="56" lean-forward="true" selection-start-line="33" selection-start-column="56" selection-end-line="33" selection-end-column="56" />
+          <caret line="33" column="56" selection-start-line="33" selection-start-column="56" selection-end-line="33" selection-end-column="56" />
           <folding>
             <element signature="e#634#666#0" expanded="true" />
           </folding>
@@ -967,7 +953,7 @@
     <entry file="file://$PROJECT_DIR$/minmarkets/templates/minmarket/cont.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="144">
-          <caret line="9" column="7" lean-forward="true" selection-start-line="9" selection-start-column="7" selection-end-line="9" selection-end-column="7" />
+          <caret line="9" column="7" selection-start-line="9" selection-start-column="7" selection-end-line="9" selection-end-column="7" />
         </state>
       </provider>
     </entry>
@@ -988,22 +974,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/loans/views.py">
+    <entry file="file://$PROJECT_DIR$/minmarkets/templates/minmarket/auth.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="597" column="41" lean-forward="true" selection-start-line="597" selection-start-column="41" selection-end-line="597" selection-end-column="41" />
+        <state relative-caret-position="122">
+          <caret line="31" column="19" lean-forward="true" selection-start-line="31" selection-start-column="19" selection-end-line="31" selection-end-column="19" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#form#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/minmarkets/templates/minmarket/auth.html">
+    <entry file="file://$PROJECT_DIR$/loans/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="35" column="156" selection-start-line="35" selection-start-column="156" selection-end-line="35" selection-end-column="156" />
+        <state relative-caret-position="90">
+          <caret line="656" column="74" selection-start-line="656" selection-start-column="74" selection-end-line="656" selection-end-column="74" />
           <folding>
-            <element signature="n#style#0;n#span#0;n#form#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
