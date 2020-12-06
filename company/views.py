@@ -22,7 +22,7 @@ TRIAL_WARNING_DAYS = 5
 
 
 class Dashboard(View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request: object, args: object, kwargs: object) -> object:
         if request.user.is_authenticated:
             if request.user.full_name and request.user.profile.phone:
                 try:
@@ -433,8 +433,7 @@ class UpdateCompanyProfileView(GetObjectMixin, DetailView):
     model = Company
 
     def get_context_data(self, **kwargs):
-        context = super(UpdateCompanyProfileView, self).get_context_data(**kwargs)
-        return context
+        return super(UpdateCompanyProfileView, self).get_context_data(**kwargs)
 
     def render_to_response(self, context, **response_kwargs):
         if context:
@@ -445,23 +444,22 @@ class UpdateCompanyProfileView(GetObjectMixin, DetailView):
                                "Account Expired!, Your Account Has Been Expired You Would Be "
                                "Redirected To The Payment Portal Upgrade Your Payment")
                 return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
-            if self.request.user.is_authenticated:
-                thisUser = str(self.get_object().user)
-                currentUser = str(self.request.user)
-                if thisUser != currentUser:
-                    return reverse('404_')
-                else:
-                    if self.get_object().name:
-                        messages.warning(self.request,
-                                         "You Can Only Access This Page Once!")  # jQuery handles redirect after this
-                    else:
-                        if self.get_object().user.phone is None:
-                            print("Redirect To Profile Update!")
-                        else:
-                            messages.info(self.request,
-                                          "Update Company Information")  # jQuery lets you update this information
-            else:
+            if not self.request.user.is_authenticated:
                 return redirect(reverse('404_'))
+            thisUser = str(self.get_object().user)
+            currentUser = str(self.request.user)
+            if thisUser == currentUser:
+                if self.get_object().name:
+                    messages.warning(self.request,
+                                     "You Can Only Access This Page Once!")  # jQuery handles redirect after this
+                else:
+                    if self.get_object().user.phone is None:
+                        print("Redirect To Profile Update!")
+                    else:
+                        messages.info(self.request,
+                                      "Update Company Information")  # jQuery lets you update this information
+            else:
+                return reverse('404_')
         return super(UpdateCompanyProfileView, self).render_to_response(context, **response_kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -493,8 +491,7 @@ class CompanyAccountTypesList(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         company = Company.objects.get(slug=self.kwargs.get('slug'))
-        account_types_qs = self.model.objects.filter(company=company)
-        return account_types_qs
+        return self.model.objects.filter(company=company)
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(CompanyAccountTypesList, self).get_context_data(**kwargs)

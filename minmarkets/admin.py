@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from minmarkets.models import LoanPackage, LoanCalculators, LoanCollectionPackage
+from minmarkets.models import LoanPackage, LoanCalculators, LoanCollectionPackage, IdentityVerificationPackage
 
 
 @admin.register(LoanPackage)
@@ -29,3 +29,14 @@ class LoanCollectionPackageAdmin(admin.ModelAdmin):
     search_fields = ('name', 'product_code',)
     readonly_fields = ('image_tag',)
     list_filter = ('name', 'price', 'premium_package', 'package_owner', 'product_code',)
+
+
+@admin.register(IdentityVerificationPackage)
+class IdentityVerificationPackageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'price', 'premium_package', 'package_owner', 'product_code', 'timestamp', 'updated')
+    list_display_links = ('name', 'timestamp', 'product_code',)
+    search_fields = ('name', 'product_code',)
+    readonly_fields = ('image_tag',)
+    list_filter = ('name', 'price', 'premium_package', 'package_owner', 'product_code',)
+
+

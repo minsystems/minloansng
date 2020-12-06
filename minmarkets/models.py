@@ -12,6 +12,7 @@ class LoanPackage(models.Model):
     package_owner = models.CharField(max_length=300)
     description = models.TextField()
     product_code = models.CharField(null=True, blank=True, max_length=10)
+    featured = models.BooleanField(default=True)
     image = CloudinaryField(upload_image_path, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
@@ -35,6 +36,7 @@ class LoanCalculators(models.Model):
     description = models.TextField()
     file = models.CharField(max_length=300, blank=True, null=True, help_text="download link here!")
     product_code = models.CharField(null=True, blank=True, max_length=10)
+    featured = models.BooleanField(default=True)
     image = CloudinaryField(upload_image_path, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
@@ -61,6 +63,7 @@ class LoanCollectionPackage(models.Model):
     package_owner = models.CharField(max_length=300)
     description = models.TextField()
     product_code = models.CharField(null=True, blank=True, max_length=10)
+    featured = models.BooleanField(default=True)
     image = CloudinaryField(upload_image_path, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
@@ -74,3 +77,27 @@ class LoanCollectionPackage(models.Model):
 
     image_tag.short_description = 'Package Image'
     image_tag.allow_tags = True
+
+
+class IdentityVerificationPackage(models.Model):
+    name = models.CharField(max_length=300, blank=True, null=True)
+    price = models.IntegerField(default=3000)
+    premium_package = models.BooleanField(default=True)
+    package_owner = models.CharField(max_length=300)
+    description = models.TextField()
+    featured = models.BooleanField(default=True)
+    product_code = models.CharField(null=True, blank=True, max_length=10)
+    image = CloudinaryField(upload_image_path, null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
+    updated = models.DateTimeField(auto_now_add=False, auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+    def image_tag(self):
+        from django.utils.html import mark_safe
+        return mark_safe('<img src="%s" width="150" height="200" />' % self.image.url)
+
+    image_tag.short_description = 'Package Image'
+    image_tag.allow_tags = True
+

@@ -177,20 +177,21 @@ class LoanListView(LoginRequiredMixin, ListView):
                                "Account Expired!, Your Account Has Been Expired You Would Be "
                                "Redirected To The Payment Portal Upgrade Your Payment")
                 return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
-            staff_array = list()
-            for user_obj in context.get('object').staffs.all():
-                staff_array.append(str(user_obj))
-            if self.request.user.email in staff_array or self.request.user.email == str(
-                    context.get('object').user.user.email):
-                pass
-            else:
+            staff_array = [
+                str(user_obj) for user_obj in context.get('object').staffs.all()
+            ]
+
+            if (
+                self.request.user.email not in staff_array
+                and self.request.user.email
+                != str(context.get('object').user.user.email)
+            ):
                 redirect(reverse('404_'))
         return super(LoanListView, self).render_to_response(context, **response_kwargs)
 
     def get_queryset(self, *args, **kwargs):
         company_obj = Company.objects.get(slug=self.kwargs.get('slug'))
-        qs = self.queryset.filter(company=company_obj)
-        return qs
+        return self.queryset.filter(company=company_obj)
 
 
 class LoanDetailView(LoginRequiredMixin, DetailView):
@@ -234,19 +235,14 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
                 paymentDetails = RemitaPaymentDetails.objects.filter(loan=self.get_object())
                 context['mandateTransactionRecord'] = mandateTransactionRecord
                 context['paymentDetails'] = paymentDetails
-                amountArray = []
-                for amountValue in paymentDetails:
-                    amountArray.append(amountValue.amount)
+                amountArray = [amountValue.amount for amountValue in paymentDetails]
                 context['amountArray'] = amountArray
             except RemitaMandateTransactionRecord.DoesNotExist:
                 context['mandateTransactionRecord'] = "No mandate Transaction Record Found"
                 context['paymentDetails'] = "No Payment Record For This Transactiom"
                 amountArray = []
                 context['amountArray'] = amountArray
-            if borrowerBank.otp_enabled:
-                context['otpCheck'] = 1
-            else:
-                context['otpCheck'] = 0
+            context['otpCheck'] = 1 if borrowerBank.otp_enabled else 0
             try:
                 context['dd_status_report'] = RemitaMandateStatusReport.objects.get(loan=self.get_object())
             except RemitaMandateStatusReport.DoesNotExist:
@@ -337,9 +333,6 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
                         loan_ = Loan.objects.get(loan_key=context['loan_obj'])
                         loan_.balance_due = (balanceFee + baseFee) + (periodFee * period_gone)
                         loan_.save()
-                else:
-                    pass
-
             CollateralType.objects.get_or_create(owned=self.get_object())
             if self.get_object().balance_due == "Modify/Change Loan":
                 thisArmortizedValue = armotizationLoanCalculator(
@@ -379,13 +372,15 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
                                "Account Expired!, Your Account Has Been Expired You Would Be "
                                "Redirected To The Payment Portal Upgrade Your Payment")
                 return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
-            staff_array = list()
-            for user_obj in context.get('object').staffs.all():
-                staff_array.append(str(user_obj))
-            if self.request.user.email in staff_array or self.request.user.email == str(
-                    context.get('object').user.user.email):
-                pass
-            else:
+            staff_array = [
+                str(user_obj) for user_obj in context.get('object').staffs.all()
+            ]
+
+            if (
+                self.request.user.email not in staff_array
+                and self.request.user.email
+                != str(context.get('object').user.user.email)
+            ):
                 redirect(reverse('404_'))
         return super(LoanDetailView, self).render_to_response(context, **response_kwargs)
 
@@ -750,42 +745,42 @@ class RRRandTransactionRefAmount(View):
 
 class RemitaDDMandateTransactionRecord(View):
     def post(self, *args, **kwargs):
-        if self.request.is_ajax():
-            data = self.request.body.decode("utf-8")
-            payload = json.loads(data)
-            print(payload['record_data']['data']['totalAmount'])
-            loanInstance = Loan.objects.get(loan_key=payload['loan_key'])
-            mandateDatas = RemitaMandateActivationData.objects.get(loan_key=loanInstance)
-            try:
-                remita_dd_history = RemitaMandateTransactionRecord.objects.get(loan=loanInstance)
-                remita_dd_history.total_amount = payload['record_data']['data']['totalAmount']
-                remita_dd_history.total_transaction_count = payload['record_data']['data']['totalTransactionCount']
-                remita_dd_history.save()
-            except RemitaMandateTransactionRecord.DoesNotExist:
-                remita_dd_history = RemitaMandateTransactionRecord.objects.create(
-                    remita_dd_mandate_owned_record=mandateDatas,
+        if not self.request.is_ajax():
+            return JsonResponse({'message': 'Method Not Allowed'}, status=501)
+        data = self.request.body.decode("utf-8")
+        payload = json.loads(data)
+        print(payload['record_data']['data']['totalAmount'])
+        loanInstance = Loan.objects.get(loan_key=payload['loan_key'])
+        mandateDatas = RemitaMandateActivationData.objects.get(loan_key=loanInstance)
+        try:
+            remita_dd_history = RemitaMandateTransactionRecord.objects.get(loan=loanInstance)
+            remita_dd_history.total_amount = payload['record_data']['data']['totalAmount']
+            remita_dd_history.total_transaction_count = payload['record_data']['data']['totalTransactionCount']
+            remita_dd_history.save()
+        except RemitaMandateTransactionRecord.DoesNotExist:
+            remita_dd_history = RemitaMandateTransactionRecord.objects.create(
+                remita_dd_mandate_owned_record=mandateDatas,
+                loan=loanInstance,
+                total_amount=payload['record_data']['data']['totalAmount'],
+                total_transaction_count=payload['record_data']['data']['totalTransactionCount']
+            )
+        try:
+            exists = RemitaPaymentDetails.objects.get(lastStatusUpdateTime=payload['record_data']['data']['paymentDetails'][0]['lastStatusUpdateTime'])
+            exists.status = payload['record_data']['data']['paymentDetails'][0]['status']
+            exists.save()
+        except RemitaPaymentDetails.DoesNotExist:
+            for _ in range(int(payload['record_data']['data']['totalTransactionCount'])):
+                RemitaPaymentDetails.objects.create(
                     loan=loanInstance,
-                    total_amount=payload['record_data']['data']['totalAmount'],
-                    total_transaction_count=payload['record_data']['data']['totalTransactionCount']
+                    amount=payload['record_data']['data']['paymentDetails'][0]['amount'],
+                    lastStatusUpdateTime=payload['record_data']['data']['paymentDetails'][0]['lastStatusUpdateTime'],
+                    status=payload['record_data']['data']['paymentDetails'][0]['status'],
+                    statuscode=payload['record_data']['data']['paymentDetails'][0]['statuscode'],
+                    RRR=payload['record_data']['data']['paymentDetails'][0]['RRR'],
+                    transactionRef=payload['record_data']['data']['paymentDetails'][0]['transactionRef'],
+                    remita_transactions=remita_dd_history
                 )
-            try:
-                exists = RemitaPaymentDetails.objects.get(lastStatusUpdateTime=payload['record_data']['data']['paymentDetails'][0]['lastStatusUpdateTime'])
-                exists.status = payload['record_data']['data']['paymentDetails'][0]['status']
-                exists.save()
-            except RemitaPaymentDetails.DoesNotExist:
-                for _ in range(int(payload['record_data']['data']['totalTransactionCount'])):
-                    RemitaPaymentDetails.objects.create(
-                        loan=loanInstance,
-                        amount=payload['record_data']['data']['paymentDetails'][0]['amount'],
-                        lastStatusUpdateTime=payload['record_data']['data']['paymentDetails'][0]['lastStatusUpdateTime'],
-                        status=payload['record_data']['data']['paymentDetails'][0]['status'],
-                        statuscode=payload['record_data']['data']['paymentDetails'][0]['statuscode'],
-                        RRR=payload['record_data']['data']['paymentDetails'][0]['RRR'],
-                        transactionRef=payload['record_data']['data']['paymentDetails'][0]['transactionRef'],
-                        remita_transactions=remita_dd_history
-                    )
-            return JsonResponse({'message': 'Transaction Has Been Updated!', 'statuscode':'051'}, status=201)
-        return JsonResponse({'message': 'Method Not Allowed'}, status=501)
+        return JsonResponse({'message': 'Transaction Has Been Updated!', 'statuscode':'051'}, status=201)
 
 
 class RemitaDDStatusReport(View):

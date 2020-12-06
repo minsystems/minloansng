@@ -58,3 +58,12 @@ class IsUserOwnerMixin(object):
         if self.request.user != self.get_object().company.user.user:
             return HttpResponseRedirect(reverse('404_'))
         return super(IsUserOwnerMixin, self).dispatch(request, *args, **kwargs)
+
+
+class IsUserCookieExists(object):
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        cookieExists = request.COOKIES.get('sessionid')
+        if not cookieExists:
+            return redirect(reverse('minstore:welcome'))
+        return super(IsUserCookieExists, self).dispatch(request, *args, **kwargs)

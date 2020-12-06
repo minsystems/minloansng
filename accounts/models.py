@@ -47,23 +47,21 @@ class UserManager(BaseUserManager):
         return user_obj
 
     def create_staffuser(self, email, full_name=None, password=None):
-        user = self.create_user(
+        return self.create_user(
             email,
             full_name=full_name,
             password=password,
             is_staff=True
         )
-        return user
 
     def create_superuser(self, email, full_name=None, password=None):
-        user = self.create_user(
+        return self.create_user(
             email,
             full_name=full_name,
             password=password,
             is_staff=True,
             is_admin=True
         )
-        return user
 
     def with_perm(self, perm, is_active=True, include_superusers=True, backend=None, obj=None):
         if backend is None:
@@ -182,9 +180,7 @@ class EmailActivation(models.Model):
 
     def can_activate(self):
         qs = EmailActivation.objects.filter(pk=self.pk).confirmable()  # 1 object
-        if qs.exists():
-            return True
-        return False
+        return bool(qs.exists())
 
     def activate(self):
         if self.can_activate():
@@ -201,32 +197,29 @@ class EmailActivation(models.Model):
     def regenerate(self):
         self.key = None
         self.save()
-        if self.key is not None:
-            return True
-        return False
+        return self.key is not None
 
     def send_activation(self):
-        if not self.activated and not self.forced_expired:
-            if self.key:
-                base_url = getattr(settings, 'BASE_URL', 'https://www.minloans.com.ng')
-                key_path = reverse("account:email-activate", kwargs={'key': self.key})  # use reverse
-                path = "{base}{path}".format(base=base_url, path=key_path)
-                context = {
-                    'path': path,
-                    'email': self.email
-                }
-                txt_ = get_template("registration/emails/verify.txt").render(context)
-                html_ = get_template("registration/emails/verify.html").render(context)
-                subject = 'Minloansng 1-Click Email Verification'
-                from_email = email_settings.EMAIL_HOST_USER
-                recipient_list = [self.email]
+        if not self.activated and not self.forced_expired and self.key:
+            base_url = getattr(settings, 'BASE_URL', 'https://www.minloans.com.ng')
+            key_path = reverse("account:email-activate", kwargs={'key': self.key})  # use reverse
+            path = "{base}{path}".format(base=base_url, path=key_path)
+            context = {
+                'path': path,
+                'email': self.email
+            }
+            txt_ = get_template("registration/emails/verify.txt").render(context)
+            html_ = get_template("registration/emails/verify.html").render(context)
+            subject = 'Minloansng 1-Click Email Verification'
+            from_email = email_settings.EMAIL_HOST_USER
+            recipient_list = [self.email]
 
-                from django.core.mail import EmailMessage
-                message = EmailMessage(
-                    subject, html_, from_email, recipient_list
-                )
-                message.fail_silently = False
-                message.send()
+            from django.core.mail import EmailMessage
+            message = EmailMessage(
+                subject, html_, from_email, recipient_list
+            )
+            message.fail_silently = False
+            message.send()
         return False
 
 
@@ -326,9 +319,12 @@ class Profile(models.Model):
 
 
 def pre_save_email_activation(sender, instance, *args, **kwargs):
-    if not instance.activated and not instance.forced_expired:
-        if not instance.key:
-            instance.key = unique_key_generator(instance)
+    if (
+        not instance.activated
+        and not instance.forced_expired
+        and not instance.key
+    ):
+        instance.key = unique_key_generator(instance)
 
 
 pre_save.connect(pre_save_email_activation, sender=EmailActivation)

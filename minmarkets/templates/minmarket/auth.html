@@ -3,53 +3,67 @@
 <head>
 	<title>Store | Minloans NG</title>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-<!--===============================================================================================-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--===============================================================================================-->
 	<link rel="shortcut icon" type="image/x-icon" href="https://cdn.minloans.com.ng/images/minloansng2.png">
-<!--===============================================================================================-->
+    <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="https://cdn.minloans.com.ng/minstore/vendor/bootstrap/css/bootstrap.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="https://cdn.minloans.com.ng/minstore/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="https://cdn.minloans.com.ng/minstore/fonts/Linearicons-Free-v1.0.0/icon-font.min.css">
-<!--===============================================================================================-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+    <!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css">
+    <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="https://cdn.minloans.com.ng/minstore/vendor/animate/animate.css">
-<!--===============================================================================================-->
+    <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="https://cdn.minloans.com.ng/minstore/vendor/css-hamburgers/hamburgers.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="https://cdn.minloans.com.ng/minstore/vendor/animsition/css/animsition.min.css">
-<!--===============================================================================================-->
+    <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="https://cdn.minloans.com.ng/minstore/vendor/select2/select2.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="https://cdn.minloans.com.ng/minstore/vendor/daterangepicker/daterangepicker.css">
-<!--===============================================================================================-->
+    <!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="https://cdn.minloans.com.ng/minstore/css/util.css">
 	<link rel="stylesheet" type="text/css" href="https://cdn.minloans.com.ng/minstore/css/main.css">
-<!--===============================================================================================-->
+    <!--===============================================================================================-->
 </head>
 <body>
 
 	<div class="limiter">
 		<div class="container-login100">
-			<div class="wrap-login100 p-b-160 p-t-50">
-				<form class="login100-form validate-form">
-					<span class="login100-form-title p-b-43" style="font-family: Arial,sans-serif">
-						Welcome Minstore
+			<div class="wrap-login100">
+				<div class="login100-pic js-tilt" data-tilt>
+					<img src="https://cdn.minloans.com.ng/images/minloansng2.png" height="300px" width="300px" alt="company">
+				</div>
+
+				<form class="login100-form validate-form" method="post" action="{% url 'minstore:welcome' %}">
+                    {% csrf_token %}
+					<span class="login100-form-title" style="font-family: Arial, Helvetica">
+						Welcome To Minstore
 					</span>
 
-					<div class="container-login100-form-btn wrap-input100 rs1 rs2 validate-input" data-validate = "Company Owner Access Token is required">
-						<input class="input100" type="text" name="username">
-						<span class="label-input100" style="font-family: Arial,sans-serif">Access Token</span>
+					<div class="wrap-input100 validate-input" style="font-family: Arial, Helvetica" data-validate = "Enter Admin Access Token">
+						<input class="input100" type="text" name="accessToken" id="accessToken" placeholder="Company Owner Access Token " required="required">
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-lock" aria-hidden="true"></i>
+						</span>
 					</div>
 
-					<div class="container-login100-form-btn">
-						<button class="login100-form-btn" style="font-family: Arial,sans-serif">
-							Let Me In
+					<div class="container-login100-form-btn" style="font-family: Arial, Helvetica">
+						<button class="login100-form-btn" type="submit" style="font-family: Arial, Helvetica">
+							Enter Store <i class="fa fa-arrow-right"></i>
 						</button>
 					</div>
 
-					<div class="text-center w-full p-t-23">
-						<a href="#" class="txt1" style="font-family: Arial,sans-serif">
-							Go Back To Loan Management
+					<div class="text-center p-t-12" style="font-family: Arial, Helvetica">
+						<span class="txt1" style="font-family: Arial, Helvetica">
+							The Store Can Be Accessed
+						</span>
+						<a class="txt2" href="#" style="font-family: Arial, Helvetica">
+							Only through the Access token of {% for comp in user_companies %} {{ comp }}, {% endfor %} Admin/Owner
+						</a>
+					</div>
+
+					<div class="text-center p-t-136" style="font-family: Arial, Helvetica">
+						<a class="txt2" href="#" style="font-family: Arial, Helvetica">
+							Get Unlimited Plugins &amp; Loan Management Tools From The Store!
+							<i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
 						</a>
 					</div>
 				</form>
@@ -58,25 +72,95 @@
 	</div>
 
 
-
-
-
-<!--===============================================================================================-->
+    <!--===============================================================================================-->
 	<script src="https://cdn.minloans.com.ng/minstore/vendor/jquery/jquery-3.2.1.min.js"></script>
-<!--===============================================================================================-->
-	<script src="https://cdn.minloans.com.ng/minstore/vendor/animsition/js/animsition.min.js"></script>
-<!--===============================================================================================-->
+    <!--===============================================================================================-->
 	<script src="https://cdn.minloans.com.ng/minstore/vendor/bootstrap/js/popper.js"></script>
 	<script src="https://cdn.minloans.com.ng/minstore/vendor/bootstrap/js/bootstrap.min.js"></script>
-<!--===============================================================================================-->
+    <!--===============================================================================================-->
 	<script src="https://cdn.minloans.com.ng/minstore/vendor/select2/select2.min.js"></script>
-<!--===============================================================================================-->
-	<script src="https://cdn.minloans.com.ng/minstore/vendor/daterangepicker/moment.min.js"></script>
-	<script src="https://cdn.minloans.com.ng/minstore/vendor/daterangepicker/daterangepicker.js"></script>
-<!--===============================================================================================-->
-	<script src="https://cdn.minloans.com.ng/minstore/vendor/countdowntime/countdowntime.js"></script>
-<!--===============================================================================================-->
+    <!--===============================================================================================-->
+	<script src="https://cdn.minloans.com.ng/minstore/vendor/tilt/tilt.jquery.min.js"></script>
+	<script >
+		$('.js-tilt').tilt({
+			scale: 1.1
+		})
+	</script>
+    <!--===============================================================================================-->
 	<script src="https://cdn.minloans.com.ng/minstore/js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+
+    <script>
+        $(function () {
+            'use strict';
+            const tokenVerificationForm = $('.login100-form');
+            const tokenVerificationFormMethod = tokenVerificationForm.attr('method');
+            const tokenVerificationFormEndpoint = tokenVerificationForm.attr('action');
+
+            function displaySubmitting(submitBtn, defaultText, doSubmit) {
+              if (doSubmit) {
+                  submitBtn.prop("disabled", true);
+                  submitBtn.html("<i class='fa fa-spin fa-spinner'></i> Validating Access Token..");
+
+              } else {
+                  submitBtn.prop("disabled", false);
+                  submitBtn.add(defaultText);
+              }
+            }
+
+            const tokenVerificationFormSubmitBtn = tokenVerificationForm.find("[type='submit']");
+            const tokenVerificationFormSubmitBtnText = tokenVerificationFormSubmitBtn.text();
+
+            tokenVerificationForm.submit(function (event) {
+                event.preventDefault();
+                {% include 'csrf_ajax/csrf_ajax_token.js' %}
+                const tokenVerificationFormData = {
+                    "accessToken": $('#accessToken').val(),
+                };
+                console.log(tokenVerificationFormData);
+                displaySubmitting(tokenVerificationFormSubmitBtn, "", true);
+                $.ajax({
+                    method: tokenVerificationFormMethod,
+                    url: tokenVerificationFormEndpoint,
+                    data: tokenVerificationFormData,
+                    contentType: 'application/x-www-form-urlencoded',
+
+                    success: function (data) {
+                        displaySubmitting(tokenVerificationFormSubmitBtn, tokenVerificationFormSubmitBtnText, false);
+                        tokenVerificationForm[0].reset();
+                        console.log(data);
+                        $.alert({
+                            icon: 'fa fa-spinner fa-spin',
+                            title: 'Success!',
+                            content: data.message,
+                            type: 'green',
+                            typeAnimated: true,
+                            closeIcon: true,
+                            closeIconClass: 'fa fa-close'
+                        });
+                        setTimeout(function() {
+                            window.location.replace("{% url 'minstore:homepage' %}");
+                        }, 2000);
+                    }, error: function (error) {
+                        displaySubmitting(tokenVerificationFormSubmitBtn, tokenVerificationFormSubmitBtnText, false);
+                        tokenVerificationForm[0].reset();
+                        $.alert({
+                            icon: 'fa fa-cancel',
+                            title: 'Error!',
+                            content: data.message,
+                            type: 'red',
+                            typeAnimated: true,
+                            closeIcon: true,
+                            closeIconClass: 'fa fa-close'
+                        });
+                        setTimeout(function() {
+                            location.reload();
+                        }, 2000);
+                    }
+                });
+            });
+        }, jQuery);
+    </script>
 
 </body>
 </html>
