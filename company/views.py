@@ -22,7 +22,7 @@ TRIAL_WARNING_DAYS = 5
 
 
 class Dashboard(View):
-    def get(self, request: object, args: object, kwargs: object) -> object:
+    def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             if request.user.full_name and request.user.profile.phone:
                 try:
