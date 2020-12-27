@@ -133,4 +133,5 @@ dmypy.json
 
 # don't track this settings
 minloansng/settings/local.py
+.idea/workspace.xml
 reports
