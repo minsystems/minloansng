@@ -1,7 +1,7 @@
-EMAIL_HOST = 'smtp-relay.sendinblue.com'
+EMAIL_HOST = 'minloans.com.ng'
 EMAIL_HOST_USER = 'support@minloans.com.ng'
-EMAIL_HOST_PASSWORD = "J9PSXbz6mQhWK3OL"
-EMAIL_PORT = 587
+EMAIL_HOST_PASSWORD = "FReakyboygeniuse123"
+EMAIL_PORT = 465
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = "customer@minloans.com.ng"
 SUPPORT_EMAIL = "support@minloans.com.ng"
