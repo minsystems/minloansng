@@ -1,7 +1,7 @@
-EMAIL_HOST = 'minloans.com.ng'
-EMAIL_HOST_USER = 'support@minloans.com.ng'
-EMAIL_HOST_PASSWORD = "FReakyboygeniuse123"
-EMAIL_PORT = 465
+EMAIL_HOST = 'email-smtp.us-east-2.amazonaws.com'
+EMAIL_HOST_USER = 'AKIAXQW67ZHWLMVF4MV6'
+EMAIL_HOST_PASSWORD = "BFii5I0vDL2h2EQMl/8KpaYSSWTWsZaN8t4lJ9PUVNPK"
+EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = "customer@minloans.com.ng"
 SUPPORT_EMAIL = "support@minloans.com.ng"

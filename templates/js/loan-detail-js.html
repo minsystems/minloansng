@@ -81,116 +81,117 @@
             let seconds = d.getUTCSeconds();
             let timeStamp = yyyy+'-'+mm+'-'+dd+'T'+hours+':'+minutes+':'+seconds+'+000000';
 
-            const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/requestAuthorization";
-            const method = "POST";
-            let payload = {
-               "mandateId":"{{ loanMandateId|safe }}",
-               "requestId":"{{ requestId|safe }}",
-            };
-            payload = JSON.stringify(payload);
-            const xhr = new XMLHttpRequest();
-            xhr.open(method, endpoint);
-            xhr.setRequestHeader("Content-Type", "application/json");
-            xhr.setRequestHeader("MERCHANT_ID", "{{ company_dd_creds.remita_dd_merchant|safe }}");
-            xhr.setRequestHeader("API_KEY", "{{ company_dd_creds.remita_dd_api_key|safe }}");
-            xhr.setRequestHeader("REQUEST_ID", ""+requestId);
-            xhr.setRequestHeader("REQUEST_TS", ""+timeStamp);
-            xhr.setRequestHeader("API_DETAILS_HASH", ""+apiHash);
-            xhr.onload = function () {
-                const serverResponse = xhr.response;
-                let preprocessed_output = serverResponse.substring(7);
-                let final_data = preprocessed_output.substring(0, preprocessed_output.length - 1);
-                let json_payload = JSON.parse(final_data);
-                console.log(json_payload);
-                if (json_payload.statuscode === "00") {
-                    $(document).Toasts('create', {
-                        class: 'bg-success',
-                        autohide: true,
-                        delay: 10000,
-                        title: 'Successful!',
-                        subtitle: ''+json_payload.authParams[0].label1,
-                        body: '' + json_payload.authParams[0].description1 + ', ' + json_payload.authParams[0].description2
-                    });
-
-                    // Send remitaTransRef to database
-                    let new_payload = {
-                        "loan_key":"{{ loan_obj|safe }}",
-                        "remitaTransRef":json_payload.remitaTransRef
-                    };
-                    new_payload = JSON.stringify(new_payload);
-                    const _xhr = new XMLHttpRequest();
-                    _xhr.open('POST', "{% url 'loans-url:loan-mandate-update-remitaTransRef' object.slug loan_obj.slug loan_obj.loan_key %}");
-                    _xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");
-                    _xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-                    _xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token|safe }}");
-                    _xhr.onload = function () {
-                        const serverResponse = _xhr.response;
-                        console.log(serverResponse);
+            if ({{ otpCheck|safe }} === 1) {
+                const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/requestAuthorization";
+                const method = "POST";
+                let payload = {
+                   "mandateId":"{{ loanMandateId|safe }}",
+                   "requestId":"{{ requestId|safe }}",
+                };
+                payload = JSON.stringify(payload);
+                const xhr = new XMLHttpRequest();
+                xhr.open(method, endpoint);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.setRequestHeader("MERCHANT_ID", "{{ company_dd_creds.remita_dd_merchant|safe }}");
+                xhr.setRequestHeader("API_KEY", "{{ company_dd_creds.remita_dd_api_key|safe }}");
+                xhr.setRequestHeader("REQUEST_ID", ""+requestId);
+                xhr.setRequestHeader("REQUEST_TS", ""+timeStamp);
+                xhr.setRequestHeader("API_DETAILS_HASH", ""+apiHash);
+                xhr.onload = function () {
+                    const serverResponse = xhr.response;
+                    let preprocessed_output = serverResponse.substring(7);
+                    let final_data = preprocessed_output.substring(0, preprocessed_output.length - 1);
+                    let json_payload = JSON.parse(final_data);
+                    console.log(json_payload);
+                    if (json_payload.statuscode === "00") {
                         $(document).Toasts('create', {
                             class: 'bg-success',
                             autohide: true,
                             delay: 10000,
                             title: 'Successful!',
-                            subtitle: 'Transaction Reference',
-                            body: 'Transaction Reference Has Been Updated Successfully!'
+                            subtitle: ''+json_payload.authParams[0].label1,
+                            body: '' + json_payload.authParams[0].description1 + ', ' + json_payload.authParams[0].description2
                         });
-                    };
-                    _xhr.send(new_payload);
 
-                    if ({{ otpCheck|safe }} === 1) {
+                        // Send remitaTransRef to database
+                        let new_payload = {
+                            "loan_key":"{{ loan_obj|safe }}",
+                            "remitaTransRef":json_payload.remitaTransRef
+                        };
+                        new_payload = JSON.stringify(new_payload);
+                        const _xhr = new XMLHttpRequest();
+                        _xhr.open('POST', "{% url 'loans-url:loan-mandate-update-remitaTransRef' object.slug loan_obj.slug loan_obj.loan_key %}");
+                        _xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");
+                        _xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                        _xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token|safe }}");
+                        _xhr.onload = function () {
+                            const serverResponse = _xhr.response;
+                            console.log(serverResponse);
+                            $(document).Toasts('create', {
+                                class: 'bg-success',
+                                autohide: true,
+                                delay: 10000,
+                                title: 'Successful!',
+                                subtitle: 'Transaction Reference',
+                                body: 'Transaction Reference Has Been Updated Successfully!'
+                            });
+                        };
+                        _xhr.send(new_payload);
+
+                    } else if (json_payload.statuscode === "020") {
                         $(document).Toasts('create', {
-                            class: 'bg-info',
+                            class: 'bg-warning',
                             autohide: true,
-                            delay: 10000,
-                            title: 'OTP Mandate',
-
-                            subtitle: 'OTP Mandate Detected!',
-                            body: 'Click On Mandate Validate OTP To Activate OTP Mandate Validation On User Bank'
+                            delay: 1000,
+                            title: 'An Error Occurred',
+                            subtitle: 'An error has made us reject this mandate ' + json_payload.mandateId,
+                            body: 'This Mandate ' + json_payload.mandateId + ' Activation Has ' + json_payload.status + ' with requestId ' + json_payload.requestId
                         });
-
-                        setTimeout(function() {
-                            location.reload();
-                        }, 12000);
+                    } else if (json_payload.statuscode === "02") {
+                        $(document).Toasts('create', {
+                            class: 'bg-danger',
+                            autohide: true,
+                            delay: 1000,
+                            title: 'Sorry! ',
+                            subtitle: 'Sorry Our OTP SMS',
+                            body: 'Our OTP SMS System Is Under Maintenance By System Specs, Please Proceed With Non OTP Banks'//'' + json_payload.status
+                        });
                     } else {
-                        // redirect users to print out page
-                        let _mandateId = "{{ loanMandateId|safe }}";
-                        let _merchantId = "{{ company_dd_creds.remita_dd_merchant|safe }}";
-                        let dataHash = "{{ company_dd_creds.remita_dd_merchant|safe }}" + "{{ company_dd_creds.remita_dd_api_key|safe }}" + requestId;
-                        let _hash = CryptoJS.SHA512(dataHash);
-                        let mandateUrl = `{{ base_url }}/remita/ecomm/mandate/form/${_merchantId}/${_hash}/${_mandateId}/${requestId}/rest.reg`;
-                        window.location.replace(mandateUrl);
+                        $(document).Toasts('create', {
+                            class: 'bg-danger',
+                            autohide: true,
+                            delay: 750,
+                            title: 'An Error Occurred',
+                            subtitle: 'An error in your mandate data',
+                            body: '' + "An error has occurred on server, please try again later!"
+                        });
                     }
+                };
+                xhr.send(payload);
 
-                } else if (json_payload.statuscode === "020") {
-                    $(document).Toasts('create', {
-                        class: 'bg-warning',
-                        autohide: true,
-                        delay: 1000,
-                        title: 'An Error Occurred',
-                        subtitle: 'An error has made us reject this mandate ' + json_payload.mandateId,
-                        body: 'This Mandate ' + json_payload.mandateId + ' Activation Has ' + json_payload.status + ' with requestId ' + json_payload.requestId
-                    });
-                } else if (json_payload.statuscode === "02") {
-                    $(document).Toasts('create', {
-                        class: 'bg-danger',
-                        autohide: true,
-                        delay: 1000,
-                        title: 'An Error Occurred',
-                        subtitle: 'An error in your mandate data',
-                        body: '' + json_payload.status
-                    });
-                } else {
-                    $(document).Toasts('create', {
-                        class: 'bg-danger',
-                        autohide: true,
-                        delay: 750,
-                        title: 'An Error Occurred',
-                        subtitle: 'An error in your mandate data',
-                        body: '' + "An error has occurred on server, please try again later!"
-                    });
-                }
-            };
-            xhr.send(payload);
+
+
+                $(document).Toasts('create', {
+                    class: 'bg-info',
+                    autohide: true,
+                    delay: 10000,
+                    title: 'OTP Mandate',
+                    subtitle: 'OTP Mandate Detected!',
+                    body: 'Click On Mandate Validate OTP To Activate OTP Mandate Validation On User Bank'
+                });
+
+                setTimeout(function() {
+                    location.reload();
+                }, 12000);
+            } else {
+                // redirect users to print out page
+                let _mandateId = "{{ loanMandateId|safe }}";
+                let _merchantId = "{{ company_dd_creds.remita_dd_merchant|safe }}";
+                let dataHash = "{{ company_dd_creds.remita_dd_merchant|safe }}" + "{{ company_dd_creds.remita_dd_api_key|safe }}" + requestId;
+                let _hash = CryptoJS.SHA512(dataHash);
+                let mandateUrl = `{{ base_url }}/remita/ecomm/mandate/form/${_merchantId}/${_hash}/${_mandateId}/${requestId}/rest.reg`;
+                window.location.replace(mandateUrl);
+            }
         }
         const mandateActivationButton = document.getElementById('mandate-activation-request');
         mandateActivationButton.addEventListener("click", handleMandateActivationRequest);
