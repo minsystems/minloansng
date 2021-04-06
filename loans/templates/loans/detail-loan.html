@@ -118,34 +118,64 @@
                         <span class="description">Loan Type - {{ loan_obj.loan_type }}</span>
                       </div>
                       <!-- /.user-block -->
+                      {% if loan_collection_type == 1 %}
+                          <div class="row">
+                              <div class="col-sm-4">
+                                  <strong>Repayment: </strong> {{ loan_obj.mode_of_repayments }}<br/>
+                                  <strong>Status: </strong> {{ loan_obj.loan_status }}<br/>
+                                  <strong>Occupancy: </strong> {{ loan_obj.borrower.get_address }}<br/>
+                                  <strong>Phone: </strong> <a href="tel:{{ loan_obj.borrower.phone }}" >{{ loan_obj.borrower.phone }}</a><br/>
+                              </div>
+                              <div class="col-sm-4">
+                                  <strong>Number Of Repayments: </strong> {{ loan_obj.number_repayments }}<br/>
+                                  <strong>Mandate Reference: </strong> {{ dd_obj.mandateId }}<br/>
+                                  <strong>Grace Period: </strong> {{ loan_obj.grace_period }} {% if loan_obj.grace_period == 1 %} Day {% else %} Days {% endif %} <br/>
+                                  <strong>Payer Bank: </strong> {{ loan_obj.borrower.bank.get_short_name }} / {{ loan_obj.borrower.bank.code }}<br/>
+                                  <strong>Loan Interest: </strong> {{ loan_obj.interest }}% {{ loan_obj.interest_period }}<br/>
+                              </div>
+                              <div class="col-sm-4">
+                                  <strong>Penalty: </strong> Overdue Loan Penalty {{ loan_obj.penalty }} <a href="#" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modal-sm-penalty-change">Modify</a> | <a href="#" data-toggle="modal" data-target="#modal-sm-penalty"> <i class="fas fa-eye" style="color: #2aabd2"></i> </a> |
+                                      <a href="#" data-toggle="modal" data-target="#modal-sm-penalty-knowledge">
+                                          <i class="fas fa-book" style="color: #eea236"></i>
+                                      </a> <hr/>
+                                    <strong>Repayment: </strong>
+                                        {% if loan_obj.balance_due == 'Modify/Change Loan' %}
+                                            <a href="#" class="btn btn-xs btn-outline-warning" data-toggle="modal" data-target="#modal-sm-repayment">Update Repayment Balance</a>
+                                        {% else %}
+                                            ₦ {{ loan_obj.balance_due|localize|intcomma }} <a href="#" class="btn btn-xs btn-outline-warning" data-toggle="modal" data-target="#modal-sm-repayment">Modify</a>
+                                        {% endif %}
+                              </div>
+                          </div>
+                      {% elif loan_collection_type == 2 %}
+                          <div class="row">
+                              <div class="col-sm-4">
+                                  <strong>Repayment: </strong> {{ loan_obj.mode_of_repayments }}<br/>
+                                  <strong>Status: </strong> {{ loan_obj.loan_status }}<br/>
+                                  <strong>Occupancy: </strong> {{ loan_obj.borrower.get_address }}<br/>
+                                  <strong>Phone: </strong> <a href="tel:{{ loan_obj.borrower.phone }}">{{ loan_obj.borrower.phone }}</a><br/>
+                              </div>
+                              <div class="col-sm-4">
+                                  <strong>Number Of Repayments: </strong> {{ loan_obj.number_repayments }}<br/>
+                                  <strong>Mandate Reference: </strong> #<br/>
+                                  <strong>Grace Period: </strong> {{ loan_obj.grace_period }} {% if loan_obj.grace_period == 1 %} Day {% else %} Days {% endif %} <br/>
+                                  <strong>Payer Bank: </strong> {{ loan_obj.borrower.bank.get_short_name }} / {{ loan_obj.borrower.bank.code }}<br/>
+                                  <strong>Loan Interest: </strong> {{ loan_obj.interest }}% {{ loan_obj.interest_period }}<br/>
+                              </div>
+                              <div class="col-sm-4">
+                                  <strong>Penalty: </strong> Overdue Loan Penalty {{ loan_obj.penalty }} <a href="#" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modal-sm-penalty-change">Modify</a> | <a href="#" data-toggle="modal" data-target="#modal-sm-penalty"> <i class="fas fa-eye" style="color: #2aabd2"></i> </a> |
+                                      <a href="#" data-toggle="modal" data-target="#modal-sm-penalty-knowledge">
+                                          <i class="fas fa-book" style="color: #eea236"></i>
+                                      </a> <hr/>
+                                    <strong>Repayment: </strong>
+                                        {% if loan_obj.balance_due == 'Modify/Change Loan' %}
+                                            <a href="#" class="btn btn-xs btn-outline-warning" data-toggle="modal" data-target="#modal-sm-repayment">Update Repayment Balance</a>
+                                        {% else %}
+                                            ₦ {{ loan_obj.balance_due|localize|intcomma }} <a href="#" class="btn btn-xs btn-outline-warning" data-toggle="modal" data-target="#modal-sm-repayment">Modify</a>
+                                        {% endif %}
+                              </div>
+                          </div>
+                      {% endif %}
 
-                      <div class="row">
-                          <div class="col-sm-4">
-                              <strong>Repayment: </strong> {{ loan_obj.mode_of_repayments }}<br/>
-                              <strong>Status: </strong> {{ loan_obj.loan_status }}<br/>
-                              <strong>Occupancy: </strong> {{ loan_obj.borrower.get_address }}<br/>
-                              <strong>Phone: </strong> <a href="tel:{{ loan_obj.borrower.phone }}" >{{ loan_obj.borrower.phone }}</a><br/>
-                          </div>
-                          <div class="col-sm-4">
-                              <strong>Number Of Repayments: </strong> {{ loan_obj.number_repayments }}<br/>
-                              <strong>Mandate Reference: </strong> {{ dd_obj.mandateId }}<br/>
-                              <strong>Grace Period: </strong> {{ loan_obj.grace_period }} {% if loan_obj.grace_period == 1 %} Day {% else %} Days {% endif %} <br/>
-                              <strong>Payer Bank: </strong> {{ loan_obj.borrower.bank.get_short_name }} / {{ loan_obj.borrower.bank.code }}<br/>
-                              <strong>Loan Interest: </strong> {{ loan_obj.interest }}% {{ loan_obj.interest_period }}<br/>
-                          </div>
-                          <div class="col-sm-4">
-                              <strong>Penalty: </strong> Overdue Loan Penalty {{ loan_obj.penalty }} <a href="#" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modal-sm-penalty-change">Modify</a> | <a href="#" data-toggle="modal" data-target="#modal-sm-penalty"> <i class="fas fa-eye" style="color: #2aabd2"></i> </a> |
-                                  <a href="#" data-toggle="modal" data-target="#modal-sm-penalty-knowledge">
-                                      <i class="fas fa-book" style="color: #eea236"></i>
-                                  </a> <hr/>
-                                <strong>Repayment: </strong>
-                                    {% if loan_obj.balance_due == 'Modify/Change Loan' %}
-                                        <a href="#" class="btn btn-xs btn-outline-warning" data-toggle="modal" data-target="#modal-sm-repayment">Update Repayment Balance</a>
-                                    {% else %}
-                                        ₦ {{ loan_obj.balance_due|localize|intcomma }} <a href="#" class="btn btn-xs btn-outline-warning" data-toggle="modal" data-target="#modal-sm-repayment">Modify</a>
-                                    {% endif %}
-                          </div>
-                      </div>
                       <br/>
                       <p>
                         <a href="#" class="link-black text-sm">
@@ -222,6 +252,8 @@
                                       <!-- /.card-body -->
                                     </div>
                                  <!-- /.card -->
+                              {% elif loanActions == 'DRF' %}
+                                  some actions
                               {% endif %}
                           </div>
                           <div class="tab-pane fade" id="vert-tabs-profile" role="tabpanel" aria-labelledby="vert-tabs-profile-tab">

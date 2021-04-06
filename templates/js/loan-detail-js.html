@@ -555,6 +555,7 @@
                 let final_data = preprocessed_output.substring(0, preprocessed_output.length - 1);
                 let json_payload = JSON.parse(final_data);
                 console.log(json_payload);
+
                 if (json_payload.statuscode === "00") {
                     $(document).Toasts('create', {
                         class: 'bg-success',
@@ -1080,7 +1081,7 @@
               submitBtn.prop("disabled", false);
               submitBtn.add(defaultText);
           }
-        }
+      }
 
         const taskFormSubmitBtn = taskForm.find("[type='submit']");
         const taskFormSubmitBtnText = taskFormSubmitBtn.text();

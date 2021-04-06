@@ -30,6 +30,7 @@ from loans.forms import CollateralForm, LoanFileForm
 from loans.models import Loan, LoanType, ModeOfRepayments, Penalty, Collateral, LoanTerms, CollateralFiles, \
     CollateralType, LoanActivityComments
 from mincore.models import BaseUrl
+from minloansng import email_settings
 from minloansng.cloudinary_settings import cloudinary_upload_preset, cloudinary_url
 from minloansng.minmarket.packages.remita import remita_dd_url, statuscode_success
 from minloansng.mixins import GetObjectMixin
@@ -135,6 +136,21 @@ class LoanCreateView(LoginRequiredMixin, DetailView):
             slug=loan_slug,
         )
 
+        # Send an Email Saying Loan Application Was Made By A User
+        html_ = "Your loan request have been approved by {company}, you would " \
+                "be sent RRR form or OTP verification for final confirmation before funds can be disbursed, " \
+                "Please bear in mind, we would remove our loan processing and insurance fee alongside.".format(company=self.get_object().name)
+        subject = 'Loan Request Notice From AMJU'
+        from_email = email_settings.EMAIL_HOST_USER
+        recipient_list = [borrower_inst.email]
+
+        from django.core.mail import EmailMessage
+        message = EmailMessage(
+            subject, html_, from_email, recipient_list
+        )
+        message.fail_silently = False
+        message.send()
+
         base_url = getattr(settings, 'BASE_URL', 'https://www.minloans.com.ng')
 
         if str(loan_collection_type) == "Remita Direct Debit":
@@ -144,11 +160,12 @@ class LoanCreateView(LoginRequiredMixin, DetailView):
             finalpath = "{base}{path}".format(base=base_url, path=urlpath)
             print(finalpath)
             loan_data = {'companySlug': self.get_object().slug, 'loanSlug': loan_slug, 'loanKey': loan_key_value}
-        elif str(loan_collection_type) == "Data Referencing":
-            urlpath = ""
-            finalpath = ""
-            loan_data = ""
-        elif str(loan_collection_type) == "Quick Loans":
+        elif str(loan_collection_type) == "Remita Data Referencing":
+            urlpath = reverse("loans-url:loan-detail", kwargs={'slug':self.get_object().slug, 'loan_slug': loan_slug})
+            finalpath = "{base}{path}".format(base=base_url, path=urlpath)
+            print(finalpath)
+            loan_data = {'companySlug': self.get_object().slug, 'loanSlug': loan_slug, 'loanKey': loan_key_value}
+        elif str(loan_collection_type) == "Paystack Partial Debit":
             urlpath = ""
             finalpath = ""
             loan_data = ""
@@ -210,12 +227,16 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
             context['overdue'] = "active"
         else:
             context['overdue'] = 'notActive'
-        context['installment_repayment'] = armotizationLoanCalculator(self.get_object().principal_amount, self.get_object().interest, self.get_object().number_repayments)
+        if str(self.get_object().mode_of_repayments) == "Remita Direct Debit":
+            context['installment_repayment'] = armotizationLoanCalculator(self.get_object().principal_amount, self.get_object().interest, self.get_object().number_repayments)
+        else:
+            context['installment_repayment'] = "Set Payment"
         context['loan_comment_qs'] = LoanActivityComments.objects.filter(loan=self.get_object())
         context['form'] = LoanFileForm()
         if self.get_object().loan_file_upload is not None:
             file_type = get_fileType(self.get_object().loan_file_upload.url)
             context['fileType'] = str(file_type)
+
         if str(self.get_object().mode_of_repayments) == "Remita Direct Debit":
             try:
                 base_url = BaseUrl.objects.get(belongs_to='remita').base_url
@@ -230,6 +251,7 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
             context['company_dd_creds'] = company_inst.user.thirdpartycreds
             borrowerBank = BankCode.objects.get(code__exact=requestId_obj.payer_bank_code)
             context['account_number'] = self.get_object().borrower.account_number
+            context['loan_collection_type'] = 1
             try:
                 mandateTransactionRecord = RemitaMandateTransactionRecord.objects.get(loan=self.get_object())
                 paymentDetails = RemitaPaymentDetails.objects.filter(loan=self.get_object())
@@ -247,10 +269,10 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
                 context['dd_status_report'] = RemitaMandateStatusReport.objects.get(loan=self.get_object())
             except RemitaMandateStatusReport.DoesNotExist:
                 context['dd_status_report'] = None
-        else:
-            context['dd_obj'] = RemitaMandateActivationData.objects.get(loan_key=self.get_object())
+        elif str(self.get_object().mode_of_repayments) == "Remita Data Referencing":
             context['company_creds'] = RemitaCredentials.objects.get(connected_firm=company_inst)
-            context['loanActions'] = 'OD'
+            context['loan_collection_type'] = 2
+            context['loanActions'] = 'DRF'
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -334,15 +356,18 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
                         loan_.balance_due = (balanceFee + baseFee) + (periodFee * period_gone)
                         loan_.save()
             CollateralType.objects.get_or_create(owned=self.get_object())
-            if self.get_object().balance_due == "Modify/Change Loan":
-                thisArmortizedValue = armotizationLoanCalculator(
-                    self.get_object().principal_amount,
-                    self.get_object().interest,
-                    self.get_object().number_repayments
-                )
-                newloanInstance = Loan.objects.get(loan_key=self.get_object())
-                newloanInstance.balance_due = int(thisArmortizedValue) * int(self.get_object().number_repayments)
-                newloanInstance.save()
+            if str(self.get_object().mode_of_repayments) == "Remita Direct Debit":
+                if self.get_object().balance_due == "Modify/Change Loan":
+                    thisArmortizedValue = armotizationLoanCalculator(
+                        self.get_object().principal_amount,
+                        self.get_object().interest,
+                        self.get_object().number_repayments
+                    )
+                    newloanInstance = Loan.objects.get(loan_key=self.get_object())
+                    newloanInstance.balance_due = int(thisArmortizedValue) * int(self.get_object().number_repayments)
+                    newloanInstance.save()
+            elif str(self.get_object().mode_of_repayments) == "Remita Data Referencing":
+                pass
             if self.get_object().penalty is None:
                 loan_penalty = Penalty.objects.get(title__exact=self.get_object().loan_key)
                 loan_penalty.company = context.get('company')
