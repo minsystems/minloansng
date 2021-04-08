@@ -194,9 +194,16 @@
                           <a class="nav-link active" id="vert-tabs-home-tab" data-toggle="pill" href="#vert-tabs-home" role="tab" aria-controls="vert-tabs-home" aria-selected="true">
                               Loan Actions
                           </a>
+
+                          {% if loanActions == 'DD' %}
                           <a class="nav-link" id="vert-tabs-profile-tab" data-toggle="pill" href="#vert-tabs-profile" role="tab" aria-controls="vert-tabs-profile" aria-selected="false">
                               Visuals
                           </a>
+                          {% elif loanActions == 'DRF' %}
+                          <a class="nav-link" id="vert-tabs-profile-tab" data-toggle="pill" href="#vert-tabs-profile" role="tab" aria-controls="vert-tabs-profile" aria-selected="false">
+                              Salary History
+                          </a>
+                          {% endif %}
                           <a class="nav-link" id="vert-tabs-messages-tab" data-toggle="pill" href="#vert-tabs-messages" role="tab" aria-controls="vert-tabs-messages" aria-selected="false">
                               Mandate Payment Transaction History For {{ loan_obj.borrower }}
                           </a>
@@ -253,14 +260,32 @@
                                     </div>
                                  <!-- /.card -->
                               {% elif loanActions == 'DRF' %}
-                                  some actions
+                                  <div class="card">
+                                      <div class="card-header">
+                                        <h3 class="card-title">Remita Data Reference Loan Actions </h3>
+                                      </div>
+                                      <div class="card-body">
+                                        <p>
+                                            <code>Please make sure you fully understand the DRF loan enough to use it</code>
+                                        </p>
+                                        <button class="btn btn-app" id="salary-history">
+                                          <i class="fas fa-book"></i> Get Salary History
+                                        </button>
+                                      </div>
+                                  </div>
                               {% endif %}
                           </div>
-                          <div class="tab-pane fade" id="vert-tabs-profile" role="tabpanel" aria-labelledby="vert-tabs-profile-tab">
 
-                              <canvas id="myChart" width="400" height="400"></canvas>
+                          {% if loanActions == 'DD' %}
+                              <div class="tab-pane fade" id="vert-tabs-profile" role="tabpanel" aria-labelledby="vert-tabs-profile-tab">
+                                  <canvas id="myChart" width="400" height="400"></canvas>
+                              </div>
+                          {% elif loanActions == 'DRF' %}
+                              <div class="tab-pane fade" id="vert-tabs-profile" role="tabpanel" aria-labelledby="vert-tabs-profile-tab">
+                                  Salary Data
+                              </div>
+                          {% endif %}
 
-                          </div>
                           <div class="tab-pane fade" id="vert-tabs-messages" role="tabpanel" aria-labelledby="vert-tabs-messages-tab">
 
                               <div class="row">
@@ -958,6 +983,11 @@
     <script src="https://cdn.minloans.com.ng/min-dash/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
-    {% include 'js/loan-detail-js.html' %}
+
+    {% if loan_collection_type == 1 %}
+        {% include 'js/loan-detail-js.html' %}
+    {% elif loan_collection_type == 2 %}
+        {% include 'js/loan-detail-js-drf.html' %}
+    {% endif %}
 
 {% endblock js_links %}

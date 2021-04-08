@@ -3,7 +3,7 @@ from django.urls import path
 from loans.views import LoanCreateView, LoanListView, LoanDetailView, RemitaStandingOrder, RemitaMandateUpdate, \
     LoanCollateralDetail, CollateralFormProcessor, LoanDetailAutoSaveProcessor, LoanCommentProcessor, \
     LoanRepaymentProcessor, LoanStatusChangeProcessor, RemitaTransRefUpdate, RRRandTransactionRef, RRRandTransactionRefAmount, \
-    RemitaDDMandateTransactionRecord, RemitaDDStatusReport, LoanPenaltyRepayment
+    RemitaDDMandateTransactionRecord, RemitaDDStatusReport, LoanPenaltyRepayment, DRFSalaryHistoryUpdate
 
 urlpatterns = [
     path('<slug:slug>/create/', LoanCreateView.as_view(), name='loan-create'),
@@ -13,6 +13,7 @@ urlpatterns = [
     path('<slug:slug>/<slug:loan_slug>/<slug:loan_key>/', RemitaStandingOrder.as_view(), name='loan-standing-order-create'),
     path('<slug:slug>/<slug:loan_slug>/<slug:loan_key>/update/', RemitaMandateUpdate.as_view(), name='loan-mandate-update'),
     path('<slug:slug>/<slug:loan_slug>/<slug:loan_key>/update/remitaTransRef/', RemitaTransRefUpdate.as_view(), name='loan-mandate-update-remitaTransRef'),
+    path('<slug:slug>/<slug:loan_slug>/<slug:loan_key>/update/salary-history/', DRFSalaryHistoryUpdate.as_view(), name='loan-mandate-update-salary-history'),
     path('<slug:slug>/<slug:loan_slug>/<slug:loan_key>/update/rrr-update/', RRRandTransactionRef.as_view(), name='loan-mandate-update-rrr'),
     path('<slug:slug>/<slug:loan_slug>/<slug:loan_key>/update/rrr-amount-update/', RRRandTransactionRefAmount.as_view(), name='loan-mandate-update-rrr-amount'),
     path('<slug:slug>/<slug:loan_slug>/<slug:loan_key>/mandate-dd-record/', RemitaDDMandateTransactionRecord.as_view(), name='mandate-dd-record'),

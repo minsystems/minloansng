@@ -35,7 +35,7 @@ from minloansng.cloudinary_settings import cloudinary_upload_preset, cloudinary_
 from minloansng.minmarket.packages.remita import remita_dd_url, statuscode_success
 from minloansng.mixins import GetObjectMixin
 from minloansng.utils import random_string_generator, secondWordExtract, digitExtract, addDays, get_fileType, \
-    armotizationLoanCalculator, removeNCharFromString
+    armotizationLoanCalculator, removeNCharFromString, phoneParseConverter
 
 DESCRIPTION = "If a loan payment is due " \
               "and is not paid within the specified time constraints, " \
@@ -137,19 +137,19 @@ class LoanCreateView(LoginRequiredMixin, DetailView):
         )
 
         # Send an Email Saying Loan Application Was Made By A User
-        html_ = "Your loan request have been approved by {company}, you would " \
-                "be sent RRR form or OTP verification for final confirmation before funds can be disbursed, " \
-                "Please bear in mind, we would remove our loan processing and insurance fee alongside.".format(company=self.get_object().name)
-        subject = 'Loan Request Notice From AMJU'
-        from_email = email_settings.EMAIL_HOST_USER
-        recipient_list = [borrower_inst.email]
-
-        from django.core.mail import EmailMessage
-        message = EmailMessage(
-            subject, html_, from_email, recipient_list
-        )
-        message.fail_silently = False
-        message.send()
+        # html_ = "Your loan request have been approved by {company}, you would " \
+        #         "be sent RRR form or OTP verification for final confirmation before funds can be disbursed, " \
+        #         "Please bear in mind, we would remove our loan processing and insurance fee alongside.".format(company=self.get_object().name)
+        # subject = 'Loan Request Notice From AMJU'
+        # from_email = email_settings.EMAIL_HOST_USER
+        # recipient_list = [borrower_inst.email]
+        #
+        # from django.core.mail import EmailMessage
+        # message = EmailMessage(
+        #     subject, html_, from_email, recipient_list
+        # )
+        # message.fail_silently = False
+        # message.send()
 
         base_url = getattr(settings, 'BASE_URL', 'https://www.minloans.com.ng')
 
@@ -270,9 +270,17 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
             except RemitaMandateStatusReport.DoesNotExist:
                 context['dd_status_report'] = None
         elif str(self.get_object().mode_of_repayments) == "Remita Data Referencing":
+            try:
+                base_url = BaseUrl.objects.get(belongs_to='remita').base_url
+            except BaseUrl.DoesNotExist:
+                base_url = "https://no-url-connected.com"
+            context['base_url'] = base_url
             context['company_creds'] = RemitaCredentials.objects.get(connected_firm=company_inst)
+            context['company_drf_creds'] = company_inst.user.thirdpartycreds
             context['loan_collection_type'] = 2
             context['loanActions'] = 'DRF'
+            context['parsed_phone'] = phoneParseConverter(str(self.get_object().borrower.phone))
+            context['installments'] = digitExtract(self.get_object().number_repayments)
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -837,5 +845,16 @@ class RemitaDDStatusReport(View):
                     mandate_status=payload['isActive'],
                     report_status=payload['status']
                 )
+            return JsonResponse({'message': 'Transaction Has Been Updated!'}, status=201)
+        return JsonResponse({'message': 'Method Not Allowed'}, status=501)
+
+
+class DRFSalaryHistoryUpdate(View):
+    def post(self, *args, **kwargs):
+        if self.request.is_ajax():
+            data = self.request.body.decode("utf-8")
+            payload = json.loads(data)
+            print(payload)
+            loanInstance = Loan.objects.get(loan_key=payload['loan_key'])
             return JsonResponse({'message': 'Transaction Has Been Updated!'}, status=201)
         return JsonResponse({'message': 'Method Not Allowed'}, status=501)

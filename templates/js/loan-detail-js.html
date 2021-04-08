@@ -12,6 +12,7 @@
         // chartjs
         var ctx = document.getElementById('myChart').getContext('2d');
         let numOfInstallments = {{ loan_obj.number_repayments|safe }};
+        console.log(numOfInstallments);
         var myChart = new Chart(ctx, {
             type: 'bar',
             data: {

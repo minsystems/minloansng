@@ -7,6 +7,7 @@ from django.db.models.signals import post_save
 from django.urls import reverse
 
 from accounts.models import Profile, upload_image_path
+from banks.models import BankCode
 from borrowers.models import Borrower
 from company.models import Company
 from minloansng.utils import digitExtract, addDays
@@ -307,3 +308,43 @@ class LoanActivityComments(models.Model):
 
     def __str__(self):
         return str(self.loan)
+
+
+class DRFSalaryHistory(models.Model):
+    borrower = models.ForeignKey(Borrower, on_delete=models.CASCADE, blank=True, null=True)
+    loan = models.ForeignKey(Loan, on_delete=models.CASCADE, blank=True, null=True)
+    has_data = models.BooleanField(default=False)
+    response_id = models.CharField(blank=True, null=True, max_length=299)
+    count = models.IntegerField(default=0)
+    customer_id = models.CharField(max_length=200, blank=True, null=True)
+    account_number = models.CharField(max_length=200, blank=True, null=True)
+    bank_code = models.ForeignKey(BankCode, on_delete=models.CASCADE, blank=True, null=True)
+    bvn = models.CharField(max_length=200, blank=True, null=True)
+    company_name = models.CharField(max_length=200, blank=True, null=True)
+    customer_name = models.CharField(max_length=200, blank=True, null=True)
+    category = models.CharField(max_length=200, blank=True, null=True)
+    first_payment_date = models.DateTimeField()
+
+    class Meta:
+        db_table = "DRF Salary History"
+        verbose_name = "DRF Salary History"
+        verbose_name_plural = "DRF Salary History"
+
+    def __str__(self):
+        return str(self.loan)
+
+
+class DRFSalaryPaymentDetails(models.Model):
+    drf_salary_history = models.ForeignKey(DRFSalaryHistory, on_delete=models.CASCADE, blank=True, null=True)
+    payment_date = models.DateTimeField()
+    amount = models.CharField(max_length=200, blank=True, null=True)
+    account_number = models.CharField(max_length=200, blank=True, null=True)
+    bank_code = models.ForeignKey(BankCode, on_delete=models.CASCADE, blank=True, null=True)
+
+    class Meta:
+        db_table = "DRF Payment Details"
+        verbose_name = "DRF Payment Details"
+        verbose_name_plural = "DRF Payment Details"
+
+    def __str__(self):
+        return str(self.drf_salary_history.loan)

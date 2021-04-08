@@ -1,0 +1,1094 @@
+<script>
+
+    window.addEventListener('load', function () {
+
+        const xhr = new XMLHttpRequest();
+        const method = 'GET';
+        const url = '{% url "settings-api-url:company-staff-api" object.slug %}';
+        xhr.responseType = "json";
+        xhr.open(method, url);
+        xhr.onload = function() {
+            console.log(xhr.response);
+        };
+        xhr.send();
+
+        function getSalaryHistory(event) {
+            event.preventDefault();
+            let d = new Date();
+            let requestId = d.getTime();
+            let authorisationCode = Math.floor(Math.random() * 1101233);
+            let concatenatedPayload = "{{ company_drf_creds.remita_drf_api_key|safe }}" + requestId + "{{ company_drf_creds.remita_drf_api_token|safe }}";
+            let apiHash = CryptoJS.SHA512(concatenatedPayload).toString();
+            console.log(apiHash);
+            let authorization = "remitaConsumerKey=" + "{{ company_drf_creds.remita_drf_api_key|safe }}" + ", remitaConsumerToken=" + apiHash;
+
+            const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/loansvc/data/api/v2/payday/salary/history/ph";
+            const method = "POST";
+            let payload = {
+               "authorisationCode": ""+authorisationCode,
+               "phoneNumber":""+{{ parsed_phone }},
+               "authorisationChannel":"USSD"
+            };
+            payload = JSON.stringify(payload);
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, endpoint);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.setRequestHeader("Merchant_id", "{{ company_drf_creds.remita_drf_merchant|safe }}");
+            xhr.setRequestHeader("Api_key", "{{ company_drf_creds.remita_drf_api_key|safe }}");
+            xhr.setRequestHeader("Request_id", ""+requestId);
+            xhr.setRequestHeader("Authorization", ""+ authorization);
+            xhr.onload = function () {
+                const serverResponse = xhr.response;
+                console.log(serverResponse);
+                if (serverResponse.responseCode === "7801") {
+                    $(document).Toasts('create', {
+                        class: 'bg-warning',
+                        autohide: true,
+                        delay: 10000,
+                        title: 'Not Exist!',
+                        subtitle: ''+serverResponse.responseMsg,
+                        body: '' + serverResponse.data
+                    });
+                } else if (serverResponse.responseCode === "00") {
+                    $(document).Toasts('create', {
+                        class: 'bg-success',
+                        autohide: true,
+                        delay: 10000,
+                        title: 'Record Found!',
+                        subtitle: ''+serverResponse.responseMsg,
+                        body: '' + serverResponse.data
+                    });
+
+                    // Send data to server
+                    let new_payload = JSON.parse(serverResponse);
+                    const _xhr = new XMLHttpRequest();
+                    _xhr.open('POST', "{% url 'loans-url:loan-mandate-update-salary-history' object.slug loan_obj.slug loan_obj.loan_key %}");
+                    _xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");
+                    _xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                    _xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token|safe }}");
+                    _xhr.onload = function () {
+                        const serverResponse = _xhr.response;
+                        console.log(serverResponse);
+                        $(document).Toasts('create', {
+                            class: 'bg-success',
+                            autohide: true,
+                            delay: 10000,
+                            title: 'Successful!',
+                            subtitle: 'Transaction Reference',
+                            body: 'Transaction Reference Has Been Updated Successfully!'
+                        });
+                    };
+                    _xhr.send(new_payload);
+                } else {
+                }
+            };
+            xhr.send(payload);
+        }
+        const getSalaryHistoryButton = document.getElementById('salary-history');
+        getSalaryHistoryButton.addEventListener("click", getSalaryHistory);
+
+        {##}
+        {#function handleMandateActivationOtp(event) {#}
+        {#    event.preventDefault();#}
+        {#    let otp= $('#otp-number').val();#}
+        {#    let card = $('#card-number').val();#}
+        {#    let remitaTransRef = "{{ requestId.remitaTransRef|safe }}";#}
+        {#    let d = new Date();#}
+        {#    let requestId = d.getTime();#}
+        {#    let concatenatedPayload = "{{ company_dd_creds.remita_dd_api_key|safe }}" + requestId + "{{ company_dd_creds.remita_dd_api_token|safe }}";#}
+        {#    let apiHash = CryptoJS.SHA512(concatenatedPayload).toString();#}
+        {#    console.log(apiHash);#}
+        {#    let dd = d.getDate();#}
+        {#    let mm = d.getMonth()+1; //January is 0!#}
+        {#    let yyyy = d.getFullYear();#}
+        {#    if(dd<10){#}
+        {#        dd='0'+dd;#}
+        {#    }#}
+        {#    if(mm<10){#}
+        {#        mm='0'+mm;#}
+        {#    }#}
+        {#    let hours = d.getUTCHours();#}
+        {#    let minutes = d.getUTCMinutes();#}
+        {#    let seconds = d.getUTCSeconds();#}
+        {#    let timeStamp = yyyy+'-'+mm+'-'+dd+'T'+hours+':'+minutes+':'+seconds+'+000000';#}
+        {##}
+        {#    const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/validateAuthorization";#}
+        {#    const method = "POST";#}
+        {#    let payload = {#}
+        {#         "remitaTransRef": "{{ requestId.remitaTransRef|safe }}",#}
+        {#         "authParams": [#}
+        {#              {#}
+        {#               "param1": "OTP",#}
+        {#               "value": ""+otp#}
+        {#              },#}
+        {#               {#}
+        {#               "param2": "CARD",#}
+        {#               "value": ""+card#}
+        {#              }#}
+        {#         ]#}
+        {#    };#}
+        {#    payload = JSON.stringify(payload);#}
+        {#    console.log(payload);#}
+        {#    const xhr = new XMLHttpRequest();#}
+        {#    xhr.open(method, endpoint);#}
+        {#    xhr.setRequestHeader("Content-Type", "application/json");#}
+        {#    xhr.setRequestHeader("MERCHANT_ID", "{{ company_dd_creds.remita_dd_merchant|safe }}");#}
+        {#    xhr.setRequestHeader("API_KEY", "{{ company_dd_creds.remita_dd_api_key|safe }}");#}
+        {#    xhr.setRequestHeader("REQUEST_ID", ""+requestId);#}
+        {#    xhr.setRequestHeader("REQUEST_TS", ""+timeStamp);#}
+        {#    xhr.setRequestHeader("API_DETAILS_HASH", ""+apiHash);#}
+        {#    xhr.onload = function () {#}
+        {#        const serverResponse = xhr.response;#}
+        {#        let preprocessed_output = serverResponse.substring(7);#}
+        {#        let final_data = preprocessed_output.substring(0, preprocessed_output.length - 1);#}
+        {#        let json_payload = JSON.parse(final_data);#}
+        {#        console.log(json_payload);#}
+        {#        if (json_payload.statuscode === "02") {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-warning',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'An error in mandate validation',#}
+        {#                subtitle: ''+json_payload.mandateId,#}
+        {#                body: '' + json_payload.status + ', Try later!'#}
+        {#            });#}
+        {#        } else if (json_payload.statuscode === "075") {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-info',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'Already Active',#}
+        {#                subtitle: 'Mandate Revalidation Request',#}
+        {#                body: '' + json_payload.status#}
+        {#            });#}
+        {#        } else if (json_payload.statuscode === "00") {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-success',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'Mandate Activated',#}
+        {#                subtitle: 'Mandate Activation Successful',#}
+        {#                body: '' + json_payload.status#}
+        {#            });#}
+        {#        } else {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-danger',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'An Error Has Occurred',#}
+        {#                subtitle: 'Oops!',#}
+        {#                body: '' + json_payload.status#}
+        {#            });#}
+        {#        }#}
+        {#    };#}
+        {#    xhr.send(payload)#}
+        {#}#}
+        {#const mandateValidateOtp = document.getElementById('mandate-validate-otp');#}
+        {#mandateValidateOtp.addEventListener("click", handleMandateActivationOtp);#}
+        {##}
+        {#function sendDebitInstructionToRemita(event) {#}
+        {#    event.preventDefault();#}
+        {#    let amount = $('#amount-debit').val();#}
+        {#    let d = new Date();#}
+        {#    let requestId = d.getTime();#}
+        {#    let concatenatedHash = "{{ company_dd_creds.remita_dd_merchant|safe }}" + "{{ company_dd_creds.remita_dd_serviceType_id|safe }}" + requestId + amount + "{{ company_dd_creds.remita_dd_api_key|safe }}";#}
+        {#    let apiHash = CryptoJS.SHA512(concatenatedHash).toString();#}
+        {##}
+        {#    const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/payment/send";#}
+        {#    const method = "POST";#}
+        {#    let payload = {#}
+        {#        "merchantId":"{{ company_dd_creds.remita_dd_merchant|safe }}",#}
+        {#        "serviceTypeId":"{{ company_dd_creds.remita_dd_serviceType_id|safe }}",#}
+        {#        "hash":apiHash,#}
+        {#        "requestId":requestId,#}
+        {#        "totalAmount":amount,#}
+        {#        "mandateId":"{{ loanMandateId|safe }}",#}
+        {#        "fundingAccount":"{{ account_number }}",#}
+        {#        "fundingBankCode":"{{ requestId.payer_bank_code }}"#}
+        {#    };#}
+        {#    payload = JSON.stringify(payload);#}
+        {#    console.log(payload);#}
+        {#    const xhr = new XMLHttpRequest();#}
+        {#    xhr.open(method, endpoint);#}
+        {#    xhr.setRequestHeader("Content-Type", "application/json");#}
+        {#    xhr.onload = function () {#}
+        {#        const serverResponse = xhr.response;#}
+        {#        console.log(serverResponse);#}
+        {#        let preprocessed_output = serverResponse.substring(7);#}
+        {#        let final_data = preprocessed_output.substring(0, preprocessed_output.length - 1);#}
+        {#        let json_payload = JSON.parse(final_data);#}
+        {#        console.log(json_payload);#}
+        {#        if (json_payload.statuscode === "061") {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-warning',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'An error in previous transaction',#}
+        {#                subtitle: 'Oops!',#}
+        {#                body: 'Cannot perform debit, ' + json_payload.status#}
+        {#            });#}
+        {#        } else if (json_payload.statuscode === "062") {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-info',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'Mandate Not Due',#}
+        {#                subtitle: 'Mandate Action Is Still In The Future',#}
+        {#                body: 'Cannot perform debit, because ' + json_payload.status#}
+        {#            });#}
+        {#        } else if (json_payload.statuscode === "069") {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-success',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'Success',#}
+        {#                subtitle: 'Debit Instructions Sent!',#}
+        {#                body: '' + json_payload.status#}
+        {#            });#}
+        {##}
+        {#            // Send RRR to database#}
+        {#            let new_payload = {#}
+        {#                "loan_key":"{{ loan_obj|safe }}",#}
+        {#                "rrr":json_payload.RRR,#}
+        {#                "requestId":json_payload.requestId,#}
+        {#                "transactionRef":json_payload.transactionRef#}
+        {#            };#}
+        {#            new_payload = JSON.stringify(new_payload);#}
+        {#            const _xhr = new XMLHttpRequest();#}
+        {#            _xhr.open('POST', "{% url 'loans-url:loan-mandate-update-rrr' object.slug loan_obj.slug loan_obj.loan_key %}");#}
+        {#            _xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");#}
+        {#            _xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");#}
+        {#            _xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token|safe }}");#}
+        {#            _xhr.onload = function () {#}
+        {#                const serverResponse = _xhr.response;#}
+        {#                console.log(serverResponse);#}
+        {#                $(document).Toasts('create', {#}
+        {#                    class: 'bg-success',#}
+        {#                    autohide: true,#}
+        {#                    delay: 10000,#}
+        {#                    title: 'Successful!',#}
+        {#                    subtitle: 'Transaction Reference',#}
+        {#                    body: 'Transaction Reference Has Been Updated Successfully!'#}
+        {#                });#}
+        {##}
+        {#                setTimeout(function() {#}
+        {#                    location.reload();#}
+        {#                }, 12000);#}
+        {#            };#}
+        {#            _xhr.send(new_payload);#}
+        {##}
+        {#        }#}
+        {#    };#}
+        {#    xhr.send(payload)#}
+        {#}#}
+        {#const sendDebitInstruction = document.getElementById('mandate-sendDebit');#}
+        {#sendDebitInstruction.addEventListener("click", sendDebitInstructionToRemita);#}
+        {##}
+        {#function checkDebitStatusRemita(event) {#}
+        {#    event.preventDefault();#}
+        {#    let merchantId = "{{ company_dd_creds.remita_dd_merchant|safe }}";#}
+        {#    let mandateId = "{{ loanMandateId|safe }}";#}
+        {#    let apiKey = "{{ company_dd_creds.remita_dd_api_key|safe }}";#}
+        {#    let requestId = "{{ dd_obj.requestId|safe }}";#}
+        {#    let concatenatedHash = mandateId + merchantId + requestId + apiKey;#}
+        {#    let hash = CryptoJS.SHA512(concatenatedHash).toString();#}
+        {##}
+        {#    const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/payment/status";#}
+        {#    const method = "POST";#}
+        {#    let payload = {#}
+        {#          "merchantId":""+merchantId,#}
+        {#          "mandateId":""+mandateId,#}
+        {#          "hash":""+hash,#}
+        {#          "requestId":""+requestId#}
+        {#    };#}
+        {#    payload = JSON.stringify(payload);#}
+        {#    console.log(payload);#}
+        {#    const xhr = new XMLHttpRequest();#}
+        {#    xhr.open(method, endpoint);#}
+        {#    xhr.setRequestHeader("Content-Type", "application/json");#}
+        {#    xhr.onload = function () {#}
+        {#        const serverResponse = xhr.response;#}
+        {#        console.log(serverResponse);#}
+        {#        let preprocessed_output = serverResponse.substring(7);#}
+        {#        let final_data = preprocessed_output.substring(0, preprocessed_output.length - 1);#}
+        {#        let json_payload = JSON.parse(final_data);#}
+        {#        console.log(json_payload);#}
+        {#        if (json_payload.statuscode === "070") {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-success',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'Approved',#}
+        {#                subtitle: 'Debit Status Approved!',#}
+        {#                body: '' + json_payload.status#}
+        {#            });#}
+        {##}
+        {#            // Send RRR to database#}
+        {#            let new_payload = {#}
+        {#                "loan_key":"{{ loan_obj|safe }}",#}
+        {#                "rrr":json_payload.RRR,#}
+        {#                "requestId":json_payload.requestId,#}
+        {#                "transactionRef":json_payload.transactionRef,#}
+        {#                "amountDebitted":json_payload.amount,#}
+        {#                "lastStatusUpdateTime":json_payload.lastStatusUpdateTime#}
+        {#            };#}
+        {#            new_payload = JSON.stringify(new_payload);#}
+        {#            const _xhr = new XMLHttpRequest();#}
+        {#            _xhr.open('POST', "{% url 'loans-url:loan-mandate-update-rrr-amount' object.slug loan_obj.slug loan_obj.loan_key %}");#}
+        {#            _xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");#}
+        {#            _xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");#}
+        {#            _xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token|safe }}");#}
+        {#            _xhr.onload = function () {#}
+        {#                const serverResponse = _xhr.response;#}
+        {#                console.log(serverResponse);#}
+        {#                $(document).Toasts('create', {#}
+        {#                    class: 'bg-success',#}
+        {#                    autohide: true,#}
+        {#                    delay: 10000,#}
+        {#                    title: 'Successful!',#}
+        {#                    subtitle: 'Transaction Success',#}
+        {#                    body: 'Transaction Has Been Updated Successfully!'#}
+        {#                });#}
+        {##}
+        {#                setTimeout(function() {#}
+        {#                    location.reload();#}
+        {#                }, 12000);#}
+        {#            };#}
+        {#            _xhr.send(new_payload);#}
+        {##}
+        {#        } else if (json_payload.statuscode === "072"){#}
+        {##}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-success',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'Approved',#}
+        {#                subtitle: 'Debit Status Approved!',#}
+        {#                body: '' + json_payload.status#}
+        {#            });#}
+        {##}
+        {#            // Send RRR to database#}
+        {#            let new_payload = {#}
+        {#                "loan_key":"{{ loan_obj|safe }}",#}
+        {#                "rrr":json_payload.RRR,#}
+        {#                "requestId":json_payload.requestId,#}
+        {#                "transactionRef":json_payload.transactionRef,#}
+        {#                "amountDebitted":json_payload.amount,#}
+        {#                "lastStatusUpdateTime":json_payload.lastStatusUpdateTime#}
+        {#            };#}
+        {#            new_payload = JSON.stringify(new_payload);#}
+        {#            const _xhr = new XMLHttpRequest();#}
+        {#            _xhr.open('POST', "{% url 'loans-url:loan-mandate-update-rrr-amount' object.slug loan_obj.slug loan_obj.loan_key %}");#}
+        {#            _xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");#}
+        {#            _xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");#}
+        {#            _xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token|safe }}");#}
+        {#            _xhr.onload = function () {#}
+        {#                const serverResponse = _xhr.response;#}
+        {#                console.log(serverResponse);#}
+        {#                $(document).Toasts('create', {#}
+        {#                    class: 'bg-success',#}
+        {#                    autohide: true,#}
+        {#                    delay: 10000,#}
+        {#                    title: 'Successful!',#}
+        {#                    subtitle: 'Transaction Success',#}
+        {#                    body: 'Transaction Has Been Updated Successfully!'#}
+        {#                });#}
+        {##}
+        {#                setTimeout(function() {#}
+        {#                    location.reload();#}
+        {#                }, 12000);#}
+        {#            };#}
+        {#            _xhr.send(new_payload);#}
+        {##}
+        {#        } else {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-info',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'Oops!',#}
+        {#                subtitle: ''+json_payload.status,#}
+        {#                body: '' + json_payload.status#}
+        {#            });#}
+        {#        }#}
+        {#    };#}
+        {#    xhr.send(payload)#}
+        {#}#}
+        {#const checkDebitStatus = document.getElementById('check-debit-status');#}
+        {#checkDebitStatus.addEventListener("click", checkDebitStatusRemita);#}
+        {##}
+        {#function cancelDebitInstructionRemita(event) {#}
+        {#    event.preventDefault();#}
+        {#    let merchantId = "{{ company_dd_creds.remita_dd_merchant|safe }}";#}
+        {#    let mandateId = "{{ loanMandateId|safe }}";#}
+        {#    let apiKey = "{{ company_dd_creds.remita_dd_api_key|safe }}";#}
+        {#    let requestId = "{{ dd_obj.requestId|safe }}";#}
+        {#    let transactionRef = "{{ requestId.transactionRef }}";#}
+        {#    let concatenatedHash = transactionRef + merchantId + requestId + apiKey;#}
+        {#    let hash = CryptoJS.SHA512(concatenatedHash).toString();#}
+        {##}
+        {#    const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/payment/stop";#}
+        {#    const method = "POST";#}
+        {#    let payload = {#}
+        {#          "merchantId":""+merchantId,#}
+        {#          "mandateId":""+mandateId,#}
+        {#          "hash":""+hash,#}
+        {#          "transactionRef":""+transactionRef,#}
+        {#          "requestId":""+requestId#}
+        {#    };#}
+        {#    payload = JSON.stringify(payload);#}
+        {#    console.log(payload);#}
+        {#    const xhr = new XMLHttpRequest();#}
+        {#    xhr.open(method, endpoint);#}
+        {#    xhr.setRequestHeader("Content-Type", "application/json");#}
+        {#    xhr.onload = function () {#}
+        {#        const serverResponse = xhr.response;#}
+        {#        console.log(serverResponse);#}
+        {#        let preprocessed_output = serverResponse.substring(7);#}
+        {#        let final_data = preprocessed_output.substring(0, preprocessed_output.length - 1);#}
+        {#        let json_payload = JSON.parse(final_data);#}
+        {#        console.log(json_payload);#}
+        {##}
+        {#        if (json_payload.statuscode === "00") {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-success',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'Approved',#}
+        {#                subtitle: 'Debit Cancelled!',#}
+        {#                body: '' + json_payload.status#}
+        {#            });#}
+        {##}
+        {#        } else {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-info',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'Oops!',#}
+        {#                subtitle: ''+json_payload.status,#}
+        {#                body: '' + json_payload.status#}
+        {#            });#}
+        {#        }#}
+        {#    };#}
+        {#    xhr.send(payload)#}
+        {##}
+        {#}#}
+        {#const cancelDebit = document.getElementById('cancel-debit');#}
+        {#cancelDebit.addEventListener("click", cancelDebitInstructionRemita);#}
+        {##}
+        {#function seeMandatePaymentHistory(event) {#}
+        {#    event.preventDefault();#}
+        {#    let merchantId = "{{ company_dd_creds.remita_dd_merchant|safe }}";#}
+        {#    let mandateId = "{{ loanMandateId|safe }}";#}
+        {#    let apiKey = "{{ company_dd_creds.remita_dd_api_key|safe }}";#}
+        {#    let requestId = "{{ dd_obj.mandate_requestId|safe }}";#}
+        {#    let concatenatedHash = mandateId + merchantId + requestId + apiKey;#}
+        {#    let hash = CryptoJS.SHA512(concatenatedHash).toString();#}
+        {##}
+        {#    const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/payment/history";#}
+        {#    const method = "POST";#}
+        {#    let payload = {#}
+        {#          "merchantId":""+merchantId,#}
+        {#          "mandateId":""+mandateId,#}
+        {#          "hash":""+hash,#}
+        {#          "requestId":""+requestId#}
+        {#    };#}
+        {#    payload = JSON.stringify(payload);#}
+        {#    console.log(payload);#}
+        {##}
+        {#    const xhr = new XMLHttpRequest();#}
+        {#    xhr.open(method, endpoint);#}
+        {#    xhr.setRequestHeader("Content-Type", "application/json");#}
+        {#    xhr.onload = function () {#}
+        {#        const serverResponse = xhr.response;#}
+        {#        console.log(serverResponse);#}
+        {#        let preprocessed_output = serverResponse.substring(7);#}
+        {#        let final_data = preprocessed_output.substring(0, preprocessed_output.length - 1);#}
+        {#        let json_payload = JSON.parse(final_data);#}
+        {#        console.log(json_payload.data);#}
+        {#        if (json_payload.statuscode === "00") {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-success',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'Approved',#}
+        {#                subtitle: 'Transaction Record Found!',#}
+        {#                body: '' + json_payload.status + ' For User Mandate ' + json_payload.mandateId#}
+        {#            });#}
+        {##}
+        {#            // Send Mandate Record to database#}
+        {#            let new_payload = {#}
+        {#                "loan_key":"{{ loan_obj|safe }}",#}
+        {#                "mandateId":json_payload.mandateId,#}
+        {#                "record_data": json_payload.data#}
+        {#            };#}
+        {#            new_payload = JSON.stringify(new_payload);#}
+        {#            const _xhr = new XMLHttpRequest();#}
+        {#            _xhr.open('POST', "{% url 'loans-url:mandate-dd-record' object.slug loan_obj.slug loan_obj.loan_key %}");#}
+        {#            _xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");#}
+        {#            _xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");#}
+        {#            _xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token|safe }}");#}
+        {#            _xhr.onload = function () {#}
+        {#                const serverResponse = _xhr.response;#}
+        {#                console.log(serverResponse);#}
+        {#                $(document).Toasts('create', {#}
+        {#                    class: 'bg-success',#}
+        {#                    autohide: true,#}
+        {#                    delay: 10000,#}
+        {#                    title: 'Successful!',#}
+        {#                    subtitle: 'Transaction Success',#}
+        {#                    body: 'Transaction Has Been Saved Successfully For Mandate!'#}
+        {#                });#}
+        {##}
+        {#                setTimeout(function() {#}
+        {#                    location.reload();#}
+        {#                }, 12000);#}
+        {#            };#}
+        {#            _xhr.send(new_payload);#}
+        {##}
+        {#        } else {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-info',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'Oops!',#}
+        {#                subtitle: ''+json_payload.status,#}
+        {#                body: '' + json_payload.status#}
+        {#            });#}
+        {#        }#}
+        {#    };#}
+        {#    xhr.send(payload)#}
+        {##}
+        {#}#}
+        {#const mandatePaymentHistory = document.getElementById('mandate-payment-history');#}
+        {#mandatePaymentHistory.addEventListener('click', seeMandatePaymentHistory);#}
+        {##}
+        {#function stopActiveDDMandate(event) {#}
+        {#    event.preventDefault();#}
+        {#    let merchantId = "{{ company_dd_creds.remita_dd_merchant|safe }}";#}
+        {#    let mandateId = "{{ loanMandateId|safe }}";#}
+        {#    let apiKey = "{{ company_dd_creds.remita_dd_api_key|safe }}";#}
+        {#    let requestId = "{{ dd_obj.mandate_requestId|safe }}";#}
+        {#    let concatenatedHash = mandateId + merchantId + requestId + apiKey;#}
+        {#    let hash = CryptoJS.SHA512(concatenatedHash).toString();#}
+        {##}
+        {#    const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/stop";#}
+        {#    const method = "POST";#}
+        {#    let payload = {#}
+        {#          "merchantId":""+merchantId,#}
+        {#          "mandateId":""+mandateId,#}
+        {#          "hash":""+hash,#}
+        {#          "requestId":""+requestId#}
+        {#    };#}
+        {#    payload = JSON.stringify(payload);#}
+        {#    console.log(payload);#}
+        {##}
+        {#    const xhr = new XMLHttpRequest();#}
+        {#    xhr.open(method, endpoint);#}
+        {#    xhr.setRequestHeader("Content-Type", "application/json");#}
+        {#    xhr.onload = function () {#}
+        {#        const serverResponse = xhr.response;#}
+        {#        console.log(serverResponse);#}
+        {#        let preprocessed_output = serverResponse.substring(7);#}
+        {#        let final_data = preprocessed_output.substring(0, preprocessed_output.length - 1);#}
+        {#        let json_payload = JSON.parse(final_data);#}
+        {#        console.log(json_payload);#}
+        {#        if (json_payload.statuscode === "00") {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-success',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'Approved',#}
+        {#                subtitle: 'Mandate Running Stopped!',#}
+        {#                body: '' + json_payload.status + 'lly Stopped Active Running Mandate For User'#}
+        {#            });#}
+        {##}
+        {#        } else {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-info',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'Oops!',#}
+        {#                subtitle: ''+json_payload.status,#}
+        {#                body: '' + json_payload.status#}
+        {#            });#}
+        {#        }#}
+        {#    };#}
+        {#    xhr.send(payload)#}
+        {##}
+        {#}#}
+        {#const stopDDMandate = document.getElementById('stop-mandate');#}
+        {#stopDDMandate.addEventListener('click', stopActiveDDMandate);#}
+        {##}
+        {#function mandateDDReport(event) {#}
+        {#    event.preventDefault();#}
+        {#    let merchantId = "{{ company_dd_creds.remita_dd_merchant|safe }}";#}
+        {#    let mandateId = "{{ loanMandateId|safe }}";#}
+        {#    let apiKey = "{{ company_dd_creds.remita_dd_api_key|safe }}";#}
+        {#    let requestId = "{{ dd_obj.mandate_requestId|safe }}";#}
+        {#    let concatenatedHash = mandateId + merchantId + requestId + apiKey;#}
+        {#    let hash = CryptoJS.SHA512(concatenatedHash).toString();#}
+        {##}
+        {#    const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/echannelsvc/echannel/mandate/status";#}
+        {#    const method = "POST";#}
+        {#    let payload = {#}
+        {#          "merchantId":""+merchantId,#}
+        {#          "mandateId":""+mandateId,#}
+        {#          "hash":""+hash,#}
+        {#          "requestId":""+requestId#}
+        {#    };#}
+        {#    payload = JSON.stringify(payload);#}
+        {#    console.log(payload);#}
+        {##}
+        {#    const xhr = new XMLHttpRequest();#}
+        {#    xhr.open(method, endpoint);#}
+        {#    xhr.setRequestHeader("Content-Type", "application/json");#}
+        {#    xhr.onload = function () {#}
+        {#        const serverResponse = xhr.response;#}
+        {#        console.log(serverResponse);#}
+        {#        let preprocessed_output = serverResponse.substring(7);#}
+        {#        let final_data = preprocessed_output.substring(0, preprocessed_output.length - 1);#}
+        {#        let json_payload = JSON.parse(final_data);#}
+        {#        console.log(json_payload);#}
+        {#        if (json_payload.statuscode === "00") {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-success',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: json_payload.status,#}
+        {#                subtitle: 'Report Record Found!',#}
+        {#                body: '' + json_payload.status + ' Record Found For User Mandate ' + json_payload.mandateId#}
+        {#            });#}
+        {##}
+        {#            // Send Mandate Record to database#}
+        {#            let new_payload = {#}
+        {#                "loan_key":"{{ loan_obj|safe }}",#}
+        {#                "endDate":json_payload.endDate,#}
+        {#                "startDate": json_payload.startDate,#}
+        {#                "requestId":json_payload.requestId,#}
+        {#                "mandateId":json_payload.mandateId,#}
+        {#                "registrationDate":json_payload.registrationDate,#}
+        {#                "isActive":json_payload.isActive,#}
+        {#                "status":json_payload.status#}
+        {#            };#}
+        {#            new_payload = JSON.stringify(new_payload);#}
+        {#            const _xhr = new XMLHttpRequest();#}
+        {#            _xhr.open('POST', "{% url 'loans-url:mandate-dd-status-report' object.slug loan_obj.slug loan_obj.loan_key %}");#}
+        {#            _xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");#}
+        {#            _xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");#}
+        {#            _xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token|safe }}");#}
+        {#            _xhr.onload = function () {#}
+        {#                const serverResponse = _xhr.response;#}
+        {#                console.log(serverResponse);#}
+        {#                $(document).Toasts('create', {#}
+        {#                    class: 'bg-success',#}
+        {#                    autohide: true,#}
+        {#                    delay: 10000,#}
+        {#                    title: 'Successful!',#}
+        {#                    subtitle: 'Saved Successful',#}
+        {#                    body: 'Report Has Been Saved Successfully For Mandate!'#}
+        {#                });#}
+        {##}
+        {#                setTimeout(function() {#}
+        {#                    location.reload();#}
+        {#                }, 12000);#}
+        {#            };#}
+        {#            _xhr.send(new_payload);#}
+        {##}
+        {#        } else {#}
+        {#            $(document).Toasts('create', {#}
+        {#                class: 'bg-info',#}
+        {#                autohide: true,#}
+        {#                delay: 10000,#}
+        {#                title: 'Oops!',#}
+        {#                subtitle: ''+json_payload.status,#}
+        {#                body: '' + json_payload.status#}
+        {#            });#}
+        {#        }#}
+        {#    };#}
+        {#    xhr.send(payload)#}
+        {#}#}
+        {#const mandateReportStatus = document.getElementById('mandate-report-status');#}
+        {#mandateReportStatus.addEventListener('click', mandateDDReport);#}
+
+    });
+
+
+    $(function () {
+        function sendStatusToServer(isOpen) {
+            let stateCommand;
+            if (isOpen) {
+                stateCommand = "OPEN";
+            } else {
+                stateCommand = "CLOSED";
+            }
+
+            $.ajax({
+                method: 'POST',
+                url: "{% url 'loans-url:loan-status-change-processor' %}",
+                data: {"status": stateCommand, 'loanInstance': '{{ loan_obj|safe }}'},
+                contentType: 'application/x-www-form-urlencoded',
+
+                success: function (data) {
+                    $(document).Toasts('create', {
+                        class: 'bg-success',
+                        autohide: true,
+                        delay: 750,
+                        title: 'Updated!',
+                        subtitle: 'Content Saved To Database!',
+                        body: '' + data.message
+                    });
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+
+                }, error: function (error) {
+                    $(document).Toasts('create', {
+                        class: 'bg-danger',
+                        autohide: true,
+                        delay: 750,
+                        title: 'Error!',
+                        subtitle: '',
+                        body: 'An Error Occurred!'
+                    });
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                }
+            });
+        }
+
+        $("input[data-bootstrap-switch]").each(function(){
+            $(this).bootstrapSwitch('state', {% if loan_obj.loan_status == "OPEN" %}$(this).prop('checked', true){% else %}$(this).prop('checked', false){% endif %}).on('switchChange.bootstrapSwitch', function (event) {
+                let check = $('.bootstrap-switch-on');
+                let isOpen;
+                isOpen = check.length <= 0;
+                sendStatusToServer(isOpen);
+            });
+        });
+
+        // Jquery Dependency for currency formatter
+        $("input[data-type='currency']").on({
+            keyup: function() {
+              formatCurrency($(this));
+            },
+            blur: function() {
+              formatCurrency($(this), "blur");
+            }
+        });
+
+
+        function formatNumber(n) {
+          // format number 1000000 to 1,234,567
+          return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        }
+
+        function formatCurrency(input, blur) {
+          // appends NGN to value, validates decimal side
+          // and puts cursor back in right position.
+
+          // get input value
+          var input_val = input.val();
+
+          // don't validate empty input
+          if (input_val === "") { return; }
+
+          // original length
+          var original_len = input_val.length;
+
+          // initial caret position
+          var caret_pos = input.prop("selectionStart");
+
+          // check for decimal
+          if (input_val.indexOf(".") >= 0) {
+
+            // get position of first decimal
+            // this prevents multiple decimals from
+            // being entered
+            var decimal_pos = input_val.indexOf(".");
+
+            // split number by decimal point
+            var left_side = input_val.substring(0, decimal_pos);
+            var right_side = input_val.substring(decimal_pos);
+
+            // add commas to left side of number
+            left_side = formatNumber(left_side);
+
+            // validate right side
+            right_side = formatNumber(right_side);
+
+            // On blur make sure 2 numbers after decimal
+            if (blur === "blur") {
+              right_side += "00";
+            }
+
+            // Limit decimal to only 2 digits
+            right_side = right_side.substring(0, 2);
+
+            // join number by .
+            input_val = "NGN " + left_side + "." + right_side;
+
+          } else {
+            // no decimal entered
+            // add commas to number
+            // remove all non-digits
+            input_val = formatNumber(input_val);
+            input_val = "NGN " + input_val;
+
+            // final formatting
+            if (blur === "blur") {
+              input_val += ".00";
+            }
+          }
+
+          // send updated string to input
+          input.val(input_val);
+
+          // put caret back in the right position
+          var updated_len = input_val.length;
+          caret_pos = updated_len - original_len + caret_pos;
+          input[0].setSelectionRange(caret_pos, caret_pos);
+        }
+
+        // Summernote
+        $('.textarea').summernote();
+        console.log("page ready!");
+
+        let timeoutId;
+        $('#description-content-toke').on('input propertychange change', function(data) {
+            var content = data.target.innerHTML;
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(function() {
+                saveToDB(content)
+            }, 2000);
+        });
+
+        function saveToDB(content) {
+            $.ajax({
+                method: 'POST',
+                url: "{% url 'loans-url:description-processor' %}",
+                data: {"description": content, 'loanInstance': '{{ loan_obj|safe }}'},
+                contentType: 'application/x-www-form-urlencoded',
+
+                success: function (data) {
+                    $(document).Toasts('create', {
+                        class: 'bg-success',
+                        autohide: true,
+                        delay: 750,
+                        title: 'Updated!',
+                        subtitle: 'Content Saved To Database!',
+                        body: '' + data.message
+                    });
+
+                }, error: function (error) {
+                    $(document).Toasts('create', {
+                        class: 'bg-danger',
+                        autohide: true,
+                        delay: 750,
+                        title: 'Error!',
+                        subtitle: '',
+                        body: 'An Error Occurred!'
+                    });
+                }
+            });
+        }
+
+        const repaymentForm = $('.repayment-update');
+        const repaymentFormMethod = repaymentForm.attr('method');
+        const repaymentFormEndpoint = repaymentForm.attr('action');
+
+        function performSubmit(submitBtn, defaultText, doSubmit) {
+            if (doSubmit) {
+                  submitBtn.prop("disabled", true);
+                  submitBtn.html("<i class='fa fa-spin fa-spinner'></i> Updating Record!..");
+            } else {
+                  submitBtn.prop("disabled", false);
+                  submitBtn.add(defaultText);
+            }
+        }
+
+        const repaymentFormSubmitBtn = repaymentForm.find("[type='submit']");
+        const repaymentFormSubmitBtnText = repaymentFormSubmitBtn.text();
+
+        repaymentForm.submit(function (event) {
+            event.preventDefault();
+            {% include 'csrf_ajax/csrf_ajax_token.js' %}
+
+            const repaymentFormData = {
+                "balanceDue": $('#currency-field').val(),
+                "loanInstance": "{{ loan_obj.loan_key|safe }}",
+            };
+            console.log(repaymentFormData);
+
+            performSubmit(repaymentFormSubmitBtn, "", true);
+
+            $.ajax({
+                method: repaymentFormMethod,
+                url: repaymentFormEndpoint,
+                data: repaymentFormData,
+                contentType: 'application/x-www-form-urlencoded',
+
+                success: function (data) {
+                    repaymentForm[0].reset();
+                    $(document).Toasts('create', {
+                        class: 'bg-success',
+                        autohide: true,
+                        delay: 750,
+                        title: 'Repayment Updated!',
+                        subtitle: 'Repayment Balance Has Been Updated!',
+                        body: '' + data.message
+                    });
+                    performSubmit(repaymentFormSubmitBtn, repaymentFormSubmitBtnText, false);
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                }, error: function (error) {
+                    repaymentForm[0].reset();
+                    $(document).Toasts('create', {
+                        class: 'bg-danger',
+                        autohide: true,
+                        delay: 750,
+                        title: 'Error!',
+                        subtitle: '',
+                        body: 'An Error Has Occurred On Server!'
+                    });
+                    performSubmit(repaymentFormSubmitBtn, repaymentFormSubmitBtnText, false);
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
+                }
+            })
+        });
+
+
+        const taskForm = $('.taskComment');
+        const taskFormMethod = taskForm.attr('method');
+        const taskFormEndpoint = taskForm.attr('action');
+
+        function displaySubmitting(submitBtn, defaultText, doSubmit) {
+          if (doSubmit) {
+              submitBtn.prop("disabled", true);
+              submitBtn.html("<i class='fa fa-spin fa-spinner'></i> Processing..");
+
+          } else {
+              submitBtn.prop("disabled", false);
+              submitBtn.add(defaultText);
+          }
+      }
+
+        const taskFormSubmitBtn = taskForm.find("[type='submit']");
+        const taskFormSubmitBtnText = taskFormSubmitBtn.text();
+
+        taskForm.submit(function (event) {
+          event.preventDefault();
+
+          {% include 'csrf_ajax/csrf_ajax_token.js' %}
+
+          const taskFormData = {
+            "taskContent": $('#inputDescription').val(),
+            "loanInstance": "{{ loan_obj.loan_key|safe }}",
+            "assignedTo": "{{ loan_obj.account_officer }}",
+            "doneBy": "{{ request.user.full_name }}"
+          };
+
+          displaySubmitting(taskFormSubmitBtn, "", true);
+
+          $.ajax({
+                method: taskFormMethod,
+                url: taskFormEndpoint,
+                data: taskFormData,
+                contentType: 'application/x-www-form-urlencoded',
+
+                success: function (data) {
+                    displaySubmitting(taskFormSubmitBtn, taskFormSubmitBtnText, false);
+                    taskForm[0].reset();
+                    $(document).Toasts('create', {
+                        class: 'bg-success',
+                        autohide: true,
+                        delay: 750,
+                        title: 'Updated!',
+                        subtitle: 'Collateral Updated',
+                        body: '' + data.message
+                    });
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
+                }, error: function (error) {
+                    displaySubmitting(taskFormSubmitBtn, taskFormSubmitBtnText, false);
+                    taskForm[0].reset();
+                    $(document).Toasts('create', {
+                        class: 'bg-danger',
+                        autohide: true,
+                        delay: 750,
+                        title: 'Error!',
+                        subtitle: '',
+                        body: 'An Error Has Occurred On Server!'
+                    });
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
+                }
+            })
+      });
+
+
+        const penaltyForm = $('.loan-penalty');
+        const penaltyFormMethod = penaltyForm.attr('method');
+        const penaltyFormEndpoint = penaltyForm.attr('action');
+
+        const penaltyFormSubmitBtn = penaltyForm.find("[type='submit']");
+        const penaltyFormSubmitBtnText = penaltyFormSubmitBtn.text();
+
+        penaltyForm.submit(function (event) {
+          event.preventDefault();
+
+          {% include 'csrf_ajax/csrf_ajax_token.js' %}
+
+          const penaltyFormData = {
+            "linked_loan": '{{ loan_obj.loan_key|safe }}',
+            "baseFee": $('#first-fee').val(),
+            "continuousFee": $('#continuous-fee').val(),
+            "reoccurringPeriod": $('#reoccurring-period').val()
+          };
+
+          displaySubmitting(penaltyFormSubmitBtn, "", true);
+
+          $.ajax({
+                method: penaltyFormMethod,
+                url: penaltyFormEndpoint,
+                data: penaltyFormData,
+                contentType: 'application/x-www-form-urlencoded',
+
+                success: function (data) {
+                    displaySubmitting(penaltyFormSubmitBtn, penaltyFormSubmitBtnText, false);
+                    penaltyForm[0].reset();
+                    $(document).Toasts('create', {
+                        class: 'bg-success',
+                        autohide: true,
+                        delay: 750,
+                        title: 'Updated!',
+                        subtitle: 'Penalty Updated',
+                        body: '' + data.message
+                    });
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
+                }, error: function (error) {
+                    displaySubmitting(penaltyFormSubmitBtn, penaltyFormSubmitBtnText, false);
+                    penaltyForm[0].reset();
+                    $(document).Toasts('create', {
+                        class: 'bg-danger',
+                        autohide: true,
+                        delay: 750,
+                        title: 'Error!',
+                        subtitle: '',
+                        body: 'An Error Has Occurred On Server!'
+                    });
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
+                }
+            })
+      })
+
+    });
+</script>
