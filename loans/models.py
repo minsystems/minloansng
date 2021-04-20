@@ -312,7 +312,6 @@ class LoanActivityComments(models.Model):
 
 class DRFSalaryHistory(models.Model):
     borrower = models.ForeignKey(Borrower, on_delete=models.CASCADE, blank=True, null=True)
-    loan = models.ForeignKey(Loan, on_delete=models.CASCADE, blank=True, null=True)
     has_data = models.BooleanField(default=False)
     response_id = models.CharField(blank=True, null=True, max_length=299)
     count = models.IntegerField(default=0)
@@ -331,7 +330,7 @@ class DRFSalaryHistory(models.Model):
         verbose_name_plural = "DRF Salary History"
 
     def __str__(self):
-        return str(self.loan)
+        return str(self.borrower.get_borrowers_full_name())
 
 
 class DRFSalaryPaymentDetails(models.Model):
@@ -347,4 +346,4 @@ class DRFSalaryPaymentDetails(models.Model):
         verbose_name_plural = "DRF Payment Details"
 
     def __str__(self):
-        return str(self.drf_salary_history.loan)
+        return str(self.drf_salary_history.borrower.get_borrowers_full_name())

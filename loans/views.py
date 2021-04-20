@@ -28,7 +28,7 @@ from company.models import Company, RemitaCredentials, RemitaMandateActivationDa
     RemitaPaymentDetails, RemitaMandateStatusReport
 from loans.forms import CollateralForm, LoanFileForm
 from loans.models import Loan, LoanType, ModeOfRepayments, Penalty, Collateral, LoanTerms, CollateralFiles, \
-    CollateralType, LoanActivityComments
+    CollateralType, LoanActivityComments, DRFSalaryHistory
 from mincore.models import BaseUrl
 from minloansng import email_settings
 from minloansng.cloudinary_settings import cloudinary_upload_preset, cloudinary_url
@@ -161,7 +161,7 @@ class LoanCreateView(LoginRequiredMixin, DetailView):
             print(finalpath)
             loan_data = {'companySlug': self.get_object().slug, 'loanSlug': loan_slug, 'loanKey': loan_key_value}
         elif str(loan_collection_type) == "Remita Data Referencing":
-            urlpath = reverse("loans-url:loan-detail", kwargs={'slug':self.get_object().slug, 'loan_slug': loan_slug})
+            urlpath = reverse("loans-url:loan-detail", kwargs={'slug': self.get_object().slug, 'loan_slug': loan_slug})
             finalpath = "{base}{path}".format(base=base_url, path=urlpath)
             print(finalpath)
             loan_data = {'companySlug': self.get_object().slug, 'loanSlug': loan_slug, 'loanKey': loan_key_value}
@@ -199,9 +199,9 @@ class LoanListView(LoginRequiredMixin, ListView):
             ]
 
             if (
-                self.request.user.email not in staff_array
-                and self.request.user.email
-                != str(context.get('object').user.user.email)
+                    self.request.user.email not in staff_array
+                    and self.request.user.email
+                    != str(context.get('object').user.user.email)
             ):
                 redirect(reverse('404_'))
         return super(LoanListView, self).render_to_response(context, **response_kwargs)
@@ -228,7 +228,9 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
         else:
             context['overdue'] = 'notActive'
         if str(self.get_object().mode_of_repayments) == "Remita Direct Debit":
-            context['installment_repayment'] = armotizationLoanCalculator(self.get_object().principal_amount, self.get_object().interest, self.get_object().number_repayments)
+            context['installment_repayment'] = armotizationLoanCalculator(self.get_object().principal_amount,
+                                                                          self.get_object().interest,
+                                                                          self.get_object().number_repayments)
         else:
             context['installment_repayment'] = "Set Payment"
         context['loan_comment_qs'] = LoanActivityComments.objects.filter(loan=self.get_object())
@@ -305,7 +307,7 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
                 penalty_increment_period = self.get_object().penalty.period
                 if penalty_increment_period == "Per Week":
                     week_delta = timedelta(days=7)
-                    value_data = total_overdue_period/week_delta
+                    value_data = total_overdue_period / week_delta
                     period_gone = math.trunc(value_data)
                     if period_gone > 0:
                         # add basefee to balance and multiply period fee with period gone and add all together
@@ -410,9 +412,9 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
             ]
 
             if (
-                self.request.user.email not in staff_array
-                and self.request.user.email
-                != str(context.get('object').user.user.email)
+                    self.request.user.email not in staff_array
+                    and self.request.user.email
+                    != str(context.get('object').user.user.email)
             ):
                 redirect(reverse('404_'))
         return super(LoanDetailView, self).render_to_response(context, **response_kwargs)
@@ -624,7 +626,8 @@ class RemitaStandingOrder(LoginRequiredMixin, DetailView):
 
         context['remitaCredential_obj'] = RemitaCredentials.objects.get(connected_firm=self.get_object())
         context['dd_url'] = remita_dd_url
-        context['estimatedReturn'] = armotizationLoanCalculator(loan_obj.principal_amount, loan_obj.interest, digitExtract(loan_obj.number_repayments))
+        context['estimatedReturn'] = armotizationLoanCalculator(loan_obj.principal_amount, loan_obj.interest,
+                                                                digitExtract(loan_obj.number_repayments))
 
         return context
 
@@ -666,7 +669,8 @@ class RemitaStandingOrder(LoginRequiredMixin, DetailView):
 
     def post(self, *args, **kwargs):
         if self.request.POST.get("startDate") == self.request.POST.get("endDate"):
-            return JsonResponse({'message': 'Mandate Start Date, Cannot Be The Same As EndDate'}, status=status.HTTP_200_OK)
+            return JsonResponse({'message': 'Mandate Start Date, Cannot Be The Same As EndDate'},
+                                status=status.HTTP_200_OK)
         try:
             payer_obj = Borrower.objects.get(phone__exact=self.request.POST.get("payerPhone"))
         except Borrower.DoesNotExist:
@@ -798,7 +802,8 @@ class RemitaDDMandateTransactionRecord(View):
                 total_transaction_count=payload['record_data']['data']['totalTransactionCount']
             )
         try:
-            exists = RemitaPaymentDetails.objects.get(lastStatusUpdateTime=payload['record_data']['data']['paymentDetails'][0]['lastStatusUpdateTime'])
+            exists = RemitaPaymentDetails.objects.get(
+                lastStatusUpdateTime=payload['record_data']['data']['paymentDetails'][0]['lastStatusUpdateTime'])
             exists.status = payload['record_data']['data']['paymentDetails'][0]['status']
             exists.save()
         except RemitaPaymentDetails.DoesNotExist:
@@ -813,7 +818,7 @@ class RemitaDDMandateTransactionRecord(View):
                     transactionRef=payload['record_data']['data']['paymentDetails'][0]['transactionRef'],
                     remita_transactions=remita_dd_history
                 )
-        return JsonResponse({'message': 'Transaction Has Been Updated!', 'statuscode':'051'}, status=201)
+        return JsonResponse({'message': 'Transaction Has Been Updated!', 'statuscode': '051'}, status=201)
 
 
 class RemitaDDStatusReport(View):
@@ -849,12 +854,58 @@ class RemitaDDStatusReport(View):
         return JsonResponse({'message': 'Method Not Allowed'}, status=501)
 
 
+"""
+{'status': 'success', 'hasData': True, 'responseId': '1618314239174/1618314239174', 
+'responseDate': '13-04-2021 11:44:03+0000', 'requestDate': '13-04-2021 11:44:03+0000', 
+'responseCode': '00', 'responseMsg': 'SUCCESS', 
+'data': {'customerId': '99922665', 'accountNumber': '2000001234', 'bankCode': '011', 'bvn': None, 
+'companyName': 'Remita Test NG 3', 'customerName': 'SEAN NDUKA', 'category': 'FGN', 
+'firstPaymentDate': '08-08-2018 00:00:00+0000', 'salaryCount': '9', 
+'salaryPaymentDetails': [{'paymentDate': '25-02-2020 13:33:46+0000', 'amount': '120000', 
+'accountNumber': '2000001234', 'bankCode': '011'}, {'paymentDate': '25-01-2020 13:33:46+0000', 
+'amount': '120000', 'accountNumber': '2000001234', 'bankCode': '011'}, {'paymentDate': '25-12-2019 13:33:46+0000', 
+'amount': '120000', 'accountNumber': '2000001234', 'bankCode': '011'}, {'paymentDate': '25-10-2019 13:33:46+0000', 
+'amount': '120000', 'accountNumber': '2000001234', 'bankCode': '011'}, {'paymentDate': '25-09-2019 13:33:46+0000', 
+'amount': '120000', 'accountNumber': '2000001234', 'bankCode': '011'}, {'paymentDate': '25-08-2019 13:33:46+0000', 
+'amount': '120000', 'accountNumber': '2000001234', 'bankCode': '011'}, {'paymentDate': '25-07-2019 13:33:46+0000', 
+'amount': '120000', 'accountNumber': '2000001234', 'bankCode': '011'}, {'paymentDate': '25-06-2019 13:33:46+0000', 
+'amount': '120000', 'accountNumber': '2000001234', 'bankCode': '011'}, {'paymentDate': '25-05-2019 13:33:46+0000', 
+'amount': '120000', 'accountNumber': '2000001234', 'bankCode': '011'}], 
+'loanHistoryDetails': [{'loanProvider': 'CWG DEMO ', 'loanAmount': 2000, 'outstandingAmount': 2100, 
+'loanDisbursementDate': '31-01-2020 11:49:25+0000', 'status': 'NEW', 'repaymentAmount': 2100, 'repaymentFreq': 'MONTHLY'}, 
+{'loanProvider': 'CWG DEMO ', 'loanAmount': 20000, 'outstandingAmount': 21500, 'loanDisbursementDate': '04-03-2020 16:27:14+0000', 
+'status': 'NEW', 'repaymentAmount': 21500, 'repaymentFreq': 'MONTHLY'}, 
+{'loanProvider': 'CWG DEMO ', 'loanAmount': 5000, 'outstandingAmount': 16500, 
+'loanDisbursementDate': '25-05-2020 07:25:46+0000', 'status': 'NEW', 'repaymentAmount': 5500, 'repaymentFreq': 'MONTHLY'}, 
+{'loanProvider': 'CWG DEMO ', 'loanAmount': 2000, 'outstandingAmount': 2100, 'loanDisbursementDate': '31-01-2020 11:49:25+0000', 
+'status': 'NEW', 'repaymentAmount': 2100, 'repaymentFreq': 'MONTHLY'}, 
+{'loanProvider': 'CWG DEMO ', 'loanAmount': 2000, 'outstandingAmount': 2100, 
+'loanDisbursementDate': '31-01-2020 11:49:25+0000', 'status': 'NEW', 'repaymentAmount': 2100, 'repaymentFreq': 'MONTHLY'}, 
+{'loanProvider': 'CWG DEMO ', 'loanAmount': 10000, 'outstandingAmount': 10750, 'loanDisbursementDate': '04-03-2020 16:33:59+0000', 
+'status': 'NEW', 'repaymentAmount': 10750, 'repaymentFreq': 'MONTHLY'}, 
+{'loanProvider': 'CWG DEMO ', 'loanAmount': 600000, 'outstandingAmount': 955404.12, 
+'loanDisbursementDate': '03-05-2020 11:49:25+0000', 'status': 'NEW', 'repaymentAmount': 79617.01, 'repaymentFreq': 'MONTHLY'}, 
+{'loanProvider': 'CWG DEMO ', 'loanAmount': 5000, 'outstandingAmount': 16500, 'loanDisbursementDate': '25-05-2020 07:34:21+0000', 
+'status': 'NEW', 'repaymentAmount': 5500, 'repaymentFreq': 'MONTHLY'}, {'loanProvider': 'CWG DEMO ', 
+'loanAmount': 100000, 'outstandingAmount': 125228.25, 'loanDisbursementDate': '04-04-2020 11:49:25+0000', 'status': 'NEW', 
+'repaymentAmount': 25045.65, 'repaymentFreq': 'MONTHLY'}, {'loanProvider': 'CWG DEMO ', 'loanAmount': 300000, 
+'outstandingAmount': 389367.72, 'loanDisbursementDate': '10-05-2020 11:49:25+0000', 'status': 'NEW', 
+'repaymentAmount': 64894.62, 'repaymentFreq': 'MONTHLY'}, {'loanProvider': 'CWG DEMO ', 'loanAmount': 700000, 
+'outstandingAmount': 1043206.4, 'loanDisbursementDate': '10-05-2020 11:49:25+0000', 'status': 'NEW', 
+'repaymentAmount': 104320.64, 'repaymentFreq': 'MONTHLY'}, {'loanProvider': 'CWG DEMO ', 'loanAmount': 5000, 
+'outstandingAmount': 16500, 'loanDisbursementDate': '25-05-2020 07:45:21+0000', 'status': 'NEW', 'repaymentAmount': 5500, 
+'repaymentFreq': 'MONTHLY'}, {'loanProvider': 'CWG DEMO ', 'loanAmount': 2000, 'outstandingAmount': 2100, 'loanDisbursementDate': '31-01-2020 11:49:25+0000', 'status': 'NEW', 'repaymentAmount': 2100, 'repaymentFreq': 'MONTHLY'}, {'loanProvider': 'CWG DEMO ', 'loanAmount': 20000, 'outstandingAmount': 19999.9, 'loanDisbursementDate': '07-08-2020 11:59:06+0000', 'status': 'NEW', 'repaymentAmount': 19999.9, 'repaymentFreq': 'MONTHLY'}, {'loanProvider': 'CWG DEMO ', 'loanAmount': 20000, 'outstandingAmount': 20000, 'loanDisbursementDate': '12-05-0029 08:59:05+0000', 'status': 'NEW', 'repaymentAmount': 2100, 'repaymentFreq': 'MONTHLY'}, {'loanProvider': 'CWG DEMO ', 'loanAmount': 20000, 'outstandingAmount': 20000, 'loanDisbursementDate': '12-05-0029 08:59:05+0000', 'status': 'NEW', 'repaymentAmount': 2100, 'repaymentFreq': 'MONTHLY'}, {'loanProvider': 'CWG DEMO ', 'loanAmount': 20000, 'outstandingAmount': 19999.9, 'loanDisbursementDate': '07-08-2020 12:01:04+0000', 'status': 'NEW', 'repaymentAmount': 19999.9, 'repaymentFreq': 'MONTHLY'}]}}
+"""
+
+
 class DRFSalaryHistoryUpdate(View):
     def post(self, *args, **kwargs):
         if self.request.is_ajax():
             data = self.request.body.decode("utf-8")
             payload = json.loads(data)
             print(payload)
-            loanInstance = Loan.objects.get(loan_key=payload['loan_key'])
+            salary_history = DRFSalaryHistory.objects.create(
+                borrower=Borrower.objects.get(phone=payload.data['accountNumber'])
+            )
             return JsonResponse({'message': 'Transaction Has Been Updated!'}, status=201)
         return JsonResponse({'message': 'Method Not Allowed'}, status=501)
