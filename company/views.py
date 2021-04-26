@@ -395,8 +395,29 @@ class Dashboard(View):
                     }
                     return render(request, "company/public-home.html", context)
                 elif company_obj.user.plan == "ENTERPRISE":
-                    print("Have A Custom Homepage With URL Masking")
-                    return render(request, "company/public-home.html", context={})
+                    print("Have A Custom Homepage With URL Masking", company_obj)
+                    company_description = "Company Description Goes Here"
+                    feature_title_1 = "Feature Title One"
+                    feature_description_1 = "Feature Description One"
+                    feature_title_2 = "Feature Title Two"
+                    feature_description_2 = "Feature Description Two"
+                    feature_title_3 = "Feature Title Three"
+                    feature_description_3 = "Feature Description Three"
+                    loan_rate_description = "Our loan interest is 7% on Armotization Loans and With Great Benefits"
+                    rate_fig = 7
+                    context = {
+                        "company": company_obj,
+                        "company_description": company_description,
+                        "feature_title_1": feature_title_1,
+                        "feature_title_2": feature_title_2,
+                        "feature_title_3": feature_title_3,
+                        "feature_description_1": feature_description_1,
+                        "feature_description_2": feature_description_2,
+                        "feature_description_3": feature_description_3,
+                        "loan_rate_description":loan_rate_description,
+                        "rate_fig": rate_fig,
+                    }
+                    return render(request, "company/public-home.html", context)
                 elif company_obj.user.plan == "FREEMIUM":
                     print("No Custom Homepage For Freemium Users")
                     context = {
