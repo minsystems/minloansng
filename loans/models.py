@@ -322,7 +322,7 @@ class DRFSalaryHistory(models.Model):
     company_name = models.CharField(max_length=200, blank=True, null=True)
     customer_name = models.CharField(max_length=200, blank=True, null=True)
     category = models.CharField(max_length=200, blank=True, null=True)
-    first_payment_date = models.DateTimeField()
+    first_payment_date = models.CharField(max_length=200, blank=True, null=True)
 
     class Meta:
         db_table = "DRF Salary History"
@@ -335,10 +335,7 @@ class DRFSalaryHistory(models.Model):
 
 class DRFSalaryPaymentDetails(models.Model):
     drf_salary_history = models.ForeignKey(DRFSalaryHistory, on_delete=models.CASCADE, blank=True, null=True)
-    payment_date = models.DateTimeField()
-    amount = models.CharField(max_length=200, blank=True, null=True)
-    account_number = models.CharField(max_length=200, blank=True, null=True)
-    bank_code = models.ForeignKey(BankCode, on_delete=models.CASCADE, blank=True, null=True)
+    payment_details = models.CharField(max_length=200, blank=True, null=True)
 
     class Meta:
         db_table = "DRF Payment Details"

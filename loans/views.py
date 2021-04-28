@@ -28,7 +28,7 @@ from company.models import Company, RemitaCredentials, RemitaMandateActivationDa
     RemitaPaymentDetails, RemitaMandateStatusReport
 from loans.forms import CollateralForm, LoanFileForm
 from loans.models import Loan, LoanType, ModeOfRepayments, Penalty, Collateral, LoanTerms, CollateralFiles, \
-    CollateralType, LoanActivityComments, DRFSalaryHistory
+    CollateralType, LoanActivityComments, DRFSalaryHistory, DRFSalaryPaymentDetails
 from mincore.models import BaseUrl
 from minloansng import email_settings
 from minloansng.cloudinary_settings import cloudinary_upload_preset, cloudinary_url
@@ -276,6 +276,10 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
                 base_url = BaseUrl.objects.get(belongs_to='remita').base_url
             except BaseUrl.DoesNotExist:
                 base_url = "https://no-url-connected.com"
+            try:
+                drf_sal = DRFSalaryHistory.objects.filter(borrower=self.get_object().borrower).last()
+            except DRFSalaryHistory.DoesNotExist:
+                drf_sal = "No Payment Data For User"
             context['base_url'] = base_url
             context['company_creds'] = RemitaCredentials.objects.get(connected_firm=company_inst)
             context['company_drf_creds'] = company_inst.user.thirdpartycreds
@@ -283,6 +287,10 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
             context['loanActions'] = 'DRF'
             context['parsed_phone'] = phoneParseConverter(str(self.get_object().borrower.phone))
             context['installments'] = digitExtract(self.get_object().number_repayments)
+            context['salary_history_metadata'] = drf_sal
+            sal_history_data = DRFSalaryPaymentDetails.objects.get(drf_salary_history=drf_sal).payment_details
+            context['salary_history'] = sal_history_data
+            print(sal_history_data)
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -896,6 +904,19 @@ class RemitaDDStatusReport(View):
 'outstandingAmount': 16500, 'loanDisbursementDate': '25-05-2020 07:45:21+0000', 'status': 'NEW', 'repaymentAmount': 5500, 
 'repaymentFreq': 'MONTHLY'}, {'loanProvider': 'CWG DEMO ', 'loanAmount': 2000, 'outstandingAmount': 2100, 'loanDisbursementDate': '31-01-2020 11:49:25+0000', 'status': 'NEW', 'repaymentAmount': 2100, 'repaymentFreq': 'MONTHLY'}, {'loanProvider': 'CWG DEMO ', 'loanAmount': 20000, 'outstandingAmount': 19999.9, 'loanDisbursementDate': '07-08-2020 11:59:06+0000', 'status': 'NEW', 'repaymentAmount': 19999.9, 'repaymentFreq': 'MONTHLY'}, {'loanProvider': 'CWG DEMO ', 'loanAmount': 20000, 'outstandingAmount': 20000, 'loanDisbursementDate': '12-05-0029 08:59:05+0000', 'status': 'NEW', 'repaymentAmount': 2100, 'repaymentFreq': 'MONTHLY'}, {'loanProvider': 'CWG DEMO ', 'loanAmount': 20000, 'outstandingAmount': 20000, 'loanDisbursementDate': '12-05-0029 08:59:05+0000', 'status': 'NEW', 'repaymentAmount': 2100, 'repaymentFreq': 'MONTHLY'}, {'loanProvider': 'CWG DEMO ', 'loanAmount': 20000, 'outstandingAmount': 19999.9, 'loanDisbursementDate': '07-08-2020 12:01:04+0000', 'status': 'NEW', 'repaymentAmount': 19999.9, 'repaymentFreq': 'MONTHLY'}]}}
 """
+"""
+has_data = models.BooleanField(default=False)
+    response_id = models.CharField(blank=True, null=True, max_length=299)
+    count = models.IntegerField(default=0)
+    customer_id = models.CharField(max_length=200, blank=True, null=True)
+    account_number = models.CharField(max_length=200, blank=True, null=True)
+    bank_code = models.ForeignKey(BankCode, on_delete=models.CASCADE, blank=True, null=True)
+    bvn = models.CharField(max_length=200, blank=True, null=True)
+    company_name = models.CharField(max_length=200, blank=True, null=True)
+    customer_name = models.CharField(max_length=200, blank=True, null=True)
+    category = models.CharField(max_length=200, blank=True, null=True)
+    first_payment_date = models.DateTimeField()
+"""
 
 
 class DRFSalaryHistoryUpdate(View):
@@ -903,9 +924,25 @@ class DRFSalaryHistoryUpdate(View):
         if self.request.is_ajax():
             data = self.request.body.decode("utf-8")
             payload = json.loads(data)
-            print(payload)
+            print("\n")
+            print(payload['data'])
             salary_history = DRFSalaryHistory.objects.create(
-                borrower=Borrower.objects.get(phone=payload.data['accountNumber'])
+                borrower=Borrower.objects.get(account_number=payload['data'].get('accountNumber')),
+                has_data=payload['hasData'],
+                response_id=payload['responseId'],
+                count=payload['data'].get('salaryCount'),
+                customer_id=payload['data'].get('customerId'),
+                account_number=payload['data'].get('accountNumber'),
+                bank_code=BankCode.objects.get(code=payload['data'].get('bankCode')),
+                bvn=payload['data'].get('bvn'),
+                company_name=payload['data'].get('companyName'),
+                customer_name=payload['data'].get('customerName'),
+                category=payload['data'].get('category'),
+                first_payment_date=payload['data'].get('firstPaymentDate'),
+            )
+            DRFSalaryPaymentDetails.objects.create(
+                drf_salary_history=salary_history,
+                payment_details=payload['data'].get('salaryPaymentDetails')[-1]
             )
             return JsonResponse({'message': 'Transaction Has Been Updated!'}, status=201)
         return JsonResponse({'message': 'Method Not Allowed'}, status=501)

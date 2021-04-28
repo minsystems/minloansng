@@ -268,8 +268,13 @@
                                         <p>
                                             <code>Please make sure you fully understand the DRF loan enough to use it</code>
                                         </p>
+
                                         <button class="btn btn-app" id="salary-history">
                                           <i class="fas fa-book"></i> Get Salary History
+                                        </button>
+
+                                        <button class="btn btn-app" data-toggle="modal" data-target="#modal-sm-mandate-drfsendDebit">
+                                          <i class="fas fa-forward"></i> Loan Disbursement
                                         </button>
                                       </div>
                                   </div>
@@ -282,7 +287,26 @@
                               </div>
                           {% elif loanActions == 'DRF' %}
                               <div class="tab-pane fade" id="vert-tabs-profile" role="tabpanel" aria-labelledby="vert-tabs-profile-tab">
-                                  Salary Data
+
+                                    <div class="row">
+                                  <div class="col-12">
+                                    <div class="card">
+                                      <div class="card-header">
+                                        <h3 class="card-title">
+                                            Salary Count: Borrower Has Received Their Salary <strong>{{ salary_history_metadata.count }}</strong> times
+                                        </h3>
+                                      </div>
+                                      <!-- /.card-header -->
+                                      <div class="card-body table-responsive p-0">
+                                        <h4>Last Salary Received: {{ salary_history }}</h4>
+                                      </div>
+                                      <!-- /.card-body -->
+                                    </div>
+                                    <!-- /.card -->
+                                  </div>
+                                </div>
+                                <!-- /.row -->
+
                               </div>
                           {% endif %}
 
@@ -912,6 +936,51 @@
                     <div class="form-group">
                         <label for="userCard">Amount To Debit: At Intervals</label>
                         <input type="text" name="amount-debit" class="form-control" id="amount-debit" value="{{ installment_repayment }}" placeholder="System Calculated: {{ installment_repayment }}" required="required">
+                    </div>
+
+                    <div class="modal-footer justify-content-between">
+                          <button type="submit" class="btn btn-outline-success btn-block" id="mandate-sendDebit">
+                              Submit
+                          </button>
+                    </div>
+
+                </form>
+            </div>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+
+
+    <div class="modal fade" id="modal-sm-mandate-drfsendDebit">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><small>Enter Amount Details</small></h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <em>system automatically calculates estimated value, using amortization method..</em>
+                </div>
+                <form role="form" class="otp-validate" action="#" method="post">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="userCard">Loan Amount</label>
+                        <input type="text" name="amount-drfdebit" class="form-control" id="amount-drfdebit" value="{{ loan_obj.amount }}" placeholder="System Calculated: {{ installment_repayment }}" required="required">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="userCard">Loan Collection Amount</label>
+                        <input type="text" name="amount-drfdebit-c" class="form-control" id="amount-drfdebit-c" value="" placeholder="System Calculated: {{ installment_repayment }}" required="required">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="userCard">Total Loan Collection Amount</label>
+                        <input type="text" name="amount-drfdebit-tc" class="form-control" id="amount-drfdebit-tc" value="" placeholder="System Calculated: {{ installment_repayment }}" required="required">
                     </div>
 
                     <div class="modal-footer justify-content-between">

@@ -26,7 +26,7 @@
             const method = "POST";
             let payload = {
                "authorisationCode": ""+authorisationCode,
-               "phoneNumber":""+"08154567478",
+               "phoneNumber":{{ parsed_phone }},
                "authorisationChannel":"USSD"
             };
             payload = JSON.stringify(payload);
@@ -56,8 +56,8 @@
                         autohide: true,
                         delay: 10000,
                         title: 'Record Found!',
-                        subtitle: ''+serverResponse.responseMsg,
-                        body: '' + serverResponse.data
+                        subtitle: 'Success',
+                        body: 'Salary History Populated Successfully!'
                     });
 
                     // Send data to server
@@ -79,6 +79,10 @@
                             subtitle: 'Transaction Reference',
                             body: 'Transaction Reference Has Been Updated Successfully!'
                         });
+
+                        setTimeout(function() {
+                            location.reload();
+                        }, 4000);
                     };
                     _xhr.send(new_payload);
                 } else {
