@@ -276,6 +276,16 @@
                                         <button class="btn btn-app" data-toggle="modal" data-target="#modal-sm-mandate-drfsendDebit">
                                           <i class="fas fa-forward"></i> Loan Disbursement
                                         </button>
+
+                                        <button class="btn btn-app" id="mandate-payment-history">
+                                          <span class="badge bg-success">#</span>
+                                          <i class="fas fa-barcode"></i> DRF Payment History
+                                        </button>
+
+                                        <button class="btn btn-app" id="stop-mandate">
+                                          <span class="badge bg-purple">#</span>
+                                          <i class="fas fa-tasks"></i> Stop DRF Mandate
+                                        </button>
                                       </div>
                                   </div>
                               {% endif %}
@@ -984,7 +994,7 @@
                     </div>
 
                     <div class="modal-footer justify-content-between">
-                          <button type="submit" class="btn btn-outline-success btn-block" id="mandate-sendDebit">
+                          <button type="submit" class="btn btn-outline-success btn-block" id="mandate-drfsendDebit">
                               Submit
                           </button>
                     </div>

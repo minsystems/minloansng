@@ -93,6 +93,101 @@
         const getSalaryHistoryButton = document.getElementById('salary-history');
         getSalaryHistoryButton.addEventListener("click", getSalaryHistory);
 
+
+        function loanDisburse(event) {
+            event.preventDefault();
+            let d = new Date();
+            let requestId = d.getTime();
+            let authorisationCode = Math.floor(Math.random() * 1101233);
+            let concatenatedPayload = "{{ company_drf_creds.remita_drf_api_key|safe }}" + requestId + "{{ company_drf_creds.remita_drf_api_token|safe }}";
+            let apiHash = CryptoJS.SHA512(concatenatedPayload).toString();
+            console.log(apiHash);
+            let authorization = "remitaConsumerKey=" + "{{ company_drf_creds.remita_drf_api_key|safe }}" + ", remitaConsumerToken=" + apiHash;
+            let loanAmount = $("#amount-drfdebit").val();
+            let loanCollectionAmount = $("#amount-drfdebit-c").val();
+            let loanTotalCollectionAmount = $("#amount-drfdebit-tc").val();
+
+            const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/loansvc/data/api/v2/payday/post/loan";
+            const method = "POST";
+            let payload = {
+                "customerId":""+{{ salary_history_metadata.customer_id }},
+                "authorisationCode": ""+authorisationCode,
+                "authorisationChannel":"MOBILE",
+                "phoneNumber":{{ parsed_phone }},
+                "accountNumber":""+{{ salary_history_metadata.account_number }},
+                "currency":"NGN",
+                "loanAmount":parseInt(loanAmount),
+                "collectionAmount":parseInt(loanCollectionAmount),
+                "dateOfDisbursement":"26-08-2019 11:49:25+0000",
+                "dateOfCollection":"28-09-2019 11:49:25+0000",
+                "totalCollectionAmount": parseInt(loanTotalCollectionAmount),
+                "numberOfRepayments":2,
+                "bankCode":"214"
+            };
+            payload = JSON.stringify(payload);
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, endpoint);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.setRequestHeader("Merchant_id", "{{ company_drf_creds.remita_drf_merchant|safe }}");
+            xhr.setRequestHeader("Api_key", "{{ company_drf_creds.remita_drf_api_key|safe }}");
+            xhr.setRequestHeader("Request_id", ""+requestId);
+            xhr.setRequestHeader("Authorization", ""+ authorization);
+            xhr.onload = function () {
+                let serverResponse = xhr.response;
+                serverResponse = JSON.parse(serverResponse);
+                console.log(serverResponse);
+                if (serverResponse.responseCode === "7801") {
+                    $(document).Toasts('create', {
+                        class: 'bg-warning',
+                        autohide: true,
+                        delay: 10000,
+                        title: 'Not Exist!',
+                        subtitle: ''+serverResponse.responseMsg,
+                        body: '' + serverResponse.data
+                    });
+                } else if (serverResponse.responseCode === "00") {
+                    $(document).Toasts('create', {
+                        class: 'bg-success',
+                        autohide: true,
+                        delay: 10000,
+                        title: 'Record Found!',
+                        subtitle: 'Success',
+                        body: 'Salary History Populated Successfully!'
+                    });
+
+                    // Send data to server
+                    let new_payload = JSON.stringify(serverResponse);
+                    const _xhr = new XMLHttpRequest();
+                    _xhr.open('POST', "{% url 'loans-url:loan-mandate-update-salary-history' object.slug loan_obj.slug loan_obj.loan_key %}");
+                    _xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");
+                    _xhr.setRequestHeader("Content-Type", "application/json");
+                    _xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                    _xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token|safe }}");
+                    _xhr.onload = function () {
+                        const serverResponse = _xhr.response;
+                        console.log(serverResponse);
+                        $(document).Toasts('create', {
+                            class: 'bg-success',
+                            autohide: true,
+                            delay: 10000,
+                            title: 'Successful!',
+                            subtitle: 'Transaction Reference',
+                            body: 'Transaction Reference Has Been Updated Successfully!'
+                        });
+
+                        setTimeout(function() {
+                            location.reload();
+                        }, 4000);
+                    };
+                    _xhr.send(new_payload);
+                } else {
+                }
+            };
+            xhr.send(payload);
+        }
+        const loanDisburseButton = document.getElementById('mandate-drfsendDebit');
+        loanDisburseButton.addEventListener("click", loanDisburse);
+
         {##}
         {#function handleMandateActivationOtp(event) {#}
         {#    event.preventDefault();#}
