@@ -236,5 +236,9 @@ def switch_month(month):
     return switcher.get(month, "Invalid Argument")
 
 
-def phoneParseConverter(phone: str,) -> str:
+def phoneParseConverter(phone: str, ) -> str:
     return '0' + phone
+
+
+def reversePhoneParseConverter(phone: str, ) -> str:
+    return '+234' + phone.strip('0')

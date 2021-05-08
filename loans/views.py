@@ -19,6 +19,7 @@ from django.utils.text import slugify
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView
 from django.views.generic.base import View
+from django_countries.fields import Country
 from rest_framework import status
 
 from accounts.models import Profile, User
@@ -28,14 +29,14 @@ from company.models import Company, RemitaCredentials, RemitaMandateActivationDa
     RemitaPaymentDetails, RemitaMandateStatusReport
 from loans.forms import CollateralForm, LoanFileForm
 from loans.models import Loan, LoanType, ModeOfRepayments, Penalty, Collateral, LoanTerms, CollateralFiles, \
-    CollateralType, LoanActivityComments, DRFSalaryHistory, DRFSalaryPaymentDetails
+    CollateralType, LoanActivityComments, DRFSalaryHistory, DRFSalaryPaymentDetails, MonoUserResponseCode
 from mincore.models import BaseUrl
 from minloansng import email_settings
 from minloansng.cloudinary_settings import cloudinary_upload_preset, cloudinary_url
 from minloansng.minmarket.packages.remita import remita_dd_url, statuscode_success
 from minloansng.mixins import GetObjectMixin
 from minloansng.utils import random_string_generator, secondWordExtract, digitExtract, addDays, get_fileType, \
-    armotizationLoanCalculator, removeNCharFromString, phoneParseConverter
+    armotizationLoanCalculator, removeNCharFromString, phoneParseConverter, reversePhoneParseConverter
 
 DESCRIPTION = "If a loan payment is due " \
               "and is not paid within the specified time constraints, " \
@@ -945,4 +946,72 @@ class DRFSalaryHistoryUpdate(View):
                 payment_details=payload['data'].get('salaryPaymentDetails')[-1]
             )
             return JsonResponse({'message': 'Transaction Has Been Updated!'}, status=201)
+        return JsonResponse({'message': 'Method Not Allowed'}, status=501)
+
+
+class MonoConnectUserAuth(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(MonoConnectUserAuth, self).dispatch(request, *args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        if self.request.is_ajax():
+            data = self.request.body.decode("utf-8")
+            payload: dict = json.loads(data)
+            print(payload, self.request, kwargs)
+            company = Company.objects.get(slug=kwargs.get('slug'))
+
+            # exchange codeId for user token details
+            import requests
+            url = "https://api.withmono.com/account/auth"
+            payload = {"code": "{mono_connect_code}".format(mono_connect_code=payload.get('code'))}
+            headers = {"mono-sec-key": "live_sk_F4iAi3DbcMkPX5kYvRHa", "Content-Type": "application/json"}
+            response = requests.request("POST", url, json=payload, headers=headers)
+            response_data: dict = json.loads(response.content.decode('utf-8'))
+            MonoUserResponseCode.objects.get_or_create(company=company, mono_connect_code=response_data.get('id'))
+
+            # fetch user information from
+            url = "https://api.withmono.com/accounts/{id}".format(id=response_data.get('id'))
+            headers = {"mono-sec-key": "live_sk_F4iAi3DbcMkPX5kYvRHa"}
+            response = requests.request("GET", url, headers=headers)
+            response_user_data: dict = json.loads(response.content.decode('utf-8'))
+            print(response_user_data)
+
+            # detailed user information
+            url = "https://api.withmono.com/accounts/{id}/identity".format(id=response_data.get('id'))
+            headers = {"mono-sec-key": "live_sk_F4iAi3DbcMkPX5kYvRHa"}
+            response = requests.request("GET", url, headers=headers)
+            response_user_detailed_data: dict = json.loads(response.content.decode('utf-8'))
+            print(response_user_detailed_data)
+
+            borrower_title = 'Mr'
+            if response_user_detailed_data.get('gender') == 'male':
+                borrower_title = "Mr"
+            elif response_user_detailed_data.get('gender') == 'female':
+                borrower_title = "Mrs"
+
+            bank_inst = BankCode.objects.get(code=response_user_data['account']['institution'].get('bankCode'))
+            country_inst = Country(code='Nigeria')
+            parsed_string_phone = response_user_detailed_data.get('phone')
+            borrower_phone_number = reversePhoneParseConverter(parsed_string_phone if parsed_string_phone is not None else "Not Available")
+            # create borrower for the company
+            Borrower.objects.get_or_create(
+                registered_to=company,
+                first_name=response_user_data['account'].get('name').split()[0],
+                last_name=response_user_data['account'].get('name').split()[1],
+                gender=response_user_detailed_data.get('gender') if response_user_detailed_data.get('gender') is not None else "Male",
+                address=response_user_detailed_data.get('addressLine1') if response_user_detailed_data.get('addressLine1') is not None else "Not Available",
+                lga=response_user_detailed_data.get('addressLine2') if response_user_detailed_data.get('addressLine2') is not None else "Not Available",
+                country=country_inst,
+                title=borrower_title,
+                phone=borrower_phone_number,
+                land_line=borrower_phone_number,
+                email=response_user_detailed_data.get('email') if response_user_detailed_data.get('email') is not None else "Not Available",
+                bank=bank_inst,
+                account_number=response_user_data['account'].get('accountNumber'),
+                account_balance_on_commercial_bank_account=response_user_data['account'].get('balance'),
+                bvn=response_user_detailed_data.get('bvn'),
+            )
+            return JsonResponse({'message': 'User Authentication Successful!', "mono_connect": payload.get('code')},
+                                status=201)
         return JsonResponse({'message': 'Method Not Allowed'}, status=501)

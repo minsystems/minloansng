@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 from loans.models import LoanType, Collateral, LoanTerms, Loan, ModeOfRepayments, Penalty, CollateralFiles, \
-    CollateralType, LoanActivityComments, DRFSalaryHistory, DRFSalaryPaymentDetails
+    CollateralType, LoanActivityComments, DRFSalaryHistory, DRFSalaryPaymentDetails, MonoUserResponseCode
 
 
 @admin.register(LoanActivityComments)
@@ -47,3 +47,4 @@ admin.site.register(CollateralFiles)
 admin.site.register(CollateralType)
 admin.site.register(DRFSalaryHistory)
 admin.site.register(DRFSalaryPaymentDetails)
+admin.site.register(MonoUserResponseCode)

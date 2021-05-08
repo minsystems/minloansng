@@ -344,3 +344,16 @@ class DRFSalaryPaymentDetails(models.Model):
 
     def __str__(self):
         return str(self.drf_salary_history.borrower.get_borrowers_full_name())
+
+
+class MonoUserResponseCode(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
+    mono_connect_code = models.CharField(max_length=300, blank=True, null=True)
+    
+    class Meta:
+        db_table = "Mono Connect User Code"
+        verbose_name = "Mono User Code"
+        verbose_name_plural = "Mono Users Code"
+    
+    def __str__(self):
+        return self.mono_connect_code

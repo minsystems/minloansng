@@ -2,9 +2,9 @@ from django.urls import path
 
 from loans.views import LoanCreateView, LoanListView, LoanDetailView, RemitaStandingOrder, RemitaMandateUpdate, \
     LoanCollateralDetail, CollateralFormProcessor, LoanDetailAutoSaveProcessor, LoanCommentProcessor, \
-    LoanRepaymentProcessor, LoanStatusChangeProcessor, RemitaTransRefUpdate, RRRandTransactionRef, RRRandTransactionRefAmount, \
+    LoanRepaymentProcessor, LoanStatusChangeProcessor, RemitaTransRefUpdate, RRRandTransactionRef, \
+    RRRandTransactionRefAmount, \
     RemitaDDMandateTransactionRecord, RemitaDDStatusReport, LoanPenaltyRepayment, DRFSalaryHistoryUpdate
-
 urlpatterns = [
     path('<slug:slug>/create/', LoanCreateView.as_view(), name='loan-create'),
     path('<slug:slug>/list/', LoanListView.as_view(), name='loan-list'),

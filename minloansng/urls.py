@@ -21,6 +21,8 @@ from django.views.generic import RedirectView, TemplateView
 from accounts.views import LoginView, RegisterView, LogoutView
 
 # core software urls
+from loans.views import MonoConnectUserAuth
+
 urlpatterns = [
     path('dashboard/', include(('company.urls', 'company-url'), namespace='company-url')),
     path('loans/', include(('loans.urls', 'loans-url'), namespace='loans-url')),
@@ -31,6 +33,7 @@ urlpatterns = [
     path('search/', include(('search.urls','search'), namespace='search')),
     path('minstore/', include(('minmarkets.urls','minstore'), namespace='minstore')),
     path('login/', LoginView.as_view(), name='login'),
+    path('<slug:slug>/mono/borrower-auth/', MonoConnectUserAuth.as_view(), name='loan-borrower-auth'),
     path('register/', RegisterView.as_view(), name='register'),
     path('logout/', LogoutView.as_view(), name='logout'),
 ]

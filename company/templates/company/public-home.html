@@ -10,6 +10,80 @@
     <link rel="stylesheet" href="https://cdn.minloans.com.ng/minloans-public-home/dist/css/style.css">
 	<script src="https://unpkg.com/animejs@3.0.1/lib/anime.min.js"></script>
     <script src="https://unpkg.com/scrollreveal@4.0.0/dist/scrollreveal.min.js"></script>
+    <style>
+        /* The Modal (background) */
+        .modal {
+          display: none; /* Hidden by default */
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          left: 0;
+          top: 0;
+          width: 100%; /* Full width */
+          height: 100%; /* Full height */
+          overflow: auto; /* Enable scroll if needed */
+          background-color: rgb(0,0,0); /* Fallback color */
+          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        /* Modal Content/Box */
+        .modal-content {
+          background-color: #fefefe;
+          margin: 15% auto; /* 15% from the top and centered */
+          padding: 20px;
+          border: 1px solid #888;
+          width: 80%; /* Could be more or less, depending on screen size */
+        }
+
+        /* The Close Button */
+        .close {
+          color: #aaa;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+          color: black;
+          text-decoration: none;
+          cursor: pointer;
+        }
+        /* Modal Header */
+        .modal-header {
+          padding: 2px 16px;
+          background-color: #370eb1;
+          color: white;
+        }
+
+        /* Modal Body */
+        .modal-body {padding: 2px 16px;}
+
+        /* Modal Footer */
+        .modal-footer {
+          padding: 2px 16px;
+          background-color: #370eb1;
+          color: white;
+        }
+
+        /* Modal Content */
+        .modal-content {
+          position: relative;
+          background-color: #fefefe;
+          margin: auto;
+          padding: 0;
+          border: 1px solid #888;
+          width: 80%;
+          box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+          animation-name: animatetop;
+          animation-duration: 0.4s
+        }
+
+        /* Add Animation */
+        @keyframes animatetop {
+          from {top: -300px; opacity: 0}
+          to {top: 0; opacity: 1}
+        }
+    </style>
 </head>
 <body class="is-boxed has-animations">
     <div class="body-wrap">
@@ -34,7 +108,30 @@
 						<div class="hero-copy">
 	                        <h1 class="hero-title mt-0">{{ company }}</h1>
 	                        <p class="hero-paragraph">{{ company_description }}</p>
-	                        <div class="hero-cta"><a class="button button-primary" id="launch-btn">Get Loan</a><a class="button" href="#">Contact Us</a></div>
+	                        <div class="hero-cta">
+                                <a class="button button-primary" id="launch-btn">Authenticate &amp; Apply For Loan</a>
+                                <a class="button button-default" id="apply-btn">Apply For Loan</a>
+
+                                <!-- The Modal -->
+                                <div id="myModal" class="modal">
+
+                                  <!-- Modal content -->
+                                  <div class="modal-content">
+                                      <div class="modal-header">
+                                        <span class="close">&times;</span>
+                                        <h4>Apply For Loan</h4>
+                                      </div>
+                                      <div class="modal-body">
+                                        <p>Some text in the Modal Body</p>
+                                        <p>Some other text...</p>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <h4>Modal Footer</h4>
+                                      </div>
+                                  </div>
+
+                                </div>
+                            </div>
 						</div>
 						<div class="hero-figure anime-element">
 							<svg class="placeholder" width="528" height="396" viewBox="0 0 528 396">
@@ -209,16 +306,28 @@
       };
       var connect;
       var config = {
-        key: "live_pk_0iyCXfHLUPyce2WeDAe6",
-        onSuccess: function (response) {
-          copyToClipboard(response.code);
-          console.log(JSON.stringify(response));
-          alert(JSON.stringify(response));
-          /**
-           response : { "code": "code_xyz" }
-           you can send this code back to your server to get this
-           authenticated account and start making requests.
-           */
+        key: "live_pk_0iyCXfHLUPyce2WeDAe6",//"live_pk_0iyCXfHLUPyce2WeDAe6",
+        onSuccess: async function (response) {
+            /**
+             response : { "code": "code_xyz" }
+             you can send this code back to your server to get this
+             authenticated account and start making requests.
+             */
+
+            const payload = JSON.stringify(response);
+            const _xhr = new XMLHttpRequest();
+            _xhr.open('POST', "{% url 'loan-borrower-auth' company.slug %}");
+            _xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");
+            _xhr.setRequestHeader("Content-Type", "application/json");
+            _xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+            _xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token|safe }}");
+            _xhr.onload = function () {
+                const serverResponse = _xhr.response;
+                let data = JSON.parse(serverResponse);
+                localStorage.setItem("mono_connect", data.mono_connect);
+                setTimeout(function() {location.reload()}, 1000);
+            };
+            _xhr.send(payload);
         },
         onClose: function () {
           console.log('user closed the widget.')
@@ -226,10 +335,39 @@
       };
       connect = new Connect(config);
       connect.setup();
-      var launch = document.getElementById('launch-btn');
-      launch.onclick = function (e) {
-        connect.open();
-      };
+
+      if(localStorage.getItem("mono_connect") === null) {
+          let launch = document.getElementById('launch-btn');
+          document.getElementById('apply-btn').style.visibility = "hidden";
+          launch.onclick = function (e) {connect.open()};
+      } else {
+          document.getElementById('launch-btn').style.visibility = "hidden";
+          // Get the modal
+          const modal = document.getElementById("myModal");
+
+          // Get the button that opens the modal
+          const Applybtn = document.getElementById("apply-btn");
+
+          // Get the <span> element that closes the modal
+          var span = document.getElementsByClassName("close")[0];
+
+          // When the user clicks on the button, open the modal
+          Applybtn.onclick = function() {
+            modal.style.display = "block";
+          };
+
+          // When the user clicks on <span> (x), close the modal
+          span.onclick = function() {
+            modal.style.display = "none";
+          };
+
+          // When the user clicks anywhere outside of the modal, close it
+          window.onclick = function(event) {
+            if (event.target === modal) {
+              modal.style.display = "none";
+            }
+          }
+      }
     </script>
 </body>
 </html>

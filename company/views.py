@@ -14,6 +14,7 @@ from django.views.generic.base import View
 from accounts.models import Profile, ThirdPartyCreds
 from company.forms import BankAccountTypeUpdateForm
 from company.models import Company, Branch, BankAccountType
+from loans.models import MonoUserResponseCode
 from mincore.models import Messages
 from minloansng.mixins import GetObjectMixin, IsUserOwnerMixin
 from minloansng.utils import random_string_generator, switch_month
@@ -405,6 +406,10 @@ class Dashboard(View):
                     feature_description_3 = "Feature Description Three"
                     loan_rate_description = "Our loan interest is 7% on Armotization Loans and With Great Benefits"
                     rate_fig = 7
+
+
+
+
                     context = {
                         "company": company_obj,
                         "company_description": company_description,
