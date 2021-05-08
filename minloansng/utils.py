@@ -54,7 +54,7 @@ def get_month_data_range(months_ago=1, include_this_month=False):
             "year": start.year,
             "month": str(start.strftime("%B")),
         })
-    for x in range(0, months_ago):
+    for _ in range(months_ago):
         start, end = get_last_month_data(today)
         today = start
         dates_.insert(0, {
@@ -148,11 +148,7 @@ def unique_slug_generator_by_email(instance, new_slug=None):
     This is for a Django project and it assumes your instance
     has a model with a slug field and a title character (char) field.
     """
-    if new_slug is not None:
-        slug = new_slug
-    else:
-        slug = slugify(instance.email)
-
+    slug = new_slug if new_slug is not None else slugify(instance.email)
     Klass = instance.__class__
     qs_exists = Klass.objects.filter(email=slug).exists()
     if qs_exists:
@@ -169,11 +165,7 @@ def unique_slug_by_name(instance, new_slug=None):
     This is for a Django project and it assumes your instance
     has a model with a slug field and a title character (char) field.
     """
-    if new_slug is not None:
-        slug = new_slug
-    else:
-        slug = slugify(instance.name)
-
+    slug = new_slug if new_slug is not None else slugify(instance.name)
     Klass = instance.__class__
     qs_exists = Klass.objects.filter(slug=slug).exists()
     if qs_exists:

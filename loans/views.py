@@ -1011,7 +1011,9 @@ class MonoConnectUserAuth(View):
                 account_number=response_user_data['account'].get('accountNumber'),
                 account_balance_on_commercial_bank_account=response_user_data['account'].get('balance'),
                 bvn=response_user_detailed_data.get('bvn'),
-            )
+                slug=slugify("{firstName}-{lastName}-{company}-{primaryKey}".format(
+                    firstName=response_user_data['account'].get('name').split()[0], lastName=response_user_data['account'].get('name').split()[1],
+                    company=company, primaryKey=random_string_generator(4))))
             return JsonResponse({'message': 'User Authentication Successful!', "mono_connect": payload.get('code')},
                                 status=201)
         return JsonResponse({'message': 'Method Not Allowed'}, status=501)

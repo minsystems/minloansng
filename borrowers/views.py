@@ -80,8 +80,10 @@ class BorrowerCreateView(GetObjectMixin, LoginRequiredMixin, DetailView):
 
 
 def calculate_age(born):
-    today = date.today()
-    return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+    if born:
+        today = date.today()
+        return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+    return 0
 
 
 class BorrowerUpdateView(LoginRequiredMixin, DetailView):
