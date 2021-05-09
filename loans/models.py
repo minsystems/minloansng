@@ -357,3 +357,34 @@ class MonoUserResponseCode(models.Model):
     
     def __str__(self):
         return self.mono_connect_code
+
+REQUEST_STATUS = (
+    ('Granted', 'Granted'),
+    ('Rejected', 'Rejected'),
+    ('Still Processing', 'Still Processing'),
+    ('Completed', 'Completed')
+)
+
+
+class LoanRequests(models.Model):
+    borrower = models.ForeignKey(to='borrowers.Borrower', on_delete=models.CASCADE, blank=True, null=True)
+    amount = models.CharField(blank=True, null=True, max_length=300)
+    request_status = models.CharField(max_length=20, choices=REQUEST_STATUS, default="Still Processing", blank=True, null=True)
+    duration_figure = models.IntegerField(default=1)
+    duration = models.CharField(max_length=20, choices=DURATION_PLAN, default="Months", blank=True, null=True)
+    repayment_interval = models.CharField(max_length=20, choices=REPAYMENT_PLAN, default="Monthly", blank=True, null=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "loanRequest"
+        verbose_name = "loanRequest"
+        verbose_name_plural = "loanRequests"
+        ordering = ("-timestamp",)
+
+    def get_absolute_url(self):
+        return reverse('loans-url:loan-request', kwargs={'slug': self.slug})
+
+    def __str__(self):
+        return self.borrower.get_short_name()

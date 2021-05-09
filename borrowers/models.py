@@ -32,6 +32,7 @@ WORKING_STATUS = (
 
 class Borrower(models.Model):
     registered_to = models.ForeignKey(to='company.Company', on_delete=models.CASCADE, blank=True, null=True)
+    mono_code = models.CharField(blank=True, null=True, max_length=255)
     first_name = models.CharField(blank=True, null=True, max_length=255)
     last_name = models.CharField(blank=True, null=True, max_length=255)
     photo = CloudinaryField(upload_image_path, null=True, blank=True)

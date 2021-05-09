@@ -270,8 +270,7 @@ class BorrowerGroupsListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         company = Company.objects.get(slug=self.kwargs.get('slug'))
-        bg_qs = company.borrowergroup_set.all()
-        return bg_qs
+        return company.borrowergroup_set.all()
 
 
 class AssignBankAccountToBorrower(LoginRequiredMixin, DetailView):

@@ -119,14 +119,27 @@
                                   <div class="modal-content">
                                       <div class="modal-header">
                                         <span class="close">&times;</span>
-                                        <h4>Apply For Loan</h4>
+                                        <h4 class="text-center">Apply For Loan</h4>
                                       </div>
-                                      <div class="modal-body">
-                                        <p>Some text in the Modal Body</p>
-                                        <p>Some other text...</p>
+                                      <div class="modal-body text-center">
+                                        <p>{{ company }} Loan Application</p>
+
+                                        <div class="mb-4" id="">
+                                          <form class="form-control applyForLoan" action="#">
+                                            <div class="form-group d-flex align-items-center">
+                                              ₦ <input type="number" class="form-control mr-6 mb-6" min="2000" max="20000" id="customLoanAmount"/>
+                                            </div>
+                                            <hr/>
+                                            <div class="form-group d-flex align-items-center">
+                                              <button type="submit" class="btn btn-primary" id="customLoanApplication">Apply</button>
+                                            </div>
+                                          </form>
+                                        </div>
+
+                                        <p>Apply Min: ₦ 2,000 Max: ₦ 20,000</p>
                                       </div>
                                       <div class="modal-footer">
-                                        <h5>{{ company }} would validate your loan and might give you a counter offer</h5>
+                                        <h5 class="text-center">We might give you a counter offer</h5>
                                       </div>
                                   </div>
 
@@ -295,6 +308,19 @@
     </div>
 
     <script src="https://cdn.minloans.com.ng/minloans-public-home/src/js/main.js"></script>
+    <script src="https://cdn.amjuuniquemfbng.com/cdn/amju-loan/js/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.amjuuniquemfbng.com/cdn/amju-loan/js/jquery-ui.js"></script>
+    <script src="https://cdn.amjuuniquemfbng.com/cdn/amju-loan/js/popper.min.js"></script>
+    <script src="https://cdn.amjuuniquemfbng.com/cdn/amju-loan/js/bootstrap.min.js"></script>
+    <script src="https://cdn.amjuuniquemfbng.com/cdn/amju-loan/js/owl.carousel.min.js"></script>
+    <script src="https://cdn.amjuuniquemfbng.com/cdn/amju-loan/js/jquery.countdown.min.js"></script>
+    <script src="https://cdn.amjuuniquemfbng.com/cdn/amju-loan/js/jquery.easing.1.3.js"></script>
+    <script src="https://cdn.amjuuniquemfbng.com/cdn/amju-loan/js/aos.js"></script>
+    <script src="https://cdn.amjuuniquemfbng.com/cdn/amju-loan/js/jquery.fancybox.min.js"></script>
+    <script src="https://cdn.amjuuniquemfbng.com/cdn/amju-loan/js/jquery.sticky.js"></script>
+    <script src="https://cdn.amjuuniquemfbng.com/cdn/amju-loan/js/isotope.pkgd.min.js"></script>
+    <script src="https://cdn.amjuuniquemfbng.com/cdn/amju-loan/js/main.js"></script>
+
     <script type="application/javascript">
       const copyToClipboard = text => {
         const elm = document.createElement('textarea');
@@ -366,7 +392,66 @@
             if (event.target === modal) {
               modal.style.display = "none";
             }
+          };
+
+          // mono connect
+          let loanApplyForm = $('.applyForLoan');
+          let loanApplicationButton = $("#customLoanApplication");
+
+          function handleClick(clickedBtn, defaultText, doClick) {
+            if (doClick) {
+                clickedBtn.prop("disabled", true);
+                clickedBtn.html("<i class='fa fa-spin fa-spinner'></i> Checking User Credibility Status..");
+            } else {
+                clickedBtn.prop("disabled", false);
+                clickedBtn.removeClass("disabled");
+                clickedBtn.add(defaultText);
+            }
           }
+
+          loanApplicationButton.on('click', event=>{
+            event.preventDefault();
+            handleClick(loanApplicationButton, "", true);
+            let appliedLoanAmount = $("#customLoanAmount").val();
+            appliedLoanAmount = parseInt(appliedLoanAmount);
+
+            let userMonoCode = localStorage.getItem("mono_connect");
+            let companyMonoCodes = {{ mono_code_list | safe }};
+
+            $.each(companyMonoCodes , function(index, val) {
+              console.log(index, val);
+              if (userMonoCode.toString() === val.toString()){
+                  {% include 'csrf_ajax/csrf_ajax_token.js' %}
+                  const loanFormData = {
+                    "borrower":userMonoCode,
+                    "amount":''+appliedLoanAmount,
+                    "durationFigure":1,
+                    "durationPeriod":'Months',
+                    "repaymentInterval":"Monthly"
+                  };
+                  console.log(loanFormData);
+                  $.ajax({
+                    method: "POST",
+                    url: "{% url 'loans-url:loan-request-processor' %}",
+                    data: loanFormData,
+                    contentType: 'application/x-www-form-urlencoded',
+
+                    success: function (data) {
+                        loanApplyForm[0].reset();
+                        console.log(data);
+                        alert("Loan Application Successful!, We will contact you shortly!");
+                        setTimeout(function () {
+                            window.location.replace('/dashboard/{{company.slug}}/');
+                        }, 3000)
+                    }, error: function (error) {
+                        loanApplyForm[0].reset();
+                        alert("Error")
+                    }
+                  })
+              }
+            });
+
+          });
       }
     </script>
 </body>

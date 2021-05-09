@@ -407,8 +407,10 @@ class Dashboard(View):
                     loan_rate_description = "Our loan interest is 7% on Armotization Loans and With Great Benefits"
                     rate_fig = 7
 
-
-
+                    company_borrowers = company_obj.borrower_set.all()
+                    mono_code_list = []
+                    for borrowers_mono_code in company_borrowers:
+                        mono_code_list.append(borrowers_mono_code.mono_code)
 
                     context = {
                         "company": company_obj,
@@ -419,8 +421,9 @@ class Dashboard(View):
                         "feature_description_1": feature_description_1,
                         "feature_description_2": feature_description_2,
                         "feature_description_3": feature_description_3,
-                        "loan_rate_description":loan_rate_description,
+                        "loan_rate_description": loan_rate_description,
                         "rate_fig": rate_fig,
+                        "mono_code_list": mono_code_list,
                     }
                     return render(request, "company/public-home.html", context)
                 elif company_obj.user.plan == "FREEMIUM":
@@ -433,7 +436,7 @@ class Dashboard(View):
                         "fifth_nav": "Fifth Nav",
                         "business_description": "Write a brief description of your business or"
                                                 " quick caption to get your users attention",
-                        "banner_image_url":"https://financial.ucsc.edu/SiteAssets/Dept_FAST.jpg",
+                        "banner_image_url": "https://financial.ucsc.edu/SiteAssets/Dept_FAST.jpg",
                         "second_nav_description": "Write a descriptive overview of this content"
                     }
                     return render(request, "company/public-home.html", context)
