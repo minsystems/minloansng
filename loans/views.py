@@ -731,6 +731,7 @@ class RemitaStandingOrder(LoginRequiredMixin, DetailView):
 
 class RemitaMandateUpdate(View):
     def post(self, *args, **kwargs):
+        print(self.request.POST)
         if self.request.POST['statuscode'] == statuscode_success:
             mandate_dd = RemitaMandateActivationData.objects.get(requestId=self.request.POST['requestId'])
             mandate_dd.status = self.request.POST['status']
@@ -995,27 +996,33 @@ class MonoConnectUserAuth(View):
         bank_inst = BankCode.objects.get(code=response_user_data['account']['institution'].get('bankCode'))
         country_inst = Country(code='Nigeria')
         parsed_string_phone = response_user_detailed_data.get('phone')
-        borrower_phone_number = reversePhoneParseConverter(parsed_string_phone if parsed_string_phone is not None else "Not Available")
+        borrower_phone_number = reversePhoneParseConverter(
+            parsed_string_phone if parsed_string_phone is not None else "Not Available")
         # create borrower for the company
         Borrower.objects.get_or_create(
             registered_to=company,
             mono_code=mono_connect_code if mono_connect_code is not None else "Not Available",
             first_name=response_user_data['account'].get('name').split()[0],
             last_name=response_user_data['account'].get('name').split()[1],
-            gender=response_user_detailed_data.get('gender') if response_user_detailed_data.get('gender') is not None else "Male",
-            address=response_user_detailed_data.get('addressLine1') if response_user_detailed_data.get('addressLine1') is not None else "Not Available",
-            lga=response_user_detailed_data.get('addressLine2') if response_user_detailed_data.get('addressLine2') is not None else "Not Available",
+            gender=response_user_detailed_data.get('gender') if response_user_detailed_data.get(
+                'gender') is not None else "Male",
+            address=response_user_detailed_data.get('addressLine1') if response_user_detailed_data.get(
+                'addressLine1') is not None else "Not Available",
+            lga=response_user_detailed_data.get('addressLine2') if response_user_detailed_data.get(
+                'addressLine2') is not None else "Not Available",
             country=country_inst,
             title=borrower_title,
             phone=borrower_phone_number,
             land_line=borrower_phone_number,
-            email=response_user_detailed_data.get('email') if response_user_detailed_data.get('email') is not None else "Not Available",
+            email=response_user_detailed_data.get('email') if response_user_detailed_data.get(
+                'email') is not None else "Not Available",
             bank=bank_inst,
             account_number=response_user_data['account'].get('accountNumber'),
             account_balance_on_commercial_bank_account=response_user_data['account'].get('balance'),
             bvn=response_user_detailed_data.get('bvn'),
             slug=slugify("{firstName}-{lastName}-{company}-{primaryKey}".format(
-                firstName=response_user_data['account'].get('name').split()[0], lastName=response_user_data['account'].get('name').split()[1],
+                firstName=response_user_data['account'].get('name').split()[0],
+                lastName=response_user_data['account'].get('name').split()[1],
                 company=company, primaryKey=random_string_generator(4))))
         return JsonResponse({'message': 'User Authentication Successful!', "mono_connect": payload.get('code')},
                             status=201)

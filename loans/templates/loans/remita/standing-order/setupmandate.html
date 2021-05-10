@@ -361,7 +361,6 @@
 
                     success: function (data) {
                         console.log(data);
-                        mandateActivationForm[0].reset();
                         if (data.status === 401){
                             $(document).Toasts('create', {
                                 class: 'bg-error',
@@ -381,6 +380,8 @@
                                 body: '' + data.message
                             });
 
+                            console.log(finalData);
+
                             // Send data to remita server
                             $.ajax({
                                 method: mandateActivationFormMethod,
@@ -389,8 +390,9 @@
                                 contentType: 'application/json',
 
                                 success: function (data) {
-                                    mandateActivationForm[0].reset();
+                                    console.log(data);
                                     const payload_data = jsonExtract(data);
+                                    console.log(payload_data);
                                     $(document).Toasts('create', {
                                         class: 'bg-success',
                                         autohide: true,
@@ -420,9 +422,9 @@
                                                 });
 
                                                 // redirect to loan details
-                                                setTimeout(function () {
-                                                    window.location.replace("{% url 'loans-url:loan-detail' object.slug loan_obj.slug %}");
-                                                }, 3000);
+                                                //setTimeout(function () {
+                                                //    window.location.replace("{% url 'loans-url:loan-detail' object.slug loan_obj.slug %}");
+                                                //}, 3000);
                                             } else {
                                                  $(document).Toasts('create', {
                                                     class: 'bg-danger',
@@ -434,9 +436,9 @@
                                                 });
 
                                                 // redirect to loan recreate the standing order
-                                                setTimeout(function () {
-                                                    window.location.replace("{% url 'loans-url:loan-standing-order-create' object.slug loan_obj.slug loan_obj.loan_key %}");
-                                                }, 3000);
+                                                //setTimeout(function () {
+                                                //    window.location.replace("{% url 'loans-url:loan-standing-order-create' object.slug loan_obj.slug loan_obj.loan_key %}");
+                                                //}, 3000);
                                             }
 
                                         }, error: function (error) {
@@ -453,7 +455,6 @@
 
                                 }, error: function (error) {
                                     console.log(error);
-                                    mandateActivationForm[0].reset();
                                     displaySubmitting(mandateActivationFormSubmitBtn, mandateActivationFormSubmitBtnText, false);
                                     $(document).Toasts('create', {
                                         class: 'bg-danger',
@@ -469,7 +470,6 @@
 
                     }, error: function (error) {
                         console.log(error);
-                        mandateActivationForm[0].reset();
                         displaySubmitting(mandateActivationFormSubmitBtn, mandateActivationFormSubmitBtnText, false);
                         $(document).Toasts('create', {
                             class: 'bg-danger',
