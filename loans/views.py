@@ -166,6 +166,11 @@ class LoanCreateView(LoginRequiredMixin, DetailView):
             finalpath = "{base}{path}".format(base=base_url, path=urlpath)
             print(finalpath)
             loan_data = {'companySlug': self.get_object().slug, 'loanSlug': loan_slug, 'loanKey': loan_key_value}
+        elif str(loan_collection_type) == "Mono Direct Debit":
+            urlpath = reverse("loans-url:loan-detail", kwargs={'slug': self.get_object().slug, 'loan_slug': loan_slug})
+            finalpath = "{base}{path}".format(base=base_url, path=urlpath)
+            print(finalpath)
+            loan_data = {'companySlug': self.get_object().slug, 'loanSlug': loan_slug, 'loanKey': loan_key_value}
         elif str(loan_collection_type) == "Paystack Partial Debit":
             urlpath = ""
             finalpath = ""
@@ -1057,3 +1062,21 @@ class LoanRequestView(View):
         message.fail_silently = False
         message.send()
         return JsonResponse({'message': 'Successful'}, status=200)
+
+
+class LoanRequestViewAdmin(LoginRequiredMixin, ListView):
+    template_name = 'loans/loan-request-list-admin.html'
+
+    def get_queryset(self):
+        return LoanRequests.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(LoanRequestViewAdmin, self).get_context_data(**kwargs)
+        company_inst = Company.objects.get(slug=self.kwargs.get('slug'))
+        context['userCompany_qs'] = company_inst.user.company_set.all()
+        context['company'] = context['object'] = company_inst
+        return context
+
+    def render_to_response(self, context, **response_kwargs):
+        print(self.kwargs)
+        return super(LoanRequestViewAdmin, self).render_to_response(context, **response_kwargs)

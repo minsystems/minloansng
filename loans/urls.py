@@ -5,11 +5,12 @@ from loans.views import LoanCreateView, LoanListView, LoanDetailView, RemitaStan
     LoanRepaymentProcessor, LoanStatusChangeProcessor, RemitaTransRefUpdate, RRRandTransactionRef, \
     RRRandTransactionRefAmount, \
     RemitaDDMandateTransactionRecord, RemitaDDStatusReport, LoanPenaltyRepayment, DRFSalaryHistoryUpdate, \
-    LoanRequestView
+    LoanRequestView, LoanRequestViewAdmin
 
 urlpatterns = [
     path('<slug:slug>/create/', LoanCreateView.as_view(), name='loan-create'),
     path('<slug:slug>/list/', LoanListView.as_view(), name='loan-list'),
+    path('<slug:slug>/loan-request-list/', LoanRequestViewAdmin.as_view(), name='loan-list-admin'),
     path('<slug:slug>/<slug:loan_slug>/detail/', LoanDetailView.as_view(), name='loan-detail'),
     path('<slug:slug>/<slug:loan_slug>/<slug:loan_key>/collateral/', LoanCollateralDetail.as_view(), name='loan-detail-collateral'),
     path('<slug:slug>/<slug:loan_slug>/<slug:loan_key>/', RemitaStandingOrder.as_view(), name='loan-standing-order-create'),

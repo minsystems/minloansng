@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+
+{% block title %} {{ object }} {% endblock title %}
+
+
+{% block css_links %}
+
+  <!-- DataTables -->
+  <link rel="stylesheet" href="https://cdn.minloans.com.ng/min-dash/plugins/datatables-bs4/css/dataTables.bootstrap4.css">
+
+{% endblock css_links %}
+
+
+{% block content_header %}
+
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">{{ object.name }} - Loans Requests </h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{{ object.get_absolute_url }}">Home</a></li>
+              <li class="breadcrumb-item active">{{ object.name }}</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+{% endblock content_header %}
+
+
+{% block content %}
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        <div class="col-12">
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">All Loans</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+              <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                  <th>Borrower</th>
+                  <th>Request Amount</th>
+                  <th>Repayment Interval</th>
+                  <th>Status</th>
+                  <th>Timestamp</th>
+                  <th>Updated</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for obj in object_list %}
+                  <tr>
+                    <td><a href="/loans/{{ object.slug }}/{{ loan_obj.slug }}/detail/"> {{ obj.borrower }} </a></td>
+                    <td>₦ {{obj.amount}}</td>
+                    <td>{{obj.repayment_interval}}</td>
+                    <td>{{obj.request_status}}</td>
+                    <td>{{obj.timestamp}}</td>
+                    <td>{{obj.updated}}</td>
+                  </tr>
+                {% empty %}
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td><strong class="text-primary text-capitalize"><em>Empty Database Content..</em></strong></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                  <th>Borrower</th>
+                  <th>Request Amount</th>
+                  <th>Repayment Interval</th>
+                  <th>Status</th>
+                  <th>Timestamp</th>
+                  <th>Updated</th>
+                </tr>
+                </tfoot>
+              </table>
+            </div>
+            <!-- /.card-body -->
+          </div>
+          <!-- /.card -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </section>
+    <!-- /.content -->
+
+{% endblock content %}
+
+
+{% block js_links %}
+
+    <!-- jQuery -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables -->
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/datatables/jquery.dataTables.js"></script>
+    <script src="https://cdn.minloans.com.ng/min-dash/plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+    <!-- AdminLTE App -->
+    <script src="https://cdn.minloans.com.ng/min-dash/dist/js/adminlte.min.js"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="https://cdn.minloans.com.ng/min-dash/dist/js/demo.js"></script>
+    <!-- page script -->
+    <script>
+      $(function () {
+        $("#example1").DataTable();
+        $('#example2').DataTable({
+          "paging": true,
+          "lengthChange": false,
+          "searching": false,
+          "ordering": true,
+          "info": true,
+          "autoWidth": false,
+        });
+      });
+    </script>
+
+{% endblock js_links %}
