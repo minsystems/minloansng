@@ -62,7 +62,7 @@
                 <tbody>
                 {% for obj in object_list %}
                   <tr>
-                    <td><a href="/loans/{{ object.slug }}/{{ loan_obj.slug }}/detail/"> {{ obj.borrower }} </a></td>
+                    <td><a href="{{ obj.get_absolute_url }}"> {{ obj.borrower }} </a></td>
                     <td>₦ {{obj.amount}}</td>
                     <td>{{obj.repayment_interval}}</td>
                     <td>{{obj.request_status}}</td>

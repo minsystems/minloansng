@@ -95,7 +95,8 @@ class Penalty(models.Model):
     punishment_fee = models.CharField(max_length=300, blank=True, null=True)
     re_occuring = models.BooleanField(default=True)
     value_on_period = models.IntegerField(default=7, blank=True, null=True)
-    linked_loan = models.ForeignKey(to='loans.Loan', on_delete=models.CASCADE, blank=True, null=True, related_name='linked_loan')
+    linked_loan = models.ForeignKey(to='loans.Loan', on_delete=models.CASCADE, blank=True, null=True,
+                                    related_name='linked_loan')
     period = models.CharField(max_length=20, choices=INTEREST_PLAN, default="Per Month", blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
 
@@ -186,8 +187,8 @@ class LoanQuerySet(models.query.QuerySet):
 
     def search(self, query):
         lookups = (
-                Q(principal_amount__icontains=query) |Q(loan_key__icontains=query)
-            )
+                Q(principal_amount__icontains=query) | Q(loan_key__icontains=query)
+        )
         return self.filter(lookups).distinct()
 
 
@@ -349,14 +350,15 @@ class DRFSalaryPaymentDetails(models.Model):
 class MonoUserResponseCode(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
     mono_connect_code = models.CharField(max_length=300, blank=True, null=True)
-    
+
     class Meta:
         db_table = "Mono Connect User Code"
         verbose_name = "Mono User Code"
         verbose_name_plural = "Mono Users Code"
-    
+
     def __str__(self):
         return self.mono_connect_code
+
 
 REQUEST_STATUS = (
     ('Granted', 'Granted'),
@@ -369,10 +371,12 @@ REQUEST_STATUS = (
 class LoanRequests(models.Model):
     borrower = models.ForeignKey(to='borrowers.Borrower', on_delete=models.CASCADE, blank=True, null=True)
     amount = models.CharField(blank=True, null=True, max_length=300)
-    request_status = models.CharField(max_length=20, choices=REQUEST_STATUS, default="Still Processing", blank=True, null=True)
+    request_status = models.CharField(max_length=20, choices=REQUEST_STATUS, default="Still Processing", blank=True,
+                                      null=True)
     duration_figure = models.IntegerField(default=1)
     duration = models.CharField(max_length=20, choices=DURATION_PLAN, default="Months", blank=True, null=True)
-    repayment_interval = models.CharField(max_length=20, choices=REPAYMENT_PLAN, default="Monthly", blank=True, null=True)
+    repayment_interval = models.CharField(max_length=20, choices=REPAYMENT_PLAN, default="Monthly", blank=True,
+                                          null=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -384,7 +388,7 @@ class LoanRequests(models.Model):
         ordering = ("-timestamp",)
 
     def get_absolute_url(self):
-        return reverse('loans-url:loan-request', kwargs={'slug': self.slug})
+        return reverse('loans-url:loan-request-detail', kwargs={'slug': self.borrower.registered_to.slug, 'loan_request_slug': self.slug})
 
     def __str__(self):
         return self.borrower.get_short_name()
