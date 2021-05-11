@@ -1004,7 +1004,10 @@ class MonoConnectUserAuth(View):
         elif response_user_detailed_data.get('gender') == 'female':
             borrower_title = "Mrs"
 
-        bank_inst = BankCode.objects.get(code=response_user_data['account']['institution'].get('bankCode'))
+        try:
+            bank_inst = BankCode.objects.get(code=response_user_data['account']['institution'].get('bankCode'))
+        except Exception as e:
+            bank_inst = BankCode.objects.get(code="000")
         country_inst = Country(code='Nigeria')
         parsed_string_phone = response_user_detailed_data.get('phone')
         borrower_phone_number = reversePhoneParseConverter(
