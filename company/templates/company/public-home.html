@@ -349,6 +349,7 @@
             _xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token|safe }}");
             _xhr.onload = function () {
                 const serverResponse = _xhr.response;
+                console.log(serverResponse);
                 let data = JSON.parse(serverResponse);
                 localStorage.setItem("mono_connect", data.mono_connect);
                 setTimeout(function() {location.reload()}, 1000);
