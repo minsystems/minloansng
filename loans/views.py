@@ -970,6 +970,7 @@ class MonoConnectUserAuth(View):
         if not self.request.is_ajax():
             return JsonResponse({'message': 'Method Not Allowed'}, status=501)
         data = self.request.body.decode("utf-8")
+        print(data)
         payload: dict = json.loads(data)
         mono_connect_code = payload.get('code')
         print(payload, self.request, kwargs)
@@ -982,6 +983,7 @@ class MonoConnectUserAuth(View):
         headers = {"mono-sec-key": "live_sk_F4iAi3DbcMkPX5kYvRHa", "Content-Type": "application/json"}
         response = requests.request("POST", url, json=payload, headers=headers)
         response_data: dict = json.loads(response.content.decode('utf-8'))
+        print(response_data)
         MonoUserResponseCode.objects.get_or_create(company=company, mono_connect_code=response_data.get('id'))
 
         # fetch user information from

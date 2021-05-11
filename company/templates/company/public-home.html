@@ -341,6 +341,7 @@
              */
 
             const payload = JSON.stringify(response);
+            console.log(payload);
             const _xhr = new XMLHttpRequest();
             _xhr.open('POST', "{% url 'loan-borrower-auth' company.slug %}");
             _xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");
