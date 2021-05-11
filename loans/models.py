@@ -347,6 +347,30 @@ class DRFSalaryPaymentDetails(models.Model):
         return str(self.drf_salary_history.borrower.get_borrowers_full_name())
 
 
+class DRFDisbursement(models.Model):
+    loan = models.ForeignKey(Loan, on_delete=models.CASCADE, blank=True, null=True)
+    has_data = models.BooleanField(default=False)
+    status = models.BooleanField(default=False)
+    response_id = models.CharField(blank=True, null=True, max_length=299)
+    request_date = models.CharField(blank=True, null=True, max_length=299)
+    response_date = models.CharField(blank=True, null=True, max_length=299)
+    response_code = models.CharField(blank=True, null=True, max_length=299)
+    customer_id = models.CharField(max_length=200, blank=True, null=True)
+    authorisation_code = models.CharField(max_length=200, blank=True, null=True)
+    account_number = models.CharField(max_length=200, blank=True, null=True)
+    bank = models.ForeignKey(BankCode, on_delete=models.CASCADE, blank=True, null=True)
+    amount = models.CharField(max_length=200, blank=True, null=True)
+    mandate_reference = models.CharField(max_length=200, blank=True, null=True)
+
+    class Meta:
+        db_table = "DRF Disbursement"
+        verbose_name = "DRF Disbursement"
+        verbose_name_plural = "DRF Disbursements"
+
+    def __str__(self):
+        return str(self.response_id)
+
+
 class MonoUserResponseCode(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, blank=True, null=True)
     mono_connect_code = models.CharField(max_length=300, blank=True, null=True)

@@ -234,3 +234,7 @@ def phoneParseConverter(phone: str, ) -> str:
 
 def reversePhoneParseConverter(phone: str, ) -> str:
     return '+234' + phone.strip('0')
+
+
+def phoneParseNew(phone: str) -> str:
+    return '0' + phone[4:]

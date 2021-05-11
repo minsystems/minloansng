@@ -36,7 +36,7 @@ from minloansng.cloudinary_settings import cloudinary_upload_preset, cloudinary_
 from minloansng.minmarket.packages.remita import remita_dd_url, statuscode_success
 from minloansng.mixins import GetObjectMixin
 from minloansng.utils import random_string_generator, secondWordExtract, digitExtract, addDays, get_fileType, \
-    armotizationLoanCalculator, removeNCharFromString, phoneParseConverter, reversePhoneParseConverter
+    armotizationLoanCalculator, removeNCharFromString, phoneParseConverter, reversePhoneParseConverter, phoneParseNew
 
 DESCRIPTION = "If a loan payment is due " \
               "and is not paid within the specified time constraints, " \
@@ -291,7 +291,7 @@ class LoanDetailView(LoginRequiredMixin, DetailView):
             context['company_drf_creds'] = company_inst.user.thirdpartycreds
             context['loan_collection_type'] = 2
             context['loanActions'] = 'DRF'
-            context['parsed_phone'] = phoneParseConverter(str(self.get_object().borrower.phone))
+            context['parsed_phone'] = phoneParseNew(str(self.get_object().borrower.phone))
             context['installments'] = digitExtract(self.get_object().number_repayments)
             context['salary_history_metadata'] = drf_sal
             sal_history_data = DRFSalaryPaymentDetails.objects.get(drf_salary_history=drf_sal).payment_details
@@ -953,6 +953,12 @@ class DRFSalaryHistoryUpdate(View):
             )
             return JsonResponse({'message': 'Transaction Has Been Updated!'}, status=201)
         return JsonResponse({'message': 'Method Not Allowed'}, status=501)
+
+
+class DRFDisbursementProcessor(View):
+    def post(self, request, **kwargs):
+        print(self.request.POST)
+        return JsonResponse({'message': "disbursement trigger successful!"}, status=status.HTTP_201_CREATED)
 
 
 class MonoConnectUserAuth(View):

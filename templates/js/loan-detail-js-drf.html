@@ -106,6 +106,8 @@
             let loanAmount = $("#amount-drfdebit").val();
             let loanCollectionAmount = $("#amount-drfdebit-c").val();
             let loanTotalCollectionAmount = $("#amount-drfdebit-tc").val();
+            let loanDateOfDisburse = $("#amount-drfdebit-disburse").val();
+            let loanDateForCollection = $("#amount-drfdebit-collection").val();
 
             const endpoint = "{{ base_url }}/remita/exapp/api/v1/send/api/loansvc/data/api/v2/payday/post/loan";
             const method = "POST";
@@ -113,18 +115,19 @@
                 "customerId":""+{{ salary_history_metadata.customer_id }},
                 "authorisationCode": ""+authorisationCode,
                 "authorisationChannel":"MOBILE",
-                "phoneNumber":{{ parsed_phone }},
-                "accountNumber":""+{{ salary_history_metadata.account_number }},
+                "phoneNumber":"{{ parsed_phone }}",
+                "accountNumber":"{{ salary_history_metadata.account_number }}",
                 "currency":"NGN",
                 "loanAmount":parseInt(loanAmount),
                 "collectionAmount":parseInt(loanCollectionAmount),
-                "dateOfDisbursement":"26-08-2019 11:49:25+0000",
-                "dateOfCollection":"28-09-2019 11:49:25+0000",
+                "dateOfDisbursement":loanDateOfDisburse.toString() + " 11:49:25+0000",
+                "dateOfCollection":""+loanDateForCollection.toString() + " 11:49:25+0000",
                 "totalCollectionAmount": parseInt(loanTotalCollectionAmount),
                 "numberOfRepayments":2,
-                "bankCode":"214"
+                "bankCode":"{{ loan_obj.borrower.bank.code }}"
             };
             payload = JSON.stringify(payload);
+            console.log(payload);
             const xhr = new XMLHttpRequest();
             xhr.open(method, endpoint);
             xhr.setRequestHeader("Content-Type", "application/json");
@@ -150,15 +153,15 @@
                         class: 'bg-success',
                         autohide: true,
                         delay: 10000,
-                        title: 'Record Found!',
+                        title: 'Trigger Successful',
                         subtitle: 'Success',
-                        body: 'Salary History Populated Successfully!'
+                        body: 'Disbursement Trigger Successfully Activated!'
                     });
 
                     // Send data to server
                     let new_payload = JSON.stringify(serverResponse);
                     const _xhr = new XMLHttpRequest();
-                    _xhr.open('POST', "{% url 'loans-url:loan-mandate-update-salary-history' object.slug loan_obj.slug loan_obj.loan_key %}");
+                    _xhr.open('POST', "{% url 'loans-url:drf-disburse-processor' %}");
                     _xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");
                     _xhr.setRequestHeader("Content-Type", "application/json");
                     _xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
@@ -171,8 +174,8 @@
                             autohide: true,
                             delay: 10000,
                             title: 'Successful!',
-                            subtitle: 'Transaction Reference',
-                            body: 'Transaction Reference Has Been Updated Successfully!'
+                            subtitle: 'System Notified!',
+                            body: serverResponse.message.toString()
                         });
 
                         setTimeout(function() {
