@@ -407,11 +407,6 @@ class Dashboard(View):
                     loan_rate_description = "Our loan interest is 7% on Armotization Loans and With Great Benefits"
                     rate_fig = 7
 
-                    company_borrowers = company_obj.borrower_set.all()
-                    mono_code_list = []
-                    for borrowers_mono_code in company_borrowers:
-                        mono_code_list.append(borrowers_mono_code.mono_code)
-
                     context = {
                         "company": company_obj,
                         "company_description": company_description,
@@ -423,7 +418,6 @@ class Dashboard(View):
                         "feature_description_3": feature_description_3,
                         "loan_rate_description": loan_rate_description,
                         "rate_fig": rate_fig,
-                        "mono_code_list": mono_code_list,
                     }
                     return render(request, "company/public-home.html", context)
                 elif company_obj.user.plan == "FREEMIUM":

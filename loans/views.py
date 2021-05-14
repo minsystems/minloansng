@@ -24,7 +24,7 @@ from rest_framework import status
 
 from accounts.models import Profile, User
 from banks.models import BankCode
-from borrowers.models import Borrower
+from borrowers.models import Borrower, BorrowerFromMono
 from company.models import Company, RemitaCredentials, RemitaMandateActivationData, RemitaMandateTransactionRecord, \
     RemitaPaymentDetails, RemitaMandateStatusReport
 from loans.forms import CollateralForm, LoanFileForm
@@ -1001,55 +1001,67 @@ class MonoConnectUserAuth(View):
         print(response_user_detailed_data)
 
         borrower_title = 'Mr'
-        if response_user_detailed_data.get('gender') == 'male':
+        if response_user_detailed_data['gender'] == 'male':
             borrower_title = "Mr"
-        elif response_user_detailed_data.get('gender') == 'female':
+        elif response_user_detailed_data['gender'] == 'female':
             borrower_title = "Mrs"
 
         try:
             bank_inst = BankCode.objects.get(code=response_user_data['account']['institution'].get('bankCode'))
         except Exception as e:
             bank_inst = BankCode.objects.get(code="000")
-        country_inst = Country(code='Nigeria')
+
         parsed_string_phone = response_user_detailed_data.get('phone')
         borrower_phone_number = reversePhoneParseConverter(
-            parsed_string_phone if parsed_string_phone is not None else "Not Available")
+            parsed_string_phone if parsed_string_phone is not None else "N/A")
+
+        first_name = str(response_user_data['account'].get('name')).split()[0]
+        last_name = str(response_user_data['account'].get('name')).split()[-1]
+        email = str(response_user_detailed_data['email'])
+        bvn = str(response_user_detailed_data['bvn']),
+        marital_status = str(response_user_detailed_data['maritalStatus'])
+        address_line1 = str(response_user_detailed_data['addressLine1'])
+        address_line2 = str(response_user_detailed_data['addressLine2'])
+        gender = str(response_user_detailed_data['gender'])
+        bank = response_user_data['account']['institution'].get('name')
+        account_number = response_user_data['account'].get('accountNumber')
+        account_type = response_user_data['account'].get('type')
+        currency = response_user_data['account'].get('currency')
+        balance_in_kobo = response_user_data['account'].get('balance')
+
+        print(bank_inst, borrower_phone_number, first_name, last_name, bvn[0], str(bvn[0]))
         # create borrower for the company
-        Borrower.objects.get_or_create(
-            registered_to=company,
-            mono_code=mono_connect_code if mono_connect_code is not None else "Not Available",
-            first_name=response_user_data['account'].get('name').split()[0],
-            last_name=response_user_data['account'].get('name').split()[1],
-            gender=response_user_detailed_data.get('gender') if response_user_detailed_data.get(
-                'gender') is not None else "Male",
-            address=response_user_detailed_data.get('addressLine1') if response_user_detailed_data.get(
-                'addressLine1') is not None else "Not Available",
-            lga=response_user_detailed_data.get('addressLine2') if response_user_detailed_data.get(
-                'addressLine2') is not None else "Not Available",
-            country=country_inst,
-            title=borrower_title,
-            phone=borrower_phone_number,
-            land_line=borrower_phone_number,
-            email=response_user_detailed_data.get('email') if response_user_detailed_data.get(
-                'email') is not None else "Not Available",
-            bank=bank_inst,
-            account_number=response_user_data['account'].get('accountNumber'),
-            account_balance_on_commercial_bank_account=response_user_data['account'].get('balance'),
-            bvn=response_user_detailed_data.get('bvn'),
-            slug=slugify("{firstName}-{lastName}-{company}-{primaryKey}".format(
-                firstName=response_user_data['account'].get('name').split()[0],
-                lastName=response_user_data['account'].get('name').split()[1],
-                company=company, primaryKey=random_string_generator(4))))
-        return JsonResponse({'message': 'User Authentication Successful!', "mono_connect": payload.get('code')},
+        try:
+            thisBorrower = BorrowerFromMono.objects.get(registered_to=company, bvn=str(bvn[0]))
+        except BorrowerFromMono.DoesNotExist:
+            thisBorrower = BorrowerFromMono.objects.create(
+                registered_to=company,
+                mono_id=mono_connect_code,
+                fullName=str(response_user_data['account'].get('name')),
+                email=email,
+                gender=gender,
+                phone=borrower_phone_number,
+                bvn=bvn[0],
+                marital_status=marital_status,
+                home_address=address_line1,
+                office_address=address_line2,
+                bank=bank,
+                account_number=account_number,
+                account_type=account_type,
+                currency=currency,
+                balance_in_kobo=balance_in_kobo
+            )
+        return JsonResponse({'message': 'User Authentication Successful!', "mono_connect": payload.get('code'),
+                             'borrower': thisBorrower.bvn},
                             status=201)
 
 
 class LoanRequestView(View):
     def post(self, request, *args, **kwargs):
         print(self.request.POST)
-        thisBorrower = Borrower.objects.get(mono_code=self.request.POST.get('borrower'))
+        thisBorrower = BorrowerFromMono.objects.get(mono_id=self.request.POST.get('borrower'))
         LoanRequests.objects.create(
-            borrower=thisBorrower,
+            borrower_mono_code=thisBorrower,
             amount=self.request.POST.get('amount'),
             request_status='Still Processing',
             duration_figure=int(self.request.POST.get('durationFigure')),

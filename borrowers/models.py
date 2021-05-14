@@ -40,7 +40,7 @@ class Borrower(models.Model):
     address = models.CharField(max_length=500, blank=True, null=True, help_text='Block 32, Arizona Street')
     lga = models.CharField(max_length=500, blank=True, null=True)
     state = models.CharField(max_length=500, choices=STATE, blank=True, null=True, help_text='Province/State')
-    country = CountryField(blank=True, null=True, max_length=500)
+    country = CountryField(blank=True, null=True, default='Nigeria', max_length=500)
     title = models.CharField(blank=True, null=True, max_length=500)
     phone = PhoneNumberField(blank=True, null=True)
     land_line = PhoneNumberField(blank=True, null=True)
@@ -49,7 +49,7 @@ class Borrower(models.Model):
     email = models.EmailField(blank=True, null=True)
     unique_identifier = models.CharField(blank=True, null=True, max_length=500,
                                          help_text='Social Security Number, License Or Registration ID')
-    bank = models.ForeignKey(BankCode, on_delete=models.CASCADE)
+    bank = models.ForeignKey(BankCode, on_delete=models.CASCADE, null=True, blank=True)
     slug = models.SlugField(max_length=500, unique=True, blank=True, null=True)
     account_number = models.CharField(blank=True, null=True, max_length=500)
     account_balance_on_commercial_bank_account = models.CharField(blank=True, null=True, max_length=500)
@@ -166,3 +166,24 @@ class BorrowerGroup(models.Model):
 
     class Meta:
         unique_together = ('slug', 'name')
+
+
+class BorrowerFromMono(models.Model):
+    registered_to = models.ForeignKey(to='company.Company', on_delete=models.CASCADE, blank=True, null=True)
+    fullName = models.CharField(max_length=300, blank=True, null=True)
+    email = models.CharField(max_length=300, blank=True, null=True)
+    phone = models.CharField(max_length=300, blank=True, null=True)
+    gender = models.CharField(max_length=300, blank=True, null=True)
+    bvn = models.CharField(max_length=300, blank=True, null=True)
+    marital_status = models.CharField(max_length=300, blank=True, null=True)
+    home_address = models.CharField(max_length=300, blank=True, null=True)
+    office_address = models.CharField(max_length=300, blank=True, null=True)
+    mono_id = models.CharField(max_length=300, blank=True, null=True)
+    bank = models.CharField(max_length=300, blank=True, null=True)
+    account_number = models.CharField(max_length=300, blank=True, null=True)
+    account_type = models.CharField(max_length=300, blank=True, null=True)
+    currency = models.CharField(max_length=300, blank=True, null=True)
+    balance_in_kobo = models.CharField(max_length=300, blank=True, null=True)
+
+    def __str__(self):
+        return self.fullName

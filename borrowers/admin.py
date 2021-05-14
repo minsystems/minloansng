@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from borrowers.models import Borrower, BorrowerGroup, BorrowerBankAccount
+from borrowers.models import Borrower, BorrowerGroup, BorrowerBankAccount, BorrowerFromMono
 
 
 @admin.register(Borrower)
@@ -44,3 +44,16 @@ class BorrowerBankAccountAdmin(admin.ModelAdmin):
 
     class Meta:
         model = BorrowerBankAccount
+
+
+@admin.register(BorrowerFromMono)
+class BorrowersFromMonoAdmin(admin.ModelAdmin):
+    list_display = (
+        'registered_to', 'fullName', 'email', 'gender', 'phone', 'bvn', 'mono_id', 'account_number')
+    list_display_links = ('registered_to', 'fullName', 'account_number')
+    list_editable = ('phone', 'mono_id')
+    search_fields = ('fullName', 'account_number')
+    list_filter = ('bvn', 'mono_id', 'phone')
+
+    class Meta:
+        model = BorrowerFromMono

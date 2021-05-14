@@ -393,7 +393,7 @@ REQUEST_STATUS = (
 
 
 class LoanRequests(models.Model):
-    borrower = models.ForeignKey(to='borrowers.Borrower', on_delete=models.CASCADE, blank=True, null=True)
+    borrower_mono_code = models.ForeignKey(to='borrowers.BorrowerFromMono', on_delete=models.CASCADE, blank=True, null=True)
     amount = models.CharField(blank=True, null=True, max_length=300)
     request_status = models.CharField(max_length=20, choices=REQUEST_STATUS, default="Still Processing", blank=True,
                                       null=True)
@@ -412,7 +412,7 @@ class LoanRequests(models.Model):
         ordering = ("-timestamp",)
 
     def get_absolute_url(self):
-        return reverse('loans-url:loan-request-detail', kwargs={'slug': self.borrower.registered_to.slug, 'loan_request_slug': self.slug})
+        return reverse('loans-url:loan-request-detail', kwargs={'slug': self.borrower_mono_code.registered_to.slug, 'loan_request_slug': self.slug})
 
     def __str__(self):
-        return self.borrower.get_short_name()
+        return str(self.borrower_mono_code)

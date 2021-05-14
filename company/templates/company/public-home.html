@@ -418,40 +418,33 @@
             appliedLoanAmount = parseInt(appliedLoanAmount);
 
             let userMonoCode = localStorage.getItem("mono_connect");
-            let companyMonoCodes = {{ mono_code_list | safe }};
+            {% include 'csrf_ajax/csrf_ajax_token.js' %}
+              const loanFormData = {
+                "borrower":userMonoCode,
+                "amount":''+appliedLoanAmount,
+                "durationFigure":1,
+                "durationPeriod":'Months',
+                "repaymentInterval":"Monthly"
+              };
+              console.log(loanFormData);
+              $.ajax({
+                method: "POST",
+                url: "{% url 'loans-url:loan-request-processor' %}",
+                data: loanFormData,
+                contentType: 'application/x-www-form-urlencoded',
 
-            $.each(companyMonoCodes , function(index, val) {
-              console.log(index, val);
-              if (userMonoCode.toString() === val.toString()){
-                  {% include 'csrf_ajax/csrf_ajax_token.js' %}
-                  const loanFormData = {
-                    "borrower":userMonoCode,
-                    "amount":''+appliedLoanAmount,
-                    "durationFigure":1,
-                    "durationPeriod":'Months',
-                    "repaymentInterval":"Monthly"
-                  };
-                  console.log(loanFormData);
-                  $.ajax({
-                    method: "POST",
-                    url: "{% url 'loans-url:loan-request-processor' %}",
-                    data: loanFormData,
-                    contentType: 'application/x-www-form-urlencoded',
-
-                    success: function (data) {
-                        loanApplyForm[0].reset();
-                        console.log(data);
-                        alert("Loan Application Successful!, We will contact you shortly!");
-                        setTimeout(function () {
-                            window.location.replace('/dashboard/{{company.slug}}/');
-                        }, 3000)
-                    }, error: function (error) {
-                        loanApplyForm[0].reset();
-                        alert("Error")
-                    }
-                  })
-              }
-            });
+                success: function (data) {
+                    loanApplyForm[0].reset();
+                    console.log(data);
+                    alert("Loan Request Application Successful!, We will contact you shortly!");
+                    setTimeout(function () {
+                        window.location.replace('/dashboard/{{company.slug}}/');
+                    }, 3000)
+                }, error: function (error) {
+                    loanApplyForm[0].reset();
+                    alert("Error")
+                }
+              })
 
           });
       }
