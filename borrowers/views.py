@@ -17,7 +17,7 @@ from django_countries.fields import Country
 from accounts.models import Profile
 from banks.models import BankCode
 from borrowers.forms import BorrowerUpdateForm, BorrowerBankAccountForm
-from borrowers.models import Borrower, BorrowerGroup, BorrowerBankAccount
+from borrowers.models import Borrower, BorrowerGroup, BorrowerBankAccount, BorrowerFromMono
 from company.models import Company, BankAccountType
 from minloansng.mixins import GetObjectMixin
 from minloansng.utils import random_string_generator
@@ -205,7 +205,7 @@ class BorrowerFromMonoListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         company = Company.objects.get(slug=self.kwargs.get('slug'))
-        return company.borrower_set.all()
+        return BorrowerFromMono.objects.filter(registered_to=company)
 
     def get_context_data(self, *args, **kwargs):
         context = super(BorrowerFromMonoListView, self).get_context_data(*args, **kwargs)
