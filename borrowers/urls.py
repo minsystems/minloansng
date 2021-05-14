@@ -2,12 +2,13 @@ from django.urls import path
 
 from borrowers.views import (
     BorrowerCreateView, BorrowerGroupCreateView, BorrowerUpdateView, BorrowerGroupsListView,
-    BorrowerListView,BorrowerDetailView, AssignBankAccountToBorrower, CustomerAccountList
-)
+    BorrowerListView, BorrowerDetailView, AssignBankAccountToBorrower, CustomerAccountList,
+    BorrowerFromMonoListView)
 
 urlpatterns = [
     path('<slug:slug>/create/', BorrowerCreateView.as_view(), name='borrower-create'),
     path('<slug:slug>/list/', BorrowerListView.as_view(), name='borrower-list'),
+    path('<slug:slug>/borrower-from-mono/list/', BorrowerFromMonoListView.as_view(), name='borrower-from-mono-list'),
     path('<slug:slug>/<slug:slug_borrower>/detail-update/', BorrowerUpdateView.as_view(), name='borrower-update'),
     path('<slug:slug>/<slug:slug_borrower>/detail/', BorrowerDetailView.as_view(), name='borrower-detail'),
 

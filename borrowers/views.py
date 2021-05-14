@@ -200,6 +200,37 @@ class BorrowerListView(LoginRequiredMixin, ListView):
         return super(BorrowerListView, self).render_to_response(context, **response_kwargs)
 
 
+class BorrowerFromMonoListView(LoginRequiredMixin, ListView):
+    template_name = 'borrowers/borrower-from-mono-list.html'
+
+    def get_queryset(self):
+        company = Company.objects.get(slug=self.kwargs.get('slug'))
+        return company.borrower_set.all()
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(BorrowerFromMonoListView, self).get_context_data(*args, **kwargs)
+        company = Company.objects.get(slug=self.kwargs.get('slug'))
+        company_qs = company.user.user.profile.company_set.all()
+        context.update({
+            "object": company,
+            "company": company,
+            "company_owner": company.user.user,
+            "userCompany_qs": company_qs
+        })
+        return context
+
+    def render_to_response(self, context, **response_kwargs):
+        if context:
+            user_profile_obj = Profile.objects.get(user=self.request.user)
+            if timezone.now() > user_profile_obj.trial_days:
+                # return redirect to payment page
+                messages.error(self.request,
+                               "Account Expired!, Your Account Has Been Expired You Would Be "
+                               "Redirected To The Payment Portal Upgrade Your Payment")
+                return HttpResponseRedirect(reverse("mincore-url:account-upgrade"))
+        return super(BorrowerFromMonoListView, self).render_to_response(context, **response_kwargs)
+
+
 class BorrowerDetailView(LoginRequiredMixin, DetailView):
     template_name = 'borrowers/borrower-detail.html'
     model = Company

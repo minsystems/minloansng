@@ -51,7 +51,7 @@
               <table id="example1" class="table table-bordered table-striped">
                 <thead>
                 <tr>
-                  <th>Borrower</th>
+                  <th>Borrower (Mono)</th>
                   <th>Request Amount</th>
                   <th>Repayment Interval</th>
                   <th>Status</th>
@@ -62,7 +62,7 @@
                 <tbody>
                 {% for obj in object_list %}
                   <tr>
-                    <td><a href="{{ obj.get_absolute_url }}"> {{ obj.borrower }} </a></td>
+                    <td><a href="{{ obj.get_absolute_url }}"> {{ obj.borrower_mono_code }} </a></td>
                     <td>₦ {{obj.amount}}</td>
                     <td>{{obj.repayment_interval}}</td>
                     <td>{{obj.request_status}}</td>
