@@ -187,3 +187,11 @@ class BorrowerFromMono(models.Model):
 
     def __str__(self):
         return self.fullName
+
+    def get_balance(self):
+        if self.balance_in_kobo:
+            return float(self.balance_in_kobo) / 100
+        return float("0.00")
+
+    def get_absolute_url(self):
+        return reverse("borrowers-url:borrower-from-mono-detail",kwargs={"slug": self.registered_to.slug, "slug_borrower_from_mono": self.account_number})

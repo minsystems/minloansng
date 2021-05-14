@@ -62,14 +62,12 @@
                     {% for borrower_fm in object_list %}
                         <tr>
                           <th>
-                              <a href="{{ borrower_fm.get_absolute_url }}"> {{ borrower_fm }} </a>
+                              <a href="#"> {{ borrower_fm }} </a>
                           </th>
                           <th>{{ borrower_fm.mono_id }}</th>
-                          <th>{{ borrower_fm.account_balance }}</th>
+                          <th>{{ borrower_fm.get_balance }}</th>
                           <th>{{ borrower_fm.bank }}</th>
-                          <th>
-                              {{ borrower.bvn }}
-                          </th>
+                          <th>{{ borrower_fm.bvn }}</th>
                         </tr>
                     {% empty %}
                         No Mono Authenticated borrower registered in this organization
